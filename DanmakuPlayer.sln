@@ -3,7 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanmakuPlayer", "DanmakuPlayer\DanmakuPlayer.csproj", "{71AC1DF6-5AA9-4260-B20F-EF767B98F802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanmakuPlayer", "DanmakuPlayer\DanmakuPlayer.csproj", "{71AC1DF6-5AA9-4260-B20F-EF767B98F802}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{E0D99294-033A-4579-A7A2-3465759D6951}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
