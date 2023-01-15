@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+        <RootNamespace>DanmakuPlayer</RootNamespace>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Platforms>x86;x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+        <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+        <UseWinUI>true</UseWinUI>
+        <Nullable>enable</Nullable>
+        <LangVersion>Preview</LangVersion>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+      <None Remove="Controls\BackgroundPanel.xaml" />
+      <None Remove="Controls\InputDialog.xaml" />
+      <None Remove="Controls\SettingDialog.xaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\StoreLogo.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.8" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+        <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+        <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+        <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.11" />
+        <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.11" />
+        <PackageReference Include="Vortice.Direct3D12" Version="2.2.0" />
+        <PackageReference Include="Vortice.DXGI" Version="2.2.0" />
+        <PackageReference Include="Vortice.WinUI" Version="2.2.0" />
+        <PackageReference Include="WinUI3Utilities" Version="1.0.6.2" />
+        <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
+        <PackageReference Include="protobuf-net" Version="3.1.26" />
+        <PackageReference Include="protobuf-net.Grpc" Version="1.0.179" />
+        <Manifest Include="$(ApplicationManifest)" />
+    </ItemGroup>
+
+    <!-- 
+    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+    Tools extension to be activated for this project even if the Windows App SDK Nuget
+    package has not yet been restored.
+  -->
+    <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <ProjectCapability Include="Msix" />
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Controls\InputDialog.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Controls\SettingDialog.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Controls\BackgroundPanel.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+    </ItemGroup>
+
+    <!-- 
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if 
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+    <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+    </PropertyGroup>
+</Project>

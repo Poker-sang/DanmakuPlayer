@@ -1,0 +1,14 @@
+<Window
+    x:Class="DanmakuPlayer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DanmakuPlayer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DanmakuPlayer"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <controls:BackgroundPanel
+        x:Name="RootPanel"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch" />
+</Window>
