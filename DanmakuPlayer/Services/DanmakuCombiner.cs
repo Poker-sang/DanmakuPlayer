@@ -120,6 +120,10 @@ public static class DanmakuCombiner
             foreach (var danmaku in pool.Where(danmaku => danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom))
             {
                 var text = danmaku.Text;
+
+                if (text.Length == 0)
+                    continue;
+                
                 for (var i = 0; i < FullAngleChars.Length; ++i)
                     text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
 
