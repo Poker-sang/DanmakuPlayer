@@ -23,7 +23,7 @@
                 PlaceholderText="输入视频的网址" />
             <InfoBar x:Name="IbMessage" uiControls:DockPanel.Dock="Top" />
             <ListView
-                x:Name="DgPage"
+                x:Name="LvPage"
                 DoubleTapped="PageDoubleTapped"
                 SelectionChanged="SelectionChanged"
                 SelectionMode="Single">

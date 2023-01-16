@@ -36,8 +36,8 @@
         Grid.RowSpan="3"
         Grid.Column="0"
         Grid.ColumnSpan="3"
-        CreateResources="DanmakuCanvas_OnCreateResources"
-        Draw="DanmakuCanvasOnDraw"
+        CreateResources="DanmakuCanvasCreateResources"
+        Draw="DanmakuCanvasDraw"
         Opacity="{x:Bind _vm.AppConfig.DanmakuOpacity, Mode=OneWay}" />
     <TextBlock
         x:Name="TbBanner"

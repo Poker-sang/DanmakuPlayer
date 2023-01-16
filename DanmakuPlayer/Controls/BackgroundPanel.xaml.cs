@@ -24,6 +24,7 @@ using Microsoft.UI.Windowing;
 using ProtoBuf;
 using WinUI3Utilities;
 using DanmakuPlayer.Enums;
+using DragMoveHelper = WinUI3Utilities.DragMoveHelper;
 
 namespace DanmakuPlayer.Controls;
 public sealed partial class BackgroundPanel : SwapChainPanel
@@ -35,7 +36,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         AppContext.BackgroundPanel = this;
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
-        
+        DragMoveHelper.RootPanel = this;
+
         AppContext.Timer.Tick += (sender, _) =>
         {
             if (_vm.Time < _vm.TotalTime)
@@ -54,8 +56,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         };
         // AppContext.Timer.Start();
 
-
-        this.SetDragMove(CurrentContext.AppWindow, CurrentContext.OverlappedPresenter);
     }
 
     #region 操作
@@ -213,7 +213,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     private void Pause()
     {
         _vm.IsPlaying = false;
-        DanmakuHelper.RenderType = RenderType.None;
+        DanmakuHelper.RenderType = RenderType.RenderOnce;
         AppContext.Timer.Stop();
     }
 
@@ -335,8 +335,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         else
             Resume();
     }
+    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new CreatorProvider(sender, _vm.AppConfig);
 
-    private void DanmakuCanvasOnDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
+    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
 
     private void TimeMouseButtonDown(object sender, PointerRoutedEventArgs e) => TryPause();
 
@@ -361,6 +362,4 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     }
 
     #endregion
-
-    private void DanmakuCanvas_OnCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new CreatorProvider(sender, _vm.AppConfig);
 }

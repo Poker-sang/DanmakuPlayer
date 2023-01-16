@@ -43,7 +43,7 @@
         <PackageReference Include="Vortice.Direct3D12" Version="2.2.0" />
         <PackageReference Include="Vortice.DXGI" Version="2.2.0" />
         <PackageReference Include="Vortice.WinUI" Version="2.2.0" />
-        <PackageReference Include="WinUI3Utilities" Version="1.0.6.2" />
+        <PackageReference Include="WinUI3Utilities" Version="1.0.6.3" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
         <PackageReference Include="protobuf-net" Version="3.1.26" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.0.179" />
@@ -62,13 +62,9 @@
       <Page Update="Controls\InputDialog.xaml">
         <Generator>MSBuild:Compile</Generator>
       </Page>
-    </ItemGroup>
-    <ItemGroup>
       <Page Update="Controls\SettingDialog.xaml">
         <Generator>MSBuild:Compile</Generator>
       </Page>
-    </ItemGroup>
-    <ItemGroup>
       <Page Update="Controls\BackgroundPanel.xaml">
         <Generator>MSBuild:Compile</Generator>
       </Page>

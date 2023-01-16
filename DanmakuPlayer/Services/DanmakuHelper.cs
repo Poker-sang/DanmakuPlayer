@@ -75,15 +75,15 @@ public static class DanmakuHelper
         return _renderCount;
     }
 
-    public static async Task ResetFormat(CanvasControl canvas)
+    public static async Task ResetProvider(CanvasControl canvas)
     {
-        RenderType = RenderType.ReloadFormat | RenderType.RenderInit;
+        RenderType = RenderType.ReloadProvider | RenderType.RenderInit;
         await WaitForRender(canvas);
     }
 
-    public static async Task ResetProvider(CanvasControl canvas)
+    public static async Task ResetFormat(CanvasControl canvas)
     {
-        RenderType = RenderType.ReloadProvider | RenderType.ReloadFormat | RenderType.RenderInit;
+        RenderType = RenderType.ReloadFormat | RenderType.ReloadProvider | RenderType.RenderInit;
         await WaitForRender(canvas);
     }
 

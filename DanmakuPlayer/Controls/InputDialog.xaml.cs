@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DanmakuPlayer.Models;
@@ -21,11 +22,17 @@ public sealed partial class InputDialog : UserControl
         _ = await ((ContentDialog)Content).ShowAsync();
         return _cId;
     }
+
+    #region 操作
+
+    private static void ShowSecondButton(ContentDialog sender) => sender.SecondaryButtonText = "选择此视频";
+
     private static void HideSecondButton(ContentDialog sender)
     {
         sender.SecondaryButtonText = null;
         sender.IsSecondaryButtonEnabled = false;
     }
+    
     private void SelectConfirm(ListView sender)
     {
         var index = sender.SelectedIndex;
@@ -33,7 +40,9 @@ public sealed partial class InputDialog : UserControl
         ((ContentDialog)Content).Hide();
     }
 
-    private void CancelClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => sender.Hide();
+    #endregion
+
+    #region 事件处理
 
     private async void InquireClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
@@ -94,7 +103,7 @@ public sealed partial class InputDialog : UserControl
                 sender.Hide();
                 break;
             case > 1:
-                DgPage.ItemsSource = ItemsSource;
+                LvPage.ItemsSource = ItemsSource;
                 IbMessage.Message = "请选择一个视频：";
                 IbMessage.Severity = InfoBarSeverity.Informational;
                 IbMessage.IsOpen = true;
@@ -105,9 +114,11 @@ public sealed partial class InputDialog : UserControl
 
     private void PageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e) => SelectConfirm((ListView)sender);
 
-    private static void ShowSecondButton(ContentDialog sender) => sender.SecondaryButtonText = "选择此视频";
-
-    private void SelectClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => SelectConfirm(DgPage);
+    private void SelectClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => SelectConfirm(LvPage);
 
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) => ((ContentDialog)Content).IsSecondaryButtonEnabled = true;
+
+    private void CancelClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => sender.Hide();
+
+    #endregion
 }

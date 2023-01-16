@@ -6,17 +6,18 @@
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:local="using:DanmakuPlayer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rs="using:DanmakuPlayer.Resources"
     mc:Ignorable="d">
     <ContentDialog CloseButtonClick="CloseClick" CloseButtonText="关闭">
-        <ScrollViewer>
-            <StackPanel>
+        <ScrollViewer HorizontalScrollBarVisibility="Visible">
+            <StackPanel MinWidth="490">
                 <labs:SettingsExpander Description="应用的主题色" Header="主题">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE771;" />
                     </labs:SettingsExpander.HeaderIcon>
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Vertical">
-                            <RadioButtons SelectedIndex="{x:Bind _vm.Theme}">
+                            <RadioButtons SelectedIndex="{x:Bind _vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
                                 <RadioButton Content="跟随系统">
                                     <RadioButton.Tag>
                                         <x:Int32>0</x:Int32>
@@ -36,6 +37,162 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
+                <labs:SettingsCard Description="每次快进的秒数" Header="快进">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEB9D;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <Slider
+                        Maximum="20"
+                        Minimum="1"
+                        StepFrequency="1"
+                        TickFrequency="1"
+                        TickPlacement="Outside"
+                        Value="{x:Bind _vm.PlayFastForward, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard
+                    Description="是否按倍速播放"
+                    Header="播放倍速"
+                    HeaderIcon="Play">
+                    <Slider
+                        Maximum="2"
+                        Minimum="0.5"
+                        StepFrequency="0.25"
+                        TickFrequency="0.25"
+                        TickPlacement="Outside"
+                        ValueChanged="ResetTimer"
+                        Value="{x:Bind _vm.PlaySpeed, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard Description="越高体验越好、内存占用越多" Header="播放帧数">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE916;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <Slider
+                        Maximum="100"
+                        Minimum="5"
+                        TickFrequency="5"
+                        TickPlacement="Outside"
+                        ValueChanged="ResetTimer"
+                        Value="{x:Bind _vm.PlayFramePerSecond, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard Description="是否允许弹幕重叠" Header="弹幕重叠">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF156;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind _vm.DanmakuAllowOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
+                </labs:SettingsCard>
+                <labs:SettingsCard
+                    Description="每条弹幕在屏幕上的停留秒数"
+                    Header="弹幕速度"
+                    HeaderIcon="Clock">
+                    <Slider
+                        Maximum="20"
+                        Minimum="5"
+                        StepFrequency="1"
+                        TickFrequency="1"
+                        TickPlacement="Outside"
+                        Value="{x:Bind _vm.DanmakuDuration, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard Description="弹幕的透明度" Header="弹幕透明度">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEF3C;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <Slider
+                        Maximum="1"
+                        Minimum="0.1"
+                        StepFrequency="0.1"
+                        TickFrequency="0.1"
+                        TickPlacement="Outside"
+                        ValueChanged="DanmakuOpacityChanged"
+                        Value="{x:Bind _vm.DanmakuOpacity, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard
+                    Description="从计算机内已安装的字体搜索"
+                    Header="弹幕字体"
+                    HeaderIcon="Font">
+                    <ComboBox
+                        ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}"
+                        SelectedItem="{x:Bind _vm.DanmakuFont, Mode=TwoWay}"
+                        SelectionChanged="DanmakuFontChanged" />
+                </labs:SettingsCard>
+                <labs:SettingsCard
+                    Description="弹幕缩放"
+                    Header="弹幕大小"
+                    HeaderIcon="FontSize">
+                    <Slider
+                        Maximum="2"
+                        Minimum="0.5"
+                        StepFrequency="0.1"
+                        TickFrequency="0.1"
+                        TickPlacement="Outside"
+                        ValueChanged="ResetProvider"
+                        Value="{x:Bind _vm.DanmakuScale, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsExpander Header="关于 DanmakuPlayer v2.43">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE946;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            Click="NavigateUriClick"
+                            Description="poker_sang@outlook.com"
+                            Header="邮箱"
+                            HeaderIcon="Mail"
+                            IsClickEnabled="True"
+                            Tag="{x:Bind rs:ConstantStrings.MailUri}">
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Click="NavigateUriClick"
+                            Description="扑克"
+                            Header="作者"
+                            HeaderIcon="People"
+                            IsClickEnabled="True"
+                            Tag="{x:Bind rs:ConstantStrings.AuthorUri}">
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Click="NavigateUriClick"
+                            Description="2639914082"
+                            Header="QQ"
+                            IsClickEnabled="True"
+                            Tag="{x:Bind rs:ConstantStrings.QqUri}">
+                            <labs:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE8F2;" />
+                            </labs:SettingsCard.HeaderIcon>
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Click="NavigateUriClick"
+                            Description="DanmakuPlayer"
+                            Header="仓库"
+                            HeaderIcon="Library"
+                            IsClickEnabled="True"
+                            Tag="{x:Bind rs:ConstantStrings.RepositoryUri}">
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                <labs:SettingsCard
+                    Click="NavigateUriClick"
+                    Description="GNU General Public License v3.0"
+                    Header="License"
+                    IsClickEnabled="True"
+                    Tag="{x:Bind rs:ConstantStrings.LicenseUri}">
+                    <labs:SettingsCard.HeaderIcon>
+                        <SymbolIcon Symbol="Important" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <labs:SettingsCard.ActionIcon>
+                        <FontIcon Glyph="&#xE8A7;" />
+                    </labs:SettingsCard.ActionIcon>
+                </labs:SettingsCard>
             </StackPanel>
         </ScrollViewer>
     </ContentDialog>
