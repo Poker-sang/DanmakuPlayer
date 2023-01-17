@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace DanmakuPlayer;
 
-public partial class AppViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
     public void RaiseForegroundChanged() => OnPropertyChanged(nameof(Foreground));
 

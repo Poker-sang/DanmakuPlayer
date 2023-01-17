@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using WinUI3Utilities;
 
-namespace DanmakuPlayer.Controls;
+namespace DanmakuPlayer.Views.Controls;
 
 [INotifyPropertyChanged]
 public sealed partial class SettingDialog : UserControl

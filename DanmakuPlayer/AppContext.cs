@@ -1,5 +1,5 @@
 using System;
-using DanmakuPlayer.Controls;
+using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Windows.Storage;

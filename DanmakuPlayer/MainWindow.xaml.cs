@@ -13,7 +13,6 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         SwapChainPanelHelper.SetSwapChainPanel(RootPanel, CurrentContext.HWnd);
-
         CurrentContext.OverlappedPresenter.IsResizable = false;
         CurrentContext.OverlappedPresenter.SetBorderAndTitleBar(false, false);
     }

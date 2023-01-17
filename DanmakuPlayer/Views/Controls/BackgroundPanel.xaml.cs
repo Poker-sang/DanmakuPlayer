@@ -17,12 +17,12 @@ using ProtoBuf;
 using Windows.System;
 using WinUI3Utilities;
 
-namespace DanmakuPlayer.Controls;
+namespace DanmakuPlayer.Views.Controls;
 public sealed partial class BackgroundPanel : SwapChainPanel
 {
     public void RaiseForegroundChanged() => _vm.RaiseForegroundChanged();
 
-    private readonly AppViewModel _vm = new();
+    private readonly MainViewModel _vm = new();
 
     public BackgroundPanel()
     {

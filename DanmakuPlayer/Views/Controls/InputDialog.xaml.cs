@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using WinUI3Utilities;
 
-namespace DanmakuPlayer.Controls;
+namespace DanmakuPlayer.Views.Controls;
 public sealed partial class InputDialog : UserControl
 {
     public InputDialog() => InitializeComponent();
