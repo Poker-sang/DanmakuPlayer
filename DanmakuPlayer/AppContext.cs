@@ -1,8 +1,8 @@
 using System;
-using Windows.Storage;
 using DanmakuPlayer.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
+using Windows.Storage;
 using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
@@ -22,6 +22,8 @@ public static partial class AppContext
 #endif
             ? new AppConfig() : appConfigurations;
     }
+
+    public static void SetDefaultAppConfig() => AppConfig = new();
 
     public static AppConfig AppConfig { get; private set; } = null!;
 

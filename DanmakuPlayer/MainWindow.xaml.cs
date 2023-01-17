@@ -1,6 +1,5 @@
-using System;
-using Microsoft.UI.Xaml;
 using DanmakuPlayer.Services;
+using Microsoft.UI.Xaml;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer;

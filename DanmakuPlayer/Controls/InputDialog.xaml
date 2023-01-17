@@ -10,7 +10,6 @@
     mc:Ignorable="d">
     <ContentDialog
         Title="在线获取弹幕"
-        CloseButtonClick="CancelClick"
         CloseButtonText="取消"
         DefaultButton="Close"
         PrimaryButtonClick="InquireClick"

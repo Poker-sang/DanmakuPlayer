@@ -1,41 +1,34 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DanmakuPlayer.Enums;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using DanmakuPlayer.Enums;
-using Microsoft.UI;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Controls;
 
+[INotifyPropertyChanged]
 public sealed partial class SettingDialog : UserControl
 {
-    private readonly SettingViewModel _vm = new();
+    [ObservableProperty] private SettingViewModel _vm = new();
 
     public SettingDialog() => InitializeComponent();
 
-    public async Task ShowAsync() => await ((ContentDialog)Content).ShowAsync();
+    public async Task ShowAsync() => await Content.To<ContentDialog>().ShowAsync();
 
     #region 事件处理
 
-    private void CloseClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
-    {
-        sender.Hide();
-
-        AppContext.SaveConfiguration(_vm.AppConfig);
-    }
-
-    #endregion
-
     private void NavigateUriClick(object sender, RoutedEventArgs e)
     {
-        var process = new Process
+        using var process = new Process
         {
             StartInfo = new()
             {
-                FileName = (string)((FrameworkElement)sender).Tag,
+                FileName = sender.GetTag<string>(),
                 UseShellExecute = true
             }
         };
@@ -44,7 +37,7 @@ public sealed partial class SettingDialog : UserControl
 
     private void ThemeChanged(object sender, SelectionChangedEventArgs e)
     {
-        var value = sender.ToNotNull<RadioButtons>().SelectedIndex;
+        var value = sender.To<RadioButtons>().SelectedIndex;
 
         var selectedTheme = value switch
         {
@@ -64,17 +57,30 @@ public sealed partial class SettingDialog : UserControl
         };
     }
 
+    private void ForegroundColorChanged(ColorPicker sender, ColorChangedEventArgs e) => Parent.To<BackgroundPanel>().RaiseForegroundChanged();
+
     private void ResetTimer(object sender, RoutedEventArgs e) => AppContext.ResetTimerInterval();
 
     private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadProvider);
 
     private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        var value = (float)sender.ToNotNull<Slider>().Value;
+        var value = (float)sender.To<Slider>().Value;
 
         if (AppContext.DanmakuCanvas != null!)
             AppContext.DanmakuCanvas.Opacity = value;
     }
 
     private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadFormat);
+
+    private void SetDefaultAppConfigClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
+    {
+        e.Cancel = true;
+        AppContext.SetDefaultAppConfig();
+        OnPropertyChanged(nameof(Vm));
+    }
+
+    private void CloseClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => AppContext.SaveConfiguration(_vm.AppConfig);
+
+    #endregion
 }

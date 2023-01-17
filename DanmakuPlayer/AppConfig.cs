@@ -13,6 +13,12 @@ public partial record AppConfig
     /// <remarks>default: 0</remarks>
     public int Theme { get; set; }
 
+    /// <summary>
+    /// 前景色
+    /// </summary>
+    /// <remarks>default: 0xFFA9A9A9</remarks>
+    public uint Foreground { get; set; } = 0xFFA9A9A9;
+
     #endregion
 
     #region 播放设置
@@ -40,12 +46,6 @@ public partial record AppConfig
     #region 弹幕设置
 
     /// <summary>
-    /// 弹幕是否允许重叠
-    /// </summary>
-    /// <remarks>default: <see langword="true"/></remarks>
-    public bool DanmakuAllowOverlap { get; set; }
-
-    /// <summary>
     /// 弹幕显示速度（过屏时间(second)）
     /// </summary>
     /// <remarks>DanmakuDuration ∈ [5, 20], default: 15</remarks>
@@ -68,6 +68,33 @@ public partial record AppConfig
     /// </summary>
     /// <remarks>DanmakuScale ∈ [0.5, 2], default: 1</remarks>
     public float DanmakuScale { get; set; } = 1;
+
+    /// <summary>
+    /// 弹幕是否允许重叠
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool DanmakuAllowOverlap { get; set; }
+
+    #region 合并设置
+
+    /// <summary>
+    /// 弹幕合并
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool DanmakuEnableMerge { get; set; } = true;
+
+    public int MaxCosine { get; set; } = 6;
+
+
+    public int MaxDistance { get; set; } = 5;
+
+    public int TimeSpan { get; set; } = 20;
+
+    public bool CrossMode { get; set; } = false;
+
+    public int RepresentativePercent { get; set; } = 50;
+
+    #endregion
 
     #endregion
 

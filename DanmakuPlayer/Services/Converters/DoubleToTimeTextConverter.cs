@@ -3,9 +3,9 @@ using Microsoft.UI.Xaml.Data;
 
 namespace DanmakuPlayer.Services.Converters;
 
-public class TimeTextConverter : IValueConverter
+public class DoubleToTimeTextConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language) => ToTime(((double)value));
+    public object Convert(object value, Type targetType, object parameter, string language) => ToTime((double)value);
 
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 

@@ -1,11 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
-using System.Linq;
 using Vanara.Extensions;
-using DanmakuPlayer.Enums;
 
 namespace DanmakuPlayer.Services;
 

@@ -4,6 +4,22 @@ namespace DanmakuPlayer;
 
 public partial class AppViewModel : ObservableObject
 {
+    public void RaiseForegroundChanged() => OnPropertyChanged(nameof(Foreground));
+
+    public uint Foreground
+    {
+        get => AppConfig.Foreground;
+        set => SetProperty(AppConfig.Foreground, value, AppConfig, (@setting, @value) => @setting.Foreground = @value);
+    }
+
+    public float DanmakuOpacity
+    {
+        get => AppConfig.DanmakuOpacity;
+        set => SetProperty(AppConfig.DanmakuOpacity, value, AppConfig, (@setting, @value) => @setting.DanmakuOpacity = @value);
+    }
+
+    [ObservableProperty] private bool _startPlaying;
+
     [ObservableProperty] private bool _isPlaying;
 
     [ObservableProperty] private double _time;

@@ -15,10 +15,12 @@
     Unloaded="BackgroundPanelOnUnloaded"
     mc:Ignorable="d">
     <SwapChainPanel.Resources>
-        <converters:TimeTextConverter x:Key="TimeTextConverter" />
-        <converters:PlayPauseSymbolProvider x:Key="PlayPauseSymbolProvider" />
-        <converters:PinUnPinProvider x:Key="PinUnPinProvider" />
+        <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
+        <converters:BoolToPlayPauseSymbolConverter x:Key="BoolToPlayPauseSymbolConverter" />
+        <converters:BoolToPinUnPinSymbolConverter x:Key="BoolToPinUnPinSymbolConverter" />
+        <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <SolidColorBrush x:Key="Foreground" Color="{x:Bind _vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />
     </SwapChainPanel.Resources>
     <SwapChainPanel.RowDefinitions>
         <RowDefinition />
@@ -38,13 +40,13 @@
         Grid.ColumnSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        Opacity="{x:Bind _vm.AppConfig.DanmakuOpacity, Mode=OneWay}" />
+        Opacity="{x:Bind _vm.DanmakuOpacity, Mode=OneWay}" />
     <TextBlock
         x:Name="TbBanner"
         Grid.Row="1"
         Grid.Column="1"
         FontSize="72"
-        Foreground="LightGray"
+        Foreground="{StaticResource Foreground}"
         IsHitTestVisible="False"
         Text="弹幕播放器"
         TextAlignment="Center" />
@@ -59,13 +61,19 @@
             VerticalAlignment="Top"
             OverflowButtonVisibility="Collapsed"
             Visibility="{x:Bind _vm.PointerInTitleArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-            <AppBarButton Tapped="FrontTapped">
+            <AppBarButton Foreground="{StaticResource Foreground}" Tapped="FrontTapped">
                 <AppBarButton.Icon>
-                    <SymbolIcon Symbol="{x:Bind _vm.TopMost, Converter={StaticResource PinUnPinProvider}, Mode=OneWay}" />
+                    <SymbolIcon Symbol="{x:Bind _vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Icon="Setting" Tapped="SettingTapped" />
-            <AppBarButton Icon="Cancel" Tapped="CloseTapped" />
+            <AppBarButton
+                Foreground="{StaticResource Foreground}"
+                Icon="Setting"
+                Tapped="SettingTapped" />
+            <AppBarButton
+                Foreground="{StaticResource Foreground}"
+                Icon="Cancel"
+                Tapped="CloseTapped" />
         </CommandBar>
     </Border>
     <Border
@@ -79,17 +87,22 @@
             VerticalAlignment="Top"
             OverflowButtonVisibility="Collapsed"
             Visibility="{x:Bind _vm.PointerInImportArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-            <AppBarButton Icon="Download" Tapped="ImportTapped" />
-            <AppBarButton Icon="OpenFile" Tapped="FileTapped" />
+            <AppBarButton
+                Foreground="{StaticResource Foreground}"
+                Icon="Download"
+                Tapped="ImportTapped" />
+            <AppBarButton
+                Foreground="{StaticResource Foreground}"
+                Icon="OpenFile"
+                Tapped="FileTapped" />
         </CommandBar>
     </Border>
     <Border
-        x:Name="BControl"
         Grid.Row="2"
         Grid.Column="0"
         Grid.ColumnSpan="3"
         Background="Transparent"
-        IsHitTestVisible="False"
+        IsHitTestVisible="{x:Bind _vm.StartPlaying, Mode=OneWay}"
         PointerEntered="ControlPointerEntered"
         PointerExited="ControlPointerExited">
         <controls:DockPanel
@@ -97,40 +110,47 @@
             VerticalAlignment="Bottom"
             Visibility="{x:Bind _vm.PointerInControlArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
             <Button controls:DockPanel.Dock="Left" Tapped="PauseResumeTapped">
-                <SymbolIcon Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource PlayPauseSymbolProvider}, Mode=OneWay}" />
+                <SymbolIcon Foreground="{StaticResource Foreground}" Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
             </Button>
             <TextBlock
                 Width="44"
                 VerticalAlignment="Center"
                 controls:DockPanel.Dock="Left"
-                Foreground="White"
-                Text="{x:Bind _vm.Time, Converter={StaticResource TimeTextConverter}, Mode=OneWay}"
+                Foreground="{StaticResource Foreground}"
+                Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                 TextAlignment="Right" />
             <TextBlock
                 Width="10"
                 VerticalAlignment="Center"
                 controls:DockPanel.Dock="Left"
-                Foreground="White"
+                Foreground="{StaticResource Foreground}"
                 Text="-"
                 TextAlignment="Center" />
             <TextBlock
                 Width="44"
                 VerticalAlignment="Center"
                 controls:DockPanel.Dock="Left"
-                Foreground="White"
-                Text="{x:Bind _vm.TotalTime, Converter={StaticResource TimeTextConverter}, Mode=OneWay}"
+                Foreground="{StaticResource Foreground}"
+                Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                 TextAlignment="Left" />
+            <!--
+                PointerPressed="TimePointerPressed"
+                PointerReleased="TimePointerReleased"
+            -->
             <Slider
                 VerticalAlignment="Center"
                 Maximum="{x:Bind _vm.TotalTime, Mode=OneWay}"
                 Minimum="0"
-                Opacity="0.8"
                 StepFrequency="0.1"
-                ThumbToolTipValueConverter="{StaticResource TimeTextConverter}"
+                ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
                 Value="{x:Bind _vm.Time, Mode=TwoWay}" />
         </controls:DockPanel>
     </Border>
     <local:SettingDialog x:Name="DialogSetting" />
     <local:InputDialog x:Name="DialogInput" />
-    <TeachingTip x:Name="RootSnackBar" />
+    <TeachingTip x:Name="RootSnackBar">
+        <TeachingTip.IconSource>
+            <SymbolIconSource Symbol="Accept" />
+        </TeachingTip.IconSource>
+    </TeachingTip>
 </SwapChainPanel>

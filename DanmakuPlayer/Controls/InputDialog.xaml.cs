@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DanmakuPlayer.Models;
@@ -32,7 +31,7 @@ public sealed partial class InputDialog : UserControl
         sender.SecondaryButtonText = null;
         sender.IsSecondaryButtonEnabled = false;
     }
-    
+
     private void SelectConfirm(ListView sender)
     {
         var index = sender.SelectedIndex;
@@ -117,8 +116,6 @@ public sealed partial class InputDialog : UserControl
     private void SelectClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => SelectConfirm(LvPage);
 
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) => ((ContentDialog)Content).IsSecondaryButtonEnabled = true;
-
-    private void CancelClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => sender.Hide();
 
     #endregion
 }

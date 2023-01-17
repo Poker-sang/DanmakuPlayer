@@ -1,11 +1,11 @@
-using DanmakuPlayer.Enums;
-using DanmakuPlayer.Services;
 using System;
 using System.Numerics;
+using DanmakuPlayer.Enums;
+using DanmakuPlayer.Services;
 using Microsoft.Graphics.Canvas;
-using Node = System.Collections.Generic.LinkedListNode<(float BottomPos, double Time)>;
-using DanmakuRoomList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
 using WinUI3Utilities;
+using DanmakuRoomList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
+using Node = System.Collections.Generic.LinkedListNode<(float BottomPos, double Time)>;
 
 namespace DanmakuPlayer.Models;
 

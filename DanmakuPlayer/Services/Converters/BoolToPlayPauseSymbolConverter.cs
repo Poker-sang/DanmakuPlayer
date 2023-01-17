@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Data;
 
 namespace DanmakuPlayer.Services.Converters;
 
-public class PlayPauseSymbolProvider : IValueConverter
+public class BoolToPlayPauseSymbolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) => ((bool)value) ? Symbol.Pause : Symbol.Play;
 

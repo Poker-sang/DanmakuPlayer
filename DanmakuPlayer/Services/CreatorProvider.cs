@@ -1,7 +1,6 @@
 using System;
-using DanmakuPlayer.Models;
 using System.Collections.Generic;
-using Windows.UI;
+using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
@@ -31,7 +30,7 @@ public class CreatorProvider : IDisposable
     /// 颜色和对应笔刷
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/></remarks>
-    public Dictionary<int, CanvasSolidColorBrush> Brushes { get; } = new();
+    public Dictionary<uint, CanvasSolidColorBrush> Brushes { get; } = new();
 
     /// <summary>
     /// 字号和对应字体格式
@@ -60,16 +59,11 @@ public class CreatorProvider : IDisposable
 
     public CanvasTextLayout GetNewLayout(Danmaku danmaku) => new(Creator, danmaku.Text, GetTextFormat(danmaku.Size * AppConfig.DanmakuScale), int.MaxValue, int.MaxValue);
 
-    public unsafe CanvasSolidColorBrush GetBrush(in uint color)
+    public CanvasSolidColorBrush GetBrush(in uint color)
     {
-        fixed (uint* ptr = &color)
-        {
-            var c = (byte*)ptr;
-            if (!Brushes.TryGetValue((int)color, out var value))
-                Brushes[(int)color] = value = new CanvasSolidColorBrush(Creator,
-                    Color.FromArgb(0xFF, c[2], c[1], c[0]));
-            return value;
-        }
+        if (!Brushes.TryGetValue(color, out var value))
+            Brushes[color] = value = new CanvasSolidColorBrush(Creator, color.GetColor());
+        return value;
     }
 
     #endregion

@@ -10,13 +10,6 @@ namespace DanmakuPlayer.Services;
 
 public static class DanmakuCombiner
 {
-    public const int MaxCosine = 60;
-    public const int MinDanmakuSize = 10;
-    public const int MaxDist = 5;
-    public const int Threshold = 20;
-    public const bool CrossMode = false;
-    public const int RepresentativePercent = 50;
-
     /// <summary>
     /// 全角字符和部分英文标点
     /// </summary>
@@ -87,31 +80,50 @@ public static class DanmakuCombiner
 
         return (double)xy * xy / (x * y);
     }
+    public const int MinDanmakuSize = 10;
 
-    private static bool Similarity(DanmakuString p, DanmakuString q)
+
+    private static bool Similarity(DanmakuString p, DanmakuString q, AppConfig appConfig)
     {
+        // 全等
         if (p.Original == q.Original)
             return true;
 
-        var dis = EditDistance(p.Original, q.Original);
-        if ((p.Length + q.Length < MinDanmakuSize) ? dis < (p.Length + q.Length) / MinDanmakuSize * MaxDist - 1 : dis <= MaxDist)
-            return true;
+        if (appConfig.MaxDistance is not 0)
+        {
+            // 内容相近
+            var dis = EditDistance(p.Original, q.Original);
+            if ((p.Length + q.Length < MinDanmakuSize)
+                    ? dis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
+                    : dis <= appConfig.MaxDistance)
+                return true;
 
-        var pyDis = EditDistance(p.Pinyin, q.Pinyin);
-        if ((p.Length + q.Length < MinDanmakuSize) ? pyDis < (p.Length + q.Length) / MinDanmakuSize * MaxDist - 1 : pyDis <= MaxDist)
-            return true;
+            // 谐音
+            var pyDis = EditDistance(p.Pinyin, q.Pinyin);
+            if ((p.Length + q.Length < MinDanmakuSize)
+                    ? pyDis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
+                    : pyDis <= appConfig.MaxDistance)
+                return true;
 
-        // they have nothing similar. CosineDistanceSquare test can be bypassed
-        if (dis >= p.Length + q.Length)
-            return false;
+            // 完全不相似
+            if (dis >= p.Length + q.Length)
+                return false;
+        }
 
-        var cos = CosineDistanceSquare(p.Gram, q.Gram) * 100;
-        return cos >= MaxCosine;
+        if (appConfig.MaxCosine is 10)
+        {
+            // 词频
+            var cos = CosineDistanceSquare(p.Gram, q.Gram) * 10;
+            if (cos >= appConfig.MaxCosine)
+                return true;
+        }
+
+        return false;
     }
 
     private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
 
-    public static async Task<List<Danmaku>> Combine(IEnumerable<Danmaku> pool) =>
+    public static async Task<List<Danmaku>> Combine(this IEnumerable<Danmaku> pool, AppConfig appConfig) =>
         await Task.Run(() =>
         {
             var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
@@ -121,9 +133,9 @@ public static class DanmakuCombiner
             {
                 var text = danmaku.Text;
 
-                if (text.Length == 0)
+                if (text is "")
                     continue;
-                
+
                 for (var i = 0; i < FullAngleChars.Length; ++i)
                     text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
 
@@ -135,13 +147,13 @@ public static class DanmakuCombiner
                         pinyin += c;
 
                 var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
-                while (danmakuChunk.Count > 0 && danmaku.Time - danmakuChunk.Peek().Peers[0].Time > Threshold)
+                while (danmakuChunk.Count > 0 && danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.TimeSpan)
                     outDanmaku.Add(danmakuChunk.Dequeue().Peers);
 
                 var addNew = true;
                 foreach (var (_, peers) in danmakuChunk
-                             .Where(chunk => CrossMode || danmaku.Mode == chunk.Peers[0].Mode)
-                             .Where(chunk => Similarity(str, chunk.Str)))
+                             .Where(chunk => appConfig.CrossMode || danmaku.Mode == chunk.Peers[0].Mode)
+                             .Where(chunk => Similarity(str, chunk.Str, appConfig)))
                 {
                     peers.Add(danmaku);
                     addNew = false;
@@ -174,7 +186,7 @@ public static class DanmakuCombiner
 
                 var represent = new Danmaku(
                     (peers.Count > 5 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
-                    peers[Math.Min(peers.Count * RepresentativePercent / 100, peers.Count - 1)].Time,
+                    peers[Math.Min(peers.Count * appConfig.RepresentativePercent / 100, peers.Count - 1)].Time,
                     mode,
                     (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
                     (uint)peers.Average(t => t.Color),

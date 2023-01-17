@@ -1,34 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.System;
+using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Services;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
+using Windows.System;
 using WinUI3Utilities;
-using DanmakuPlayer.Enums;
-using DragMoveHelper = WinUI3Utilities.DragMoveHelper;
 
 namespace DanmakuPlayer.Controls;
 public sealed partial class BackgroundPanel : SwapChainPanel
 {
+    public void RaiseForegroundChanged() => _vm.RaiseForegroundChanged();
+
     private readonly AppViewModel _vm = new();
 
     public BackgroundPanel()
@@ -44,7 +37,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             {
                 if (_vm.IsPlaying)
                 {
-                    _vm.Time += ((DispatcherTimer)sender!).Interval.TotalSeconds;
+                    _vm.Time += sender.To<DispatcherTimer>().Interval.TotalSeconds;
                     DanmakuCanvas.Invalidate();
                 }
             }
@@ -54,15 +47,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 _vm.Time = 0;
             }
         };
-        // AppContext.Timer.Start();
-
     }
 
     #region 操作
-
-    private async void SettingOpen() => await DialogSetting.ShowAsync();
-    // FadeOut("设置已更新", false, "✧(≖ ◡ ≖✿)");
-    // BBackGround.Opacity = App.AppConfig.WindowOpacity;
 
     /// <summary>
     /// 加载弹幕操作
@@ -81,32 +68,30 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             FadeOut($"已获取{tempPool.Count}条弹幕，正在合并", false, "✧(≖ ◡ ≖✿)");
 
-            DanmakuHelper.Pool = (await DanmakuCombiner.Combine(tempPool)).OrderBy(t => t.Time).ToArray();
-
+            DanmakuHelper.Pool = (await tempPool.Combine(_vm.AppConfig)).OrderBy(t => t.Time).ToArray();
             var combineRate = DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
             FadeOut($"已合并为{DanmakuHelper.Pool.Length}条弹幕，合并率{combineRate}%，正在渲染", false, "('ヮ')");
 
             var renderedCount = await DanmakuHelper.RenderInitPool(DanmakuCanvas);
-
             var renderRate = renderedCount * 100 / DanmakuHelper.Pool.Length;
-
             var totalRate = renderedCount * 100 / tempPool.Count;
-
-            _vm.TotalTime = DanmakuHelper.Pool[^1].Time + 10;
+            _vm.TotalTime = DanmakuHelper.Pool[^1].Time + _vm.AppConfig.DanmakuDuration;
 
             FadeOut($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{combineRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
         }
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            FadeOut(e.Message, true, "​( ´･_･)ﾉ(._.`) 发生异常了");
+            FadeOut("​( ´･_･)ﾉ(._.`) 发生异常了", true, e.Message);
         }
 
         if (TbBanner is not null)
             _ = Children.Remove(TbBanner);
-        BControl.IsHitTestVisible = true;
+        _vm.StartPlaying = true;
     }
+
+    private DateTime _closeSnakeBarTime;
 
     /// <summary>
     /// 出现信息并消失
@@ -115,23 +100,18 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     /// <param name="isError"><see langword="true"/>为错误信息，<see langword="false"/>为提示信息</param>
     /// <param name="hint">信息附加内容</param>
     /// <param name="mSec">信息持续时间</param>
-    private async void FadeOut(string message, bool isError, string? hint = null, int mSec = 3000)
+    private async void FadeOut(string message, bool isError, string hint, int mSec = 3000)
     {
+        _closeSnakeBarTime = DateTime.Now + TimeSpan.FromMicroseconds(mSec - 100);
+
         RootSnackBar.Title = message;
-        if (isError)
-        {
-            RootSnackBar.Subtitle = hint ?? "错误";
-            RootSnackBar.IconSource = new SymbolIconSource { Symbol = Symbol.Important };
-        }
-        else
-        {
-            RootSnackBar.Subtitle = hint ?? "提示";
-            RootSnackBar.IconSource = new SymbolIconSource { Symbol = Symbol.Accept };
-        }
+        RootSnackBar.Subtitle = hint;
+        RootSnackBar.IconSource.To<SymbolIconSource>().Symbol = isError ? Symbol.Important : Symbol.Accept;
 
         _ = RootSnackBar.IsOpen = true;
         await Task.Delay(mSec);
-        _ = RootSnackBar.IsOpen = false;
+        if (DateTime.Now > _closeSnakeBarTime)
+            _ = RootSnackBar.IsOpen = false;
     }
 
     public async void DanmakuReload(RenderType renderType)
@@ -181,7 +161,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            FadeOut(e.Message, true, "━━Σ(ﾟДﾟ川)━ 未知的异常");
+            FadeOut("━━Σ(ﾟДﾟ川)━ 未知的异常", true, e.Message);
         }
     }
 
@@ -247,7 +227,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         DanmakuReload(RenderType.ReloadProvider);
     }
 
-    public void WindowKeyUp(object sender, KeyRoutedEventArgs e)
+    public async void WindowKeyUp(object sender, KeyRoutedEventArgs e)
     {
         switch (e.Key)
         {
@@ -274,7 +254,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             }
             case VirtualKey.Tab:
             {
-                SettingOpen();
+                await DialogSetting.ShowAsync();
                 break;
             }
             default: break;
@@ -324,7 +304,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         }
     }
 
-    private void SettingTapped(object sender, RoutedEventArgs e) => SettingOpen();
+    private async void SettingTapped(object sender, RoutedEventArgs e) => await DialogSetting.ShowAsync();
 
     private void CloseTapped(object sender, RoutedEventArgs e) => CurrentContext.App.Exit();
 
@@ -339,9 +319,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
 
-    private void TimeMouseButtonDown(object sender, PointerRoutedEventArgs e) => TryPause();
+    private void TimePointerPressed(object sender, PointerRoutedEventArgs e) => TryPause();
 
-    private void TimeMouseButtonUp(object sender, PointerRoutedEventArgs e) => TryResume();
+    private void TimePointerReleased(object sender, PointerRoutedEventArgs e) => TryResume();
 
     private void ImportPointerEntered(object sender, PointerRoutedEventArgs e) => _vm.PointerInImportArea = true;
 

@@ -1,7 +1,7 @@
 using System.IO;
-using DanmakuPlayer.Services;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DanmakuPlayer.Services;
 
 namespace DanmakuPlayer.Resources;
 
