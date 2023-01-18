@@ -9,10 +9,11 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
-    DoubleTapped="WindowDoubleTapped"
-    KeyUp="WindowKeyUp"
-    SizeChanged="WindowSizeChanged"
-    Unloaded="BackgroundPanelOnUnloaded"
+    DoubleTapped="RootDoubleTapped"
+    KeyDown="RootKeyDown"
+    KeyUp="RootKeyUp"
+    SizeChanged="RootSizeChanged"
+    Unloaded="RootUnloaded"
     mc:Ignorable="d">
     <SwapChainPanel.Resources>
         <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
@@ -106,33 +107,42 @@
         PointerEntered="ControlPointerEntered"
         PointerExited="ControlPointerExited">
         <controls:DockPanel
-            Margin="5"
+            Margin="3,0,30,0"
             VerticalAlignment="Bottom"
             Visibility="{x:Bind _vm.PointerInControlArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-            <Button controls:DockPanel.Dock="Left" Tapped="PauseResumeTapped">
-                <SymbolIcon Foreground="{StaticResource Foreground}" Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
-            </Button>
-            <TextBlock
-                Width="44"
-                VerticalAlignment="Center"
+            <AppBarButton
+                Width="40"
                 controls:DockPanel.Dock="Left"
                 Foreground="{StaticResource Foreground}"
-                Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
-                TextAlignment="Right" />
-            <TextBlock
-                Width="10"
-                VerticalAlignment="Center"
-                controls:DockPanel.Dock="Left"
-                Foreground="{StaticResource Foreground}"
-                Text="-"
-                TextAlignment="Center" />
-            <TextBlock
-                Width="44"
-                VerticalAlignment="Center"
-                controls:DockPanel.Dock="Left"
-                Foreground="{StaticResource Foreground}"
-                Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
-                TextAlignment="Left" />
+                LabelPosition="Collapsed"
+                Tapped="PauseResumeTapped">
+                <AppBarButton.Icon>
+                    <SymbolIcon Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <StackPanel
+                Margin="10,0"
+                Orientation="Horizontal"
+                Spacing="5">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    controls:DockPanel.Dock="Left"
+                    Foreground="{StaticResource Foreground}"
+                    Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                    TextAlignment="Right" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    controls:DockPanel.Dock="Left"
+                    Foreground="{StaticResource Foreground}"
+                    Text="-"
+                    TextAlignment="Center" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    controls:DockPanel.Dock="Left"
+                    Foreground="{StaticResource Foreground}"
+                    Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                    TextAlignment="Left" />
+            </StackPanel>
             <!--
                 PointerPressed="TimePointerPressed"
                 PointerReleased="TimePointerReleased"
@@ -148,7 +158,7 @@
     </Border>
     <local:SettingDialog x:Name="DialogSetting" />
     <local:InputDialog x:Name="DialogInput" />
-    <TeachingTip x:Name="RootSnackBar">
+    <TeachingTip x:Name="RootSnackBar" IsLightDismissEnabled="True">
         <TeachingTip.IconSource>
             <SymbolIconSource Symbol="Accept" />
         </TeachingTip.IconSource>

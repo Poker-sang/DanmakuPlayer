@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Enums;
+using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -71,7 +72,7 @@ public sealed partial class SettingDialog : UserControl
             AppContext.DanmakuCanvas.Opacity = value;
     }
 
-    private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadFormat);
+    private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadFormats);
 
     private void SetDefaultAppConfigClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {

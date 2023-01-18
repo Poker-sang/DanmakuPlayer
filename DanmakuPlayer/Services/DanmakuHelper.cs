@@ -22,18 +22,16 @@ public static class DanmakuHelper
     public static bool IsRendering { get; set; }
     private static int _renderCount;
 
-    // public static bool ResetBaseHeight { get; set; }
-
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {
         if (RenderType.IsFlagSet(RenderType.RenderInit))
         {
             if (RenderType.IsFlagSet(RenderType.ReloadProvider))
             {
-                if (RenderType.IsFlagSet(RenderType.ReloadFormat))
+                if (RenderType.IsFlagSet(RenderType.ReloadFormats))
                 {
                     CreatorProvider.DisposeFormats();
-                    RenderType = RenderType.SetFlags(RenderType.ReloadFormat, false);
+                    RenderType = RenderType.SetFlags(RenderType.ReloadFormats, false);
                 }
 
                 Current.Dispose();
@@ -68,7 +66,7 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = Array.Empty<Danmaku>();
 
-    public static async Task<int> RenderInitPool(CanvasControl canvas)
+    public static async Task<int> PoolRenderInit(CanvasControl canvas)
     {
         RenderType = RenderType.RenderInit;
         await WaitForRender(canvas);
@@ -83,7 +81,7 @@ public static class DanmakuHelper
 
     public static async Task ResetFormat(CanvasControl canvas)
     {
-        RenderType = RenderType.ReloadFormat | RenderType.ReloadProvider | RenderType.RenderInit;
+        RenderType = RenderType.ReloadFormats | RenderType.ReloadProvider | RenderType.RenderInit;
         await WaitForRender(canvas);
     }
 

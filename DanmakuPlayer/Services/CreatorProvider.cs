@@ -35,7 +35,7 @@ public class CreatorProvider : IDisposable
     /// <summary>
     /// 字号和对应字体格式
     /// </summary>
-    /// <remarks>依赖于<see cref="AppConfig.DanmakuFont"/></remarks>
+    /// <remarks>依赖于<see cref="DanmakuPlayer.AppConfig.DanmakuFont"/></remarks>
     public static Dictionary<float, CanvasTextFormat> Formats { get; } = new();
 
     /// <summary>

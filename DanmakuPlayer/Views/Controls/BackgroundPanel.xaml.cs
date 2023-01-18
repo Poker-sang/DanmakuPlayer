@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Services;
+using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Windowing;
@@ -18,11 +19,12 @@ using Windows.System;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
+
 public sealed partial class BackgroundPanel : SwapChainPanel
 {
     public void RaiseForegroundChanged() => _vm.RaiseForegroundChanged();
 
-    private readonly MainViewModel _vm = new();
+    private readonly RootViewModel _vm = new();
 
     public BackgroundPanel()
     {
@@ -73,7 +75,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             FadeOut($"已合并为{DanmakuHelper.Pool.Length}条弹幕，合并率{combineRate}%，正在渲染", false, "('ヮ')");
 
-            var renderedCount = await DanmakuHelper.RenderInitPool(DanmakuCanvas);
+            var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
             var renderRate = renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = DanmakuHelper.Pool[^1].Time + _vm.AppConfig.DanmakuDuration;
@@ -116,25 +118,26 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     public async void DanmakuReload(RenderType renderType)
     {
+        if (DanmakuHelper.Pool.Length is 0)
+            return;
+
         TryPause();
-        AppContext.Timer.Stop();
 
         switch (renderType)
         {
             case RenderType.RenderInit:
-                _ = await DanmakuHelper.RenderInitPool(DanmakuCanvas);
+                _ = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
                 break;
             case RenderType.ReloadProvider:
                 await DanmakuHelper.ResetProvider(DanmakuCanvas);
                 break;
-            case RenderType.ReloadFormat:
+            case RenderType.ReloadFormats:
                 await DanmakuHelper.ResetFormat(DanmakuCanvas);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(renderType), renderType, null);
         }
 
-        AppContext.Timer.Start();
         TryResume();
     }
 
@@ -203,7 +206,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region 事件处理
 
-    private void WindowDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void RootDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         switch (CurrentContext.OverlappedPresenter.State)
         {
@@ -216,10 +219,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             default:
                 break;
         }
-        DanmakuReload(RenderType.ReloadProvider);
     }
 
-    private void WindowSizeChanged(object sender, SizeChangedEventArgs e)
+    private void RootSizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (DanmakuHelper.Pool.Length is 0)
             return;
@@ -227,24 +229,24 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         DanmakuReload(RenderType.ReloadProvider);
     }
 
-    public async void WindowKeyUp(object sender, KeyRoutedEventArgs e)
+    public async void RootKeyUp(object sender, KeyRoutedEventArgs e)
     {
         switch (e.Key)
         {
             case VirtualKey.Left:
             {
-                //  if (Time - App.AppConfig.PlayFastForward < 0)
-                //      Time = 0;
-                //  else
-                //     Time -= App.AppConfig.PlayFastForward;
+                if (_vm.Time - _vm.AppConfig.PlayFastForward < 0)
+                    _vm.Time = 0;
+                else
+                    _vm.Time -= _vm.AppConfig.PlayFastForward;
                 break;
             }
             case VirtualKey.Right:
             {
-                //  if (Time + App.AppConfig.PlayFastForward > STime.Maximum)
-                //     Time = 0;
-                // else
-                //      Time += App.AppConfig.PlayFastForward;
+                if (_vm.Time + _vm.AppConfig.PlayFastForward > _vm.TotalTime)
+                    _vm.Time = 0;
+                else
+                    _vm.Time += _vm.AppConfig.PlayFastForward;
                 break;
             }
             case VirtualKey.Space:
@@ -261,21 +263,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         }
     }
 
-    /*
-    private void WindowDragEnter(object sender, DragEventArgs e) => e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Link : DragDropEffects.None;
-
-    private void WindowDrop(object sender, DragEventArgs e)
+    private void RootKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Data.GetData(DataFormats.FileDrop) is string[] data)
-            LoadDanmaku(() =>
-            {
-                App.ClearPool();
-                App.Pool = BiliHelper.ToDanmaku(XDocument.Load(data[0])).ToArray();
-                App.RenderPool();
-                return Task.CompletedTask;
-            });
+
     }
-    */
 
     private async void ImportTapped(object sender, RoutedEventArgs e)
     {
@@ -335,7 +326,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void ControlPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInControlArea = false;
 
-    private void BackgroundPanelOnUnloaded(object sender, RoutedEventArgs e)
+    private void RootUnloaded(object sender, RoutedEventArgs e)
     {
         DanmakuCanvas.RemoveFromVisualTree();
         DanmakuCanvas = null;
