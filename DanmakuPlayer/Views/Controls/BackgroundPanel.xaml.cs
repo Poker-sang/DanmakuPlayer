@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -10,12 +11,15 @@ using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using Windows.System;
+using Vanara.Extensions;
+using Vanara.PInvoke;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -31,7 +35,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         AppContext.BackgroundPanel = this;
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
-        DragMoveHelper.RootPanel = this;
 
         AppContext.Timer.Tick += (sender, _) =>
         {
@@ -93,30 +96,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         _vm.StartPlaying = true;
     }
 
-    private DateTime _closeSnakeBarTime;
-
-    /// <summary>
-    /// 出现信息并消失
-    /// </summary>
-    /// <param name="message">提示信息</param>
-    /// <param name="isError"><see langword="true"/>为错误信息，<see langword="false"/>为提示信息</param>
-    /// <param name="hint">信息附加内容</param>
-    /// <param name="mSec">信息持续时间</param>
-    private async void FadeOut(string message, bool isError, string hint, int mSec = 3000)
-    {
-        _closeSnakeBarTime = DateTime.Now + TimeSpan.FromMicroseconds(mSec - 100);
-
-        RootSnackBar.Title = message;
-        RootSnackBar.Subtitle = hint;
-        RootSnackBar.IconSource.To<SymbolIconSource>().Symbol = isError ? Symbol.Important : Symbol.Accept;
-
-        _ = RootSnackBar.IsOpen = true;
-        await Task.Delay(mSec);
-        if (DateTime.Now > _closeSnakeBarTime)
-            _ = RootSnackBar.IsOpen = false;
-    }
-
-    public async void DanmakuReload(RenderType renderType)
+    public async void ReloadDanmaku(RenderType renderType)
     {
         if (DanmakuHelper.Pool.Length is 0)
             return;
@@ -141,33 +121,32 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         TryResume();
     }
 
-    private async void Import(int cId)
-    {
-        FadeOut("弹幕装填中...", false, "(｀・ω・´)");
-        try
-        {
-            await LoadDanmaku(async () =>
-            {
-                var tempPool = new List<Danmaku>();
-                for (var i = 0; ; ++i)
-                {
-                    await using var danmaku = await DanmakuPlayer.Resources.BiliApis.GetDanmaku(cId, i + 1);
-                    if (danmaku is null)
-                        break;
-                    var reply = Serializer.Deserialize<Resources.DmSegMobileReply>(danmaku);
-                    tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
-                }
+    #region SnackBar功能
 
-                return tempPool;
-            });
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e);
-            FadeOut("━━Σ(ﾟДﾟ川)━ 未知的异常", true, e.Message);
-        }
+    private DateTime _closeSnakeBarTime;
+
+    /// <summary>
+    /// 出现信息并消失
+    /// </summary>
+    /// <param name="message">提示信息</param>
+    /// <param name="isError"><see langword="true"/>为错误信息，<see langword="false"/>为提示信息</param>
+    /// <param name="hint">信息附加内容</param>
+    /// <param name="mSec">信息持续时间</param>
+    private async void FadeOut(string message, bool isError, string hint, int mSec = 3000)
+    {
+        _closeSnakeBarTime = DateTime.Now + TimeSpan.FromMicroseconds(mSec - 100);
+
+        RootSnackBar.Title = message;
+        RootSnackBar.Subtitle = hint;
+        RootSnackBar.IconSource.To<SymbolIconSource>().Symbol = isError ? Symbol.Important : Symbol.Accept;
+
+        _ = RootSnackBar.IsOpen = true;
+        await Task.Delay(mSec);
+        if (DateTime.Now > _closeSnakeBarTime)
+            _ = RootSnackBar.IsOpen = false;
     }
 
+    #endregion
 
     #region 播放及暂停
 
@@ -206,6 +185,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region 事件处理
 
+    #region SwapChainPanel事件
+
     private void RootDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         switch (CurrentContext.OverlappedPresenter.State)
@@ -226,7 +207,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (DanmakuHelper.Pool.Length is 0)
             return;
 
-        DanmakuReload(RenderType.ReloadProvider);
+        ReloadDanmaku(RenderType.ReloadProvider);
     }
 
     public async void RootKeyUp(object sender, KeyRoutedEventArgs e)
@@ -265,21 +246,183 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void RootKeyDown(object sender, KeyRoutedEventArgs e)
     {
-
     }
 
-    private async void ImportTapped(object sender, RoutedEventArgs e)
+    private void RootUnloaded(object sender, RoutedEventArgs e)
     {
-        if ((await DialogInput.ShowAsync()) is { } cId)
-            Import(cId);
+        DanmakuCanvas.RemoveFromVisualTree();
+        DanmakuCanvas = null;
     }
 
-    private async void FileTapped(object sender, RoutedEventArgs e)
+    #region DragMove和放缩实现
+
+    // TODO 锚点位置和控件绑定
+    // TODO 最小缩放大小
+
+    private const int MinimumOffset = 10;
+    private POINT _mousePoint;
+    private PointerOperationType _type;
+
+    private InputSystemCursorShape _lastShape = InputSystemCursorShape.Arrow;
+
+    [Flags]
+    private enum PointerOperationType
     {
-        var file = await PickerHelper.PickSingleFileAsync();
-        if (file is not null)
-            await LoadDanmaku(() => Task.FromResult(BiliHelper.ToDanmaku(XDocument.Load(file.Path)).ToList()));
+        /// <summary>
+        /// 用以区分有没有在根控件按下按钮
+        /// </summary>
+        None = 0,
+        Top = 1 << 0,
+        Bottom = 1 << 1,
+        Left = 1 << 2,
+        Right = 1 << 3,
+        LeftTop = Top | Left,
+        RightTop = Right | Top,
+        LeftBottom = Left | Bottom,
+        RightBottom = Right | Bottom,
+        Move = Top | Left | Right | Bottom
     }
+
+    private void RootPointerMoved(object sender, PointerRoutedEventArgs e)
+    {
+        var frameworkElement = sender.To<FrameworkElement>();
+        var width = frameworkElement.ActualWidth;
+        var height = frameworkElement.ActualHeight;
+        var point = e.GetCurrentPoint(frameworkElement);
+        var position = point.Position;
+        const int o = MinimumOffset;
+
+        var pointerShape = InputSystemCursorShape.Arrow;
+        if (CurrentContext.OverlappedPresenter.State is not OverlappedPresenterState.Maximized)
+            switch (position._x, position._y, width - position._x, height - position._y)
+            {
+                case ( < o, < o, _, _):
+                case (_, _, < o, < o):
+                    pointerShape = InputSystemCursorShape.SizeNorthwestSoutheast;
+                    break;
+                case ( < o, _, _, < o):
+                case (_, < o, < o, _):
+                    pointerShape = InputSystemCursorShape.SizeNortheastSouthwest;
+                    break;
+                case ( < o, _, _, _):
+                case (_, _, < o, _):
+                    pointerShape = InputSystemCursorShape.SizeWestEast;
+                    break;
+                case (_, < o, _, _):
+                case (_, _, _, < o):
+                    pointerShape = InputSystemCursorShape.SizeNorthSouth;
+                    break;
+                case (_, _, _, _):
+                    break;
+            }
+
+        if (pointerShape != _lastShape)
+        {
+            ProtectedCursor?.Dispose();
+            ProtectedCursor = InputSystemCursor.Create(pointerShape);
+            _lastShape = pointerShape;
+        }
+
+        var properties = point.Properties;
+        if (!properties.IsLeftButtonPressed || _type is PointerOperationType.None)
+            return;
+
+
+        _ = User32.GetCursorPos(out var pt);
+
+        var xOffset = pt.X - _mousePoint.X;
+        var yOffset = pt.Y - _mousePoint.Y;
+
+
+        var offset = Vector2.DistanceSquared(Vector2.Zero, new(xOffset, yOffset));
+
+        if (offset < o)
+            return;
+
+        if (CurrentContext.OverlappedPresenter.State is OverlappedPresenterState.Maximized)
+        {
+            if (_type is PointerOperationType.Move)
+            {
+                var originalSize = CurrentContext.AppWindow.Size;
+                CurrentContext.OverlappedPresenter.Restore();
+                var size = CurrentContext.AppWindow.Size;
+                var rate = 1 - (double)size.Width / originalSize.Width;
+                CurrentContext.AppWindow.Move(new((pt.X * rate).To<int>(), (pt.Y * rate).To<int>()));
+            }
+        }
+        else
+        {
+            var xPos = CurrentContext.AppWindow.Position.X;
+            var yPos = CurrentContext.AppWindow.Position.Y;
+            var xSize = CurrentContext.AppWindow.Size.Width;
+            var ySize = CurrentContext.AppWindow.Size.Height;
+
+            if (_type.IsFlagSet(PointerOperationType.Top))
+            {
+                yPos += yOffset;
+                ySize -= yOffset;
+            }
+            if (_type.IsFlagSet(PointerOperationType.Bottom))
+                ySize += yOffset;
+
+            if (_type.IsFlagSet(PointerOperationType.Left))
+            {
+                xPos += xOffset;
+                xSize -= xOffset;
+            }
+            if (_type.IsFlagSet(PointerOperationType.Right))
+                xSize += xOffset;
+            CurrentContext.AppWindow.MoveAndResize(new(xPos, yPos, xSize, ySize));
+        }
+
+        _mousePoint.X = pt.X;
+        _mousePoint.Y = pt.Y;
+    }
+
+    private void RootPointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        var frameworkElement = sender.To<FrameworkElement>();
+        var point = e.GetCurrentPoint(frameworkElement);
+        var properties = point.Properties;
+
+        if (!properties.IsLeftButtonPressed)
+            return;
+
+        var width = frameworkElement.ActualWidth;
+        var height = frameworkElement.ActualHeight;
+        var position = point.Position;
+        // offset
+        const int o = MinimumOffset;
+
+        _type = PointerOperationType.None;
+        if (position.X < o)
+            _type |= PointerOperationType.Left;
+        if (position.Y < o)
+            _type |= PointerOperationType.Top;
+        if (width - position.X < o)
+            _type |= PointerOperationType.Right;
+        if (height - position.Y < o)
+            _type |= PointerOperationType.Bottom;
+        if (_type is PointerOperationType.None)
+            _type = PointerOperationType.Move;
+
+        _ = frameworkElement.CapturePointer(e.Pointer);
+        _ = User32.GetCursorPos(out _mousePoint);
+    }
+
+    private void RootPointerReleased(object sender, PointerRoutedEventArgs e)
+    {
+        sender.To<UIElement>().ReleasePointerCaptures();
+        _type = PointerOperationType.None;
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Title区按钮
+
+    private void CloseTapped(object sender, RoutedEventArgs e) => CurrentContext.App.Exit();
 
     private void FrontTapped(object sender, RoutedEventArgs e)
     {
@@ -297,7 +440,50 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private async void SettingTapped(object sender, RoutedEventArgs e) => await DialogSetting.ShowAsync();
 
-    private void CloseTapped(object sender, RoutedEventArgs e) => CurrentContext.App.Exit();
+    #endregion
+
+    #region Import区按钮
+
+    private async void ImportTapped(object sender, RoutedEventArgs e)
+    {
+        if ((await DialogInput.ShowAsync()) is not { } cId)
+            return;
+
+        FadeOut("弹幕装填中...", false, "(｀・ω・´)");
+        try
+        {
+            await LoadDanmaku(async () =>
+            {
+                var tempPool = new List<Danmaku>();
+                for (var i = 0; ; ++i)
+                {
+                    await using var danmaku = await DanmakuPlayer.Resources.BiliApis.GetDanmaku(cId, i + 1);
+                    if (danmaku is null)
+                        break;
+                    var reply = Serializer.Deserialize<Resources.DmSegMobileReply>(danmaku);
+                    tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
+                }
+
+                return tempPool;
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            FadeOut("━━Σ(ﾟДﾟ川)━ 未知的异常", true, ex.Message);
+        }
+    }
+
+    private async void FileTapped(object sender, RoutedEventArgs e)
+    {
+        var file = await PickerHelper.PickSingleFileAsync();
+        if (file is not null)
+            await LoadDanmaku(() => Task.FromResult(BiliHelper.ToDanmaku(XDocument.Load(file.Path)).ToList()));
+    }
+
+    #endregion
+
+    #region Control区事件
 
     private void PauseResumeTapped(object sender, RoutedEventArgs e)
     {
@@ -314,6 +500,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void TimePointerReleased(object sender, PointerRoutedEventArgs e) => TryResume();
 
+    #endregion
+
+    #region 区域显隐触发
+
     private void ImportPointerEntered(object sender, PointerRoutedEventArgs e) => _vm.PointerInImportArea = true;
 
     private void ImportPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInImportArea = false;
@@ -326,11 +516,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void ControlPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInControlArea = false;
 
-    private void RootUnloaded(object sender, RoutedEventArgs e)
-    {
-        DanmakuCanvas.RemoveFromVisualTree();
-        DanmakuCanvas = null;
-    }
+    #endregion
 
     #endregion
 }

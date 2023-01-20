@@ -12,6 +12,9 @@
     DoubleTapped="RootDoubleTapped"
     KeyDown="RootKeyDown"
     KeyUp="RootKeyUp"
+    PointerMoved="RootPointerMoved"
+    PointerPressed="RootPointerPressed"
+    PointerReleased="RootPointerReleased"
     SizeChanged="RootSizeChanged"
     Unloaded="RootUnloaded"
     mc:Ignorable="d">

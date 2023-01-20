@@ -62,7 +62,7 @@ public sealed partial class SettingDialog : UserControl
 
     private void ResetTimer(object sender, RoutedEventArgs e) => AppContext.ResetTimerInterval();
 
-    private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadProvider);
+    private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadProvider);
 
     private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
@@ -72,7 +72,7 @@ public sealed partial class SettingDialog : UserControl
             AppContext.DanmakuCanvas.Opacity = value;
     }
 
-    private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.DanmakuReload(RenderType.ReloadFormats);
+    private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadFormats);
 
     private void SetDefaultAppConfigClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
