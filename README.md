@@ -9,7 +9,7 @@
 * 获取弹幕依赖 [protobuf-net](https://github.com/protobuf-net/protobuf-net) 库
 
 * 弹幕渲染使用 [vortice](https://github.com/amerkoleci/vortice) 的DirectX库
-
+ 
 * 龟速更新中
 
 ## 预览
@@ -82,11 +82,11 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 * [x] 大小弹幕出现位置优化
 
+* [x] 正则屏蔽弹幕
+
 * [ ] 同屏最多（顶端、底端、滚动）弹幕限制
 
 * [ ] 弹幕阴影、描边等效果
-
-* [ ] 正则屏蔽弹幕
 
 * [ ] ⚠️ 高级弹幕
 
@@ -95,6 +95,8 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 * [x] 弹幕多时流畅度
 
 * [x] 优化项目结构
+
+* [ ] ⚠️ 正则高亮与错误提示
 
 * [ ] ⚠️ 再次优化弹幕出现算法
 

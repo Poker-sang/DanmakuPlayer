@@ -6,7 +6,7 @@ using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using Microsoft.International.Converters.PinYinConverter;
 
-namespace DanmakuPlayer.Services;
+namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuCombiner
 {
@@ -93,14 +93,14 @@ public static class DanmakuCombiner
         {
             // 内容相近
             var dis = EditDistance(p.Original, q.Original);
-            if ((p.Length + q.Length < MinDanmakuSize)
+            if (p.Length + q.Length < MinDanmakuSize
                     ? dis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
                     : dis <= appConfig.MaxDistance)
                 return true;
 
             // 谐音
             var pyDis = EditDistance(p.Pinyin, q.Pinyin);
-            if ((p.Length + q.Length < MinDanmakuSize)
+            if (p.Length + q.Length < MinDanmakuSize
                     ? pyDis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
                     : pyDis <= appConfig.MaxDistance)
                 return true;
@@ -123,7 +123,7 @@ public static class DanmakuCombiner
 
     private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
 
-    public static async Task<List<Danmaku>> Combine(this IEnumerable<Danmaku> pool, AppConfig appConfig) =>
+    public static async Task<IEnumerable<Danmaku>> Combine(IEnumerable<Danmaku> pool, AppConfig appConfig) =>
         await Task.Run(() =>
         {
             var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
@@ -197,6 +197,7 @@ public static class DanmakuCombiner
                 ret.Add(represent);
             }
 
+            ret.Sort((d1, d2) => d1.Time.CompareTo(d2.Time));
             return ret;
         });
 }

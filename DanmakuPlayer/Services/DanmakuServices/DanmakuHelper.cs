@@ -7,7 +7,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
 using Vanara.Extensions;
 
-namespace DanmakuPlayer.Services;
+namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuHelper
 {

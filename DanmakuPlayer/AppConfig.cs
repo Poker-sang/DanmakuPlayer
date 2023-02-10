@@ -96,6 +96,22 @@ public partial record AppConfig
 
     #endregion
 
+    #region 正则设置
+
+    /// <summary>
+    /// 弹幕合并
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool DanmakuEnableRegex { get; set; } = true;
+
+    /// <summary>
+    /// 正则表达式集合，用json序列化
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public string RegexPatterns { get; set; } = "[]";
+
+    #endregion
+
     #endregion
 
     public AppConfig()

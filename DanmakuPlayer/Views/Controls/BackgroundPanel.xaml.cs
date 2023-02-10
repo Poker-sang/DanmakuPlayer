@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Services;
+using DanmakuPlayer.Services.DanmakuServices;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -17,9 +18,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
-using Windows.System;
 using Vanara.Extensions;
 using Vanara.PInvoke;
+using Windows.System;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -52,9 +53,16 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 _vm.Time = 0;
             }
         };
+        _filter = new DanmakuFilter
+        {
+            DanmakuCombiner.Combine,
+            DanmakuRegex.Match
+        };
     }
 
     #region 操作
+
+    private readonly DanmakuFilter _filter;
 
     /// <summary>
     /// 加载弹幕操作
@@ -71,19 +79,19 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             var tempPool = await action();
 
-            FadeOut($"已获取{tempPool.Count}条弹幕，正在合并", false, "✧(≖ ◡ ≖✿)");
+            FadeOut($"已获取{tempPool.Count}条弹幕，正在过滤", false, "✧(≖ ◡ ≖✿)");
 
-            DanmakuHelper.Pool = (await tempPool.Combine(_vm.AppConfig)).OrderBy(t => t.Time).ToArray();
-            var combineRate = DanmakuHelper.Pool.Length * 100 / tempPool.Count;
+            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig);
+            var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            FadeOut($"已合并为{DanmakuHelper.Pool.Length}条弹幕，合并率{combineRate}%，正在渲染", false, "('ヮ')");
+            FadeOut($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", false, "('ヮ')");
 
             var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
-            var renderRate = renderedCount * 100 / DanmakuHelper.Pool.Length;
-            var totalRate = renderedCount * 100 / tempPool.Count;
-            _vm.TotalTime = DanmakuHelper.Pool[^1].Time + _vm.AppConfig.DanmakuDuration;
+            var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
+            var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
+            _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
 
-            FadeOut($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{combineRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
+            FadeOut($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
         }
         catch (Exception e)
         {
