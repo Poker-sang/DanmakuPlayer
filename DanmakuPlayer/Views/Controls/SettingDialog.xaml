@@ -241,6 +241,7 @@
                                     CornerRadius="4">
                                     <AutoSuggestBox
                                         uiControls:DockPanel.Dock="Top"
+                                        PlaceholderText="输入一条正则表达式，并点击“+”添加"
                                         QueryIcon="Add"
                                         QuerySubmitted="AddRegexPattern"
                                         TextChanged="RegexPatternChanged" />
@@ -257,12 +258,12 @@
                                                 <Button
                                                     Width="40"
                                                     Height="25"
-                                                    Tag="{x:Bind}"
-                                                    Tapped="RemoveTapped"
                                                     HorizontalContentAlignment="Center"
                                                     uiControls:DockPanel.Dock="Right"
                                                     Background="Transparent"
-                                                    BorderThickness="0">
+                                                    BorderThickness="0"
+                                                    Tag="{x:Bind}"
+                                                    Tapped="RemoveTapped">
                                                     <SymbolIcon
                                                         Width="20"
                                                         Height="15"

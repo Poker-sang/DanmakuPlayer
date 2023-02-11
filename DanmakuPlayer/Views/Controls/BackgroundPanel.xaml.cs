@@ -524,6 +524,43 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void ControlPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInControlArea = false;
 
+    #region 进度条时间输入
+
+    private void TimeTextTapped(object sender, TappedRoutedEventArgs e)
+    {
+        _vm.DefaultInputTime = _vm.Time;
+        _vm.InputtingTime = true;
+    }
+
+    private void TimeTextLostFocus(object sender, RoutedEventArgs e) => _vm.InputtingTime = false;
+
+    private void TimeTextBeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs e)
+    {
+        if (e.NewText is "")
+            return;
+        if (e.NewText[^1] is '\r' or '\n')
+        {
+            if (TimeSpan.TryParse(e.NewText.Trim(), out var result))
+                _vm.Time = result.TotalMinutes;
+
+            _vm.InputtingTime = false;
+            e.Cancel = true;
+        }
+        else if (e.NewText.Contains('\r') || e.NewText.Contains('\n'))
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private void TimeTextIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        var tb = sender.To<TextBox>();
+        if (tb.IsEnabled)
+            _ = tb.Focus(FocusState.Programmatic);
+    }
+
+    #endregion
+
     #endregion
 
     #endregion

@@ -80,9 +80,9 @@ public static class DanmakuCombiner
 
         return (double)xy * xy / (x * y);
     }
+
     public const int MinDanmakuSize = 10;
-
-
+    
     private static bool Similarity(DanmakuString p, DanmakuString q, AppConfig appConfig)
     {
         // 全等

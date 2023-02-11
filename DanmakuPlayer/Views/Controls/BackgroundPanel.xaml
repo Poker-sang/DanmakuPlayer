@@ -123,29 +123,46 @@
                     <SymbolIcon Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
                 </AppBarButton.Icon>
             </AppBarButton>
-            <StackPanel
+            <Grid
                 Margin="10,0"
-                Orientation="Horizontal"
-                Spacing="5">
-                <TextBlock
+                Background="Transparent"
+                Tapped="TimeTextTapped">
+                <StackPanel
+                    Margin="0"
+                    Orientation="Horizontal"
+                    Spacing="5"
+                    Visibility="{x:Bind _vm.NavigateInputtingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        controls:DockPanel.Dock="Left"
+                        Foreground="{StaticResource Foreground}"
+                        Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                        TextAlignment="Right" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        controls:DockPanel.Dock="Left"
+                        Foreground="{StaticResource Foreground}"
+                        Text="-"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        controls:DockPanel.Dock="Left"
+                        Foreground="{StaticResource Foreground}"
+                        Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                        TextAlignment="Left" />
+                </StackPanel>
+                <TextBox
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    controls:DockPanel.Dock="Left"
-                    Foreground="{StaticResource Foreground}"
-                    Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
-                    TextAlignment="Right" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    controls:DockPanel.Dock="Left"
-                    Foreground="{StaticResource Foreground}"
-                    Text="-"
-                    TextAlignment="Center" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    controls:DockPanel.Dock="Left"
-                    Foreground="{StaticResource Foreground}"
-                    Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
-                    TextAlignment="Left" />
-            </StackPanel>
+                    AcceptsReturn="True"
+                    BeforeTextChanging="TimeTextBeforeTextChanging"
+                    IsEnabled="{x:Bind _vm.InputtingTime, Mode=OneWay}"
+                    IsEnabledChanged="TimeTextIsEnabledChanged"
+                    LostFocus="TimeTextLostFocus"
+                    Text="{x:Bind _vm.DefaultInputTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                    TextAlignment="Center"
+                    Visibility="{x:Bind _vm.InputtingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+            </Grid>
             <!--
                 PointerPressed="TimePointerPressed"
                 PointerReleased="TimePointerReleased"
