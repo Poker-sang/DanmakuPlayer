@@ -40,22 +40,22 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.12" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.14" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
         <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
         <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
-        <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.12" />
-        <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.12" />
-        <PackageReference Include="Vortice.Direct3D12" Version="2.2.0" />
-        <PackageReference Include="Vortice.DXGI" Version="2.2.0" />
-        <PackageReference Include="Vortice.WinUI" Version="2.2.0" />
-        <PackageReference Include="WinUI3Utilities" Version="1.0.8" />
+        <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.13" />
+        <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.13" />
+        <PackageReference Include="Vortice.Direct3D12" Version="2.3.0" />
+        <PackageReference Include="Vortice.DXGI" Version="2.3.0" />
+        <PackageReference Include="Vortice.WinUI" Version="2.3.0" />
+        <PackageReference Include="WinUI3Utilities" Version="1.0.9.5" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
-        <PackageReference Include="protobuf-net" Version="3.1.26" />
-        <PackageReference Include="protobuf-net.Grpc" Version="1.0.179" />
+        <PackageReference Include="protobuf-net" Version="3.1.33" />
+        <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />
         <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>
 

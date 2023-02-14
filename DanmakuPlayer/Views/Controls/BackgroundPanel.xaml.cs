@@ -123,7 +123,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 await DanmakuHelper.ResetFormat(DanmakuCanvas);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(renderType), renderType, null);
+                ThrowHelper.ArgumentOutOfRange(renderType);
+                break;
         }
 
         TryResume();

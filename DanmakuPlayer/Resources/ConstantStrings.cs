@@ -5,9 +5,9 @@ namespace DanmakuPlayer.Resources;
 
 public static class ConstantStrings
 {
-    public const string AuthorUri = "https://github.com/Poker-sang";
+    public const string AuthorUri = "https://github.com/Poker-sang/";
 
-    public const string RepositoryUri = AuthorUri + "/DanmakuPlayer";
+    public const string RepositoryUri = AuthorUri + nameof(DanmakuPlayer);
 
     public const string LicenseUri = RepositoryUri + "/blob/master/LICENSE";
 

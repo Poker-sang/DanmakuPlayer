@@ -5,6 +5,7 @@ using Vanara.PInvoke;
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services;
 
@@ -47,7 +48,7 @@ public static class SwapChainPanelHelper
             return D3D12.D3D12CreateDevice<ID3D12Device>(dxgiAdapter1, FeatureLevel.Level_12_1);
         }
 
-        throw new("No available adapter.");
+        return ThrowHelper.NotSupported<ID3D12Device>("No available adapter.");
     }
 
     private static IDXGISwapChain1 CreateSwapChain(nint hWnd, ID3D12Device d3D12Device, IDXGIFactory5 dxgiFactory5)
