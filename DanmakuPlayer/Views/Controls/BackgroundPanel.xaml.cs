@@ -20,7 +20,7 @@ using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using Vanara.Extensions;
 using Vanara.PInvoke;
-using Windows.System;
+using WinRT;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -149,10 +149,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         RootSnackBar.Subtitle = hint;
         RootSnackBar.IconSource.To<SymbolIconSource>().Symbol = isError ? Symbol.Important : Symbol.Accept;
 
-        _ = RootSnackBar.IsOpen = true;
+        RootSnackBar.IsOpen = true;
         await Task.Delay(mSec);
         if (DateTime.Now > _closeSnakeBarTime)
-            _ = RootSnackBar.IsOpen = false;
+            RootSnackBar.IsOpen = false;
     }
 
     #endregion
@@ -219,49 +219,31 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         ReloadDanmaku(RenderType.ReloadProvider);
     }
 
-    public async void RootKeyUp(object sender, KeyRoutedEventArgs e)
-    {
-        switch (e.Key)
-        {
-            case VirtualKey.Left:
-            {
-                if (_vm.Time - _vm.AppConfig.PlayFastForward < 0)
-                    _vm.Time = 0;
-                else
-                    _vm.Time -= _vm.AppConfig.PlayFastForward;
-                break;
-            }
-            case VirtualKey.Right:
-            {
-                if (_vm.Time + _vm.AppConfig.PlayFastForward > _vm.TotalTime)
-                    _vm.Time = 0;
-                else
-                    _vm.Time += _vm.AppConfig.PlayFastForward;
-                break;
-            }
-            case VirtualKey.Space:
-            {
-                PauseResumeTapped(null!, null!);
-                break;
-            }
-            case VirtualKey.Tab:
-            {
-                await DialogSetting.ShowAsync();
-                break;
-            }
-            default: break;
-        }
-    }
-
-    private void RootKeyDown(object sender, KeyRoutedEventArgs e)
-    {
-    }
-
     private void RootUnloaded(object sender, RoutedEventArgs e)
     {
         DanmakuCanvas.RemoveFromVisualTree();
         DanmakuCanvas = null;
     }
+
+    #region 快进快退快捷键
+
+    private void RewindInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_vm.Time - _vm.AppConfig.PlayFastForward < 0)
+            _vm.Time = 0;
+        else
+            _vm.Time -= _vm.AppConfig.PlayFastForward;
+    }
+
+    private void FastForwardInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_vm.Time + _vm.AppConfig.PlayFastForward > _vm.TotalTime)
+            _vm.Time = 0;
+        else
+            _vm.Time += _vm.AppConfig.PlayFastForward;
+    }
+
+    #endregion
 
     #region DragMove和放缩实现
 
@@ -447,7 +429,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         }
     }
 
-    private async void SettingTapped(object sender, RoutedEventArgs e) => await DialogSetting.ShowAsync();
+    private async void SettingTapped(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();
 
     #endregion
 
@@ -494,7 +476,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region Control区事件
 
-    private void PauseResumeTapped(object sender, RoutedEventArgs e)
+    private void PauseResumeTapped(object sender, IWinRTObject e)
     {
         if (_vm.IsPlaying)
             Pause();

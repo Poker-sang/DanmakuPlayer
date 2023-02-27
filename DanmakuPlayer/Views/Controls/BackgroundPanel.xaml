@@ -10,8 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="RootDoubleTapped"
-    KeyDown="RootKeyDown"
-    KeyUp="RootKeyUp"
     PointerMoved="RootPointerMoved"
     PointerPressed="RootPointerPressed"
     PointerReleased="RootPointerReleased"
@@ -44,7 +42,15 @@
         Grid.ColumnSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        Opacity="{x:Bind _vm.DanmakuOpacity, Mode=OneWay}" />
+        KeyboardAcceleratorPlacementMode="Hidden"
+        Opacity="{x:Bind _vm.DanmakuOpacity, Mode=OneWay}">
+        <xaml:CanvasControl.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+            <KeyboardAccelerator Key="Left" Invoked="RewindInvoked" />
+            <KeyboardAccelerator Key="Right" Invoked="FastForwardInvoked" />
+            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
+        </xaml:CanvasControl.KeyboardAccelerators>
+    </xaml:CanvasControl>
     <TextBlock
         x:Name="TbBanner"
         Grid.Row="1"
