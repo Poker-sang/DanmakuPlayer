@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:converters="using:DanmakuPlayer.Services.Converters"
+    xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:ctkConverters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
@@ -31,7 +31,7 @@
     </SwapChainPanel.RowDefinitions>
     <SwapChainPanel.ColumnDefinitions>
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="2*" />
+        <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />
     </SwapChainPanel.ColumnDefinitions>
     <xaml:CanvasControl
@@ -54,7 +54,8 @@
     <TextBlock
         x:Name="TbBanner"
         Grid.Row="1"
-        Grid.Column="1"
+        Grid.Column="0"
+        Grid.ColumnSpan="3"
         FontSize="72"
         Foreground="{StaticResource Foreground}"
         IsHitTestVisible="False"

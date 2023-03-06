@@ -33,6 +33,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     public BackgroundPanel()
     {
+        (_maximumXSize, _maximumYSize) = WindowHelper.GetScreenSize();
         AppContext.BackgroundPanel = this;
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
@@ -79,24 +80,24 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             var tempPool = await action();
 
-            FadeOut($"已获取{tempPool.Count}条弹幕，正在过滤", false, "✧(≖ ◡ ≖✿)");
+            ShowSnackBar($"已获取{tempPool.Count}条弹幕，正在过滤", false, "✧(≖ ◡ ≖✿)");
 
             DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            FadeOut($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", false, "('ヮ')");
+            ShowSnackBar($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", false, "('ヮ')");
 
             var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
 
-            FadeOut($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
+            ShowSnackBar($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
         }
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            FadeOut("​( ´･_･)ﾉ(._.`) 发生异常了", true, e.Message);
+            ShowSnackBar("​( ´･_･)ﾉ(._.`) 发生异常了", true, e.Message);
         }
 
         if (TbBanner is not null)
@@ -141,7 +142,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     /// <param name="isError"><see langword="true"/>为错误信息，<see langword="false"/>为提示信息</param>
     /// <param name="hint">信息附加内容</param>
     /// <param name="mSec">信息持续时间</param>
-    private async void FadeOut(string message, bool isError, string hint, int mSec = 3000)
+    private async void ShowSnackBar(string message, bool isError, string hint, int mSec = 3000)
     {
         _closeSnakeBarTime = DateTime.Now + TimeSpan.FromMicroseconds(mSec - 100);
 
@@ -248,9 +249,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     #region DragMove和放缩实现
 
     // TODO 锚点位置和控件绑定
-    // TODO 最小缩放大小
 
     private const int MinimumOffset = 10;
+    private const int MinimumXSize = 1280;
+    private const int MinimumYSize = 720;
+    private readonly int _maximumXSize;
+    private readonly int _maximumYSize;
     private POINT _mousePoint;
     private PointerOperationType _type;
 
@@ -318,12 +322,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (!properties.IsLeftButtonPressed || _type is PointerOperationType.None)
             return;
 
-
         _ = User32.GetCursorPos(out var pt);
 
         var xOffset = pt.X - _mousePoint.X;
         var yOffset = pt.Y - _mousePoint.Y;
-
 
         var offset = Vector2.DistanceSquared(Vector2.Zero, new(xOffset, yOffset));
 
@@ -338,7 +340,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 CurrentContext.OverlappedPresenter.Restore();
                 var size = CurrentContext.AppWindow.Size;
                 var rate = 1 - (double)size.Width / originalSize.Width;
-                CurrentContext.AppWindow.Move(new((pt.X * rate).To<int>(), (pt.Y * rate).To<int>()));
+                CurrentContext.AppWindow.Move(new((int)(pt.X * rate), (int)(pt.Y * rate)));
             }
         }
         else
@@ -351,18 +353,34 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             if (_type.IsFlagSet(PointerOperationType.Top))
             {
                 yPos += yOffset;
-                ySize -= yOffset;
+                var newYSize = ySize - yOffset;
+                if (MinimumYSize < newYSize && newYSize < _maximumYSize)
+                    ySize = newYSize;
             }
             if (_type.IsFlagSet(PointerOperationType.Bottom))
-                ySize += yOffset;
-
+            {
+                var newYSize = ySize + yOffset;
+                if (MinimumYSize < newYSize && newYSize < _maximumYSize)
+                    ySize = newYSize;
+                else
+                    yPos += yOffset;
+            }
             if (_type.IsFlagSet(PointerOperationType.Left))
             {
                 xPos += xOffset;
-                xSize -= xOffset;
+                var newXSize = xSize - xOffset;
+                if (MinimumXSize < newXSize && newXSize < _maximumXSize)
+                    xSize = newXSize;
             }
             if (_type.IsFlagSet(PointerOperationType.Right))
-                xSize += xOffset;
+            {
+                var newXSize = xSize + xOffset;
+                if (MinimumXSize < newXSize && newXSize < _maximumXSize)
+                    xSize = newXSize;
+                else
+                    xPos += xOffset;
+            }
+
             CurrentContext.AppWindow.MoveAndResize(new(xPos, yPos, xSize, ySize));
         }
 
@@ -382,7 +400,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         var width = frameworkElement.ActualWidth;
         var height = frameworkElement.ActualHeight;
         var position = point.Position;
-        // offset
+
         const int o = MinimumOffset;
 
         _type = PointerOperationType.None;
@@ -420,12 +438,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = false;
-            FadeOut("固定上层：关闭", false, "(°∀°)ﾉ");
+            ShowSnackBar("固定上层：关闭", false, "(°∀°)ﾉ");
         }
         else
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = true;
-            FadeOut("固定上层：开启", false, "(・ω< )★");
+            ShowSnackBar("固定上层：开启", false, "(・ω< )★");
         }
     }
 
@@ -440,7 +458,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if ((await DialogInput.ShowAsync()) is not { } cId)
             return;
 
-        FadeOut("弹幕装填中...", false, "(｀・ω・´)");
+        ShowSnackBar("弹幕装填中...", false, "(｀・ω・´)");
         try
         {
             await LoadDanmaku(async () =>
@@ -461,7 +479,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            FadeOut("━━Σ(ﾟДﾟ川)━ 未知的异常", true, ex.Message);
+            ShowSnackBar("━━Σ(ﾟДﾟ川)━ 未知的异常", true, ex.Message);
         }
     }
 

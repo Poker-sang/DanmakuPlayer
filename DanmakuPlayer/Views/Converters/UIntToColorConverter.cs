@@ -1,9 +1,10 @@
 using System;
-using Microsoft.UI.Xaml.Data;
 using Windows.UI;
+using DanmakuPlayer.Services;
+using Microsoft.UI.Xaml.Data;
 using WinUI3Utilities;
 
-namespace DanmakuPlayer.Services.Converters;
+namespace DanmakuPlayer.Views.Converters;
 
 public class UIntToColorConverter : IValueConverter
 {

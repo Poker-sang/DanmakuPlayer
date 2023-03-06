@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using WinUI3Utilities;
 
-namespace DanmakuPlayer.Services.Converters;
+namespace DanmakuPlayer.Views.Converters;
 
 public class BoolToPinUnPinSymbolConverter : IValueConverter
 {

@@ -2,7 +2,7 @@
     x:Class="DanmakuPlayer.Views.Controls.SettingDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="using:DanmakuPlayer.Services.Converters"
+    xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:local="using:DanmakuPlayer.Views.Controls"

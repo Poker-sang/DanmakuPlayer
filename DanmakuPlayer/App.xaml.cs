@@ -9,7 +9,6 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        CurrentContext.App = this;
         CurrentContext.Title = nameof(DanmakuPlayer);
         AppContext.Initialize();
         HttpClientHelper.Initialize();
