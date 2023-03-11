@@ -8,18 +8,21 @@ using Microsoft.UI.Xaml.Input;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
+
 public sealed partial class InputDialog : UserControl
 {
     public InputDialog() => InitializeComponent();
 
     private BiliHelper.CodeType _codeType;
+
     private int? _cId;
+
     private VideoPage[] ItemsSource { get; set; } = Array.Empty<VideoPage>();
 
     public async Task<int?> ShowAsync()
     {
-        _ = await ((ContentDialog)Content).ShowAsync();
-        return _cId;
+        var result = await Content.To<ContentDialog>().ShowAsync();
+        return result is ContentDialogResult.None ? null : _cId;
     }
 
     #region 操作
@@ -36,7 +39,14 @@ public sealed partial class InputDialog : UserControl
     {
         var index = sender.SelectedIndex;
         _cId = ItemsSource[index].CId;
-        ((ContentDialog)Content).Hide();
+        Content.To<ContentDialog>().Hide();
+    }
+
+    private void ShowInfoBar(string message, bool isError)
+    {
+        IbMessage.Message = message;
+        IbMessage.Severity = isError ? InfoBarSeverity.Error : InfoBarSeverity.Informational;
+        IbMessage.IsOpen = true;
     }
 
     #endregion
@@ -55,9 +65,7 @@ public sealed partial class InputDialog : UserControl
         switch (_codeType)
         {
             case BiliHelper.CodeType.Error:
-                IbMessage.Message = "未匹配到相应的视频！";
-                IbMessage.Severity = InfoBarSeverity.Error;
-                IbMessage.IsOpen = true;
+                ShowInfoBar("未匹配到相应的视频！", true);
                 break;
             case BiliHelper.CodeType.AvId:
                 ItemsSource = (await BiliHelper.Av2CIds(code)).ToArray();
@@ -93,9 +101,7 @@ public sealed partial class InputDialog : UserControl
         switch (ItemsSource.Length)
         {
             case 0:
-                IbMessage.Message = "未匹配到相应的视频！";
-                IbMessage.Severity = InfoBarSeverity.Error;
-                IbMessage.IsOpen = true;
+                ShowInfoBar("未匹配到相应的视频！", true);
                 break;
             case 1:
                 _cId = ItemsSource[0].CId;
@@ -103,19 +109,17 @@ public sealed partial class InputDialog : UserControl
                 break;
             case > 1:
                 LvPage.ItemsSource = ItemsSource;
-                IbMessage.Message = "请选择一个视频：";
-                IbMessage.Severity = InfoBarSeverity.Informational;
-                IbMessage.IsOpen = true;
+                ShowInfoBar("请选择一个视频：", false);
                 ShowSecondButton(sender);
                 break;
         }
     }
 
-    private void PageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e) => SelectConfirm((ListView)sender);
+    private void PageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e) => SelectConfirm(sender.To<ListView>());
 
     private void SelectClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => SelectConfirm(LvPage);
 
-    private void SelectionChanged(object sender, SelectionChangedEventArgs e) => ((ContentDialog)Content).IsSecondaryButtonEnabled = true;
+    private void SelectionChanged(object sender, SelectionChangedEventArgs e) => Content.To<ContentDialog>().IsSecondaryButtonEnabled = true;
 
     #endregion
 }
