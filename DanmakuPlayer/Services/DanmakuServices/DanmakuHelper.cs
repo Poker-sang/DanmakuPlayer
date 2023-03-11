@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -42,7 +43,9 @@ public static class DanmakuHelper
             }
 
             var context = new DanmakuContext((float)sender.ActualHeight);
-            _renderCount = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
+            var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
+
+            _renderCount = count;
             RenderType = RenderType.SetFlags(RenderType.RenderInit, false);
         }
 
@@ -68,31 +71,31 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = Array.Empty<Danmaku>();
 
-    public static async Task<int> PoolRenderInit(CanvasControl canvas)
+    public static async Task<int> PoolRenderInit(CanvasControl canvas, CancellationToken token)
     {
         RenderType = RenderType.RenderInit;
-        await WaitForRender(canvas);
+        await WaitForRender(canvas, token);
         return _renderCount;
     }
 
-    public static async Task ResetProvider(CanvasControl canvas)
+    public static async Task ResetProvider(CanvasControl canvas, CancellationToken token)
     {
         RenderType = RenderType.ReloadProvider | RenderType.RenderInit;
-        await WaitForRender(canvas);
+        await WaitForRender(canvas, token);
     }
 
-    public static async Task ResetFormat(CanvasControl canvas)
+    public static async Task ResetFormat(CanvasControl canvas, CancellationToken token)
     {
         RenderType = RenderType.ReloadFormats | RenderType.ReloadProvider | RenderType.RenderInit;
-        await WaitForRender(canvas);
+        await WaitForRender(canvas, token);
     }
 
-    private static async Task WaitForRender(CanvasControl canvas)
+    private static async Task WaitForRender(CanvasControl canvas, CancellationToken token)
     {
         IsRendering = true;
         canvas.Invalidate();
         while (IsRendering)
-            await Task.Delay(500);
+            await Task.Delay(500, token);
     }
 
     public static Danmaku[] DisplayingDanmaku(float time, AppConfig appConfig)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -60,13 +61,13 @@ public static partial class BiliHelper
         return Array.Empty<VideoPage>();
     }
 
-    public static Task<IEnumerable<VideoPage>> Av2CIds(int av) => GetCIds(BiliApis.GetVideoPageList(av));
+    public static Task<IEnumerable<VideoPage>> Av2CIds(int av, CancellationToken token) => GetCIds(BiliApis.GetVideoPageList(av, token));
 
-    public static Task<IEnumerable<VideoPage>> Bv2CIds(string bv) => GetCIds(BiliApis.GetVideoPageList(bv));
+    public static Task<IEnumerable<VideoPage>> Bv2CIds(string bv, CancellationToken token) => GetCIds(BiliApis.GetVideoPageList(bv, token));
 
-    public static async Task<int> Ep2CId(int episodeId)
+    public static async Task<int> Ep2CId(int episodeId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiEpisodeInfo(episodeId);
+        var response = await BiliApis.GetBangumiEpisodeInfo(episodeId, token);
         if (CheckSuccess(response))
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             // Linq会多循环几遍
@@ -80,9 +81,9 @@ public static partial class BiliHelper
         return -1;
     }
 
-    public static async Task<IEnumerable<VideoPage>> Ss2CIds(int seasonId)
+    public static async Task<IEnumerable<VideoPage>> Ss2CIds(int seasonId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiEpisode(seasonId);
+        var response = await BiliApis.GetBangumiEpisode(seasonId, token);
         if (CheckSuccess(response))
             return response.RootElement
                 .GetProperty("result")
@@ -96,9 +97,9 @@ public static partial class BiliHelper
         return Array.Empty<VideoPage>();
     }
 
-    public static async Task<int> Md2Ss(int mediaId)
+    public static async Task<int> Md2Ss(int mediaId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiInfo(mediaId);
+        var response = await BiliApis.GetBangumiInfo(mediaId, token);
         if (CheckSuccess(response))
             return response.RootElement
                 .GetProperty("result")

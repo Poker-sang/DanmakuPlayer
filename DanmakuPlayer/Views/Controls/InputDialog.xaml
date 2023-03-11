@@ -7,9 +7,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:DanmakuPlayer.Models"
     xmlns:uiControls="using:CommunityToolkit.WinUI.UI.Controls"
+    Unloaded="OnUnloaded"
     mc:Ignorable="d">
     <ContentDialog
         Title="在线获取弹幕"
+        CloseButtonClick="CloseButtonClick"
         CloseButtonText="取消"
         DefaultButton="Close"
         PrimaryButtonClick="InquireClick"
@@ -23,7 +25,7 @@
             <InfoBar x:Name="IbMessage" uiControls:DockPanel.Dock="Top" />
             <ListView
                 x:Name="LvPage"
-                DoubleTapped="PageDoubleTapped"
+                DoubleTapped="SelectClick"
                 SelectionChanged="SelectionChanged"
                 SelectionMode="Single">
                 <ListView.ItemTemplate>

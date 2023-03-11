@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DanmakuPlayer.Services;
@@ -49,26 +50,26 @@ public static class HttpClientHelper
         return client;
     }
 
-    public static Task<string> DownloadStringAsync(this string uri, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetStringAsync(uri);
+    public static Task<string> DownloadStringAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
+        => Client.InitializeHeader(header).GetStringAsync(uri, token);
 
-    public static Task<Stream> DownloadStreamAsync(this string uri, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetStreamAsync(uri);
+    public static Task<Stream> DownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
+        => Client.InitializeHeader(header).GetStreamAsync(uri, token);
 
-    public static async Task<Stream?> TryDownloadStreamAsync(this string uri, Dictionary<string, string>? header = null)
+    public static async Task<Stream?> TryDownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
-        var response = await Client.InitializeHeader(header).GetAsync(uri);
+        var response = await Client.InitializeHeader(header).GetAsync(uri, token);
         if (response.IsSuccessStatusCode)
-            return await Client.InitializeHeader(header).GetStreamAsync(uri);
+            return await Client.InitializeHeader(header).GetStreamAsync(uri, token);
         return null;
     }
 
-    public static Task<byte[]> DownloadBytesAsync(this string uri, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetByteArrayAsync(uri);
+    public static Task<byte[]> DownloadBytesAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
+        => Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
 
-    public static async Task<JsonDocument> DownloadJsonAsync(this string uri, Dictionary<string, string>? header = null)
+    public static async Task<JsonDocument> DownloadJsonAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
-        await using var download = await uri.DownloadStreamAsync(header);
-        return await JsonDocument.ParseAsync(download);
+        await using var download = await uri.DownloadStreamAsync(token, header);
+        return await JsonDocument.ParseAsync(download, default, token);
     }
 }

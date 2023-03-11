@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -61,34 +63,45 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private readonly DanmakuFilter _filter;
 
+    private CancellationTokenSource _cancellationTokenSource = new();
+
     /// <summary>
     /// 加载弹幕操作
     /// </summary>
     /// <param name="action"></param>
-    private async Task LoadDanmaku(Func<Task<List<Danmaku>>> action)
+    private async Task LoadDanmaku(Func<CancellationToken, Task<List<Danmaku>>> action)
     {
+        Pause();
+
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = new();
+
+        _vm.TotalTime = 0;
+        _vm.Time = 0;
+        DanmakuHelper.ClearPool();
+
         try
         {
-            Pause();
-            _vm.TotalTime = 0;
-            _vm.Time = 0;
-            DanmakuHelper.ClearPool();
-
-            var tempPool = await action();
+            var tempPool = await action(_cancellationTokenSource.Token);
 
             SnackBarHelper.ShowAndHide($"已获取{tempPool.Count}条弹幕，正在过滤", SnackBarHelper.Severity.Information, "✧(≖ ◡ ≖✿)");
 
-            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig);
+            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
             SnackBarHelper.ShowAndHide($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", SnackBarHelper.Severity.Information, "('ヮ')");
 
-            var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
+            var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
 
             SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
+        }
+        catch (TaskCanceledException)
+        {
+            return;
         }
         catch (Exception e)
         {
@@ -108,20 +121,31 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         TryPause();
 
-        switch (renderType)
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = new();
+
+        try
         {
-            case RenderType.RenderInit:
-                _ = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
-                break;
-            case RenderType.ReloadProvider:
-                await DanmakuHelper.ResetProvider(DanmakuCanvas);
-                break;
-            case RenderType.ReloadFormats:
-                await DanmakuHelper.ResetFormat(DanmakuCanvas);
-                break;
-            default:
-                ThrowHelper.ArgumentOutOfRange(renderType);
-                break;
+            switch (renderType)
+            {
+                case RenderType.RenderInit:
+                    _ = await DanmakuHelper.PoolRenderInit(DanmakuCanvas, _cancellationTokenSource.Token);
+                    break;
+                case RenderType.ReloadProvider:
+                    await DanmakuHelper.ResetProvider(DanmakuCanvas, _cancellationTokenSource.Token);
+                    break;
+                case RenderType.ReloadFormats:
+                    await DanmakuHelper.ResetFormat(DanmakuCanvas, _cancellationTokenSource.Token);
+                    break;
+                default:
+                    ThrowHelper.ArgumentOutOfRange(renderType);
+                    break;
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            return;
         }
 
         TryResume();
@@ -193,6 +217,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         DanmakuCanvas.RemoveFromVisualTree();
         DanmakuCanvas = null;
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
     }
 
     #region 快进快退快捷键
@@ -250,12 +276,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         try
         {
-            await LoadDanmaku(async () =>
+            await LoadDanmaku(async token =>
             {
                 var tempPool = new List<Danmaku>();
                 for (var i = 0; ; ++i)
                 {
-                    await using var danmaku = await DanmakuPlayer.Resources.BiliApis.GetDanmaku(cId, i + 1);
+                    await using var danmaku = await DanmakuPlayer.Resources.BiliApis.GetDanmaku(cId, i + 1, token);
                     if (danmaku is null)
                         break;
                     var reply = Serializer.Deserialize<Resources.DmSegMobileReply>(danmaku);
@@ -276,7 +302,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         var file = await PickerHelper.PickSingleFileAsync();
         if (file is not null)
-            await LoadDanmaku(() => Task.FromResult(BiliHelper.ToDanmaku(XDocument.Load(file.Path)).ToList()));
+            await LoadDanmaku(async token => BiliHelper.ToDanmaku(await XDocument.LoadAsync(File.OpenRead(file.Path), LoadOptions.None, token)).ToList());
     }
 
     #endregion

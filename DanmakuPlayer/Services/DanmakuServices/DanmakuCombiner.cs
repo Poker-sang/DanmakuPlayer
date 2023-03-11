@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -123,13 +124,15 @@ public static class DanmakuCombiner
 
     private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
 
-    public static async Task<IEnumerable<Danmaku>> Combine(IEnumerable<Danmaku> pool, AppConfig appConfig) =>
-        await Task.Run(() =>
+    public static async Task<IEnumerable<Danmaku>> Combine(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    {
+        return await Task.Run(() =>
         {
             var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
             var outDanmaku = new List<List<Danmaku>>();
 
-            foreach (var danmaku in pool.Where(danmaku => danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom))
+            foreach (var danmaku in pool.Where(danmaku =>
+                         danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom))
             {
                 var text = danmaku.Text;
 
@@ -159,9 +162,11 @@ public static class DanmakuCombiner
                     addNew = false;
                     break;
                 }
+
                 if (addNew)
                     danmakuChunk.Enqueue((str, new List<Danmaku> { danmaku }));
             }
+
             while (danmakuChunk.Count > 0)
                 outDanmaku.Add(danmakuChunk.Dequeue().Peers);
 
@@ -173,6 +178,7 @@ public static class DanmakuCombiner
                     ret.Add(peers[0]);
                     continue;
                 }
+
                 var mode = DanmakuMode.Bottom;
                 foreach (var danmaku in peers)
                     switch (danmaku.Mode)
@@ -199,5 +205,6 @@ public static class DanmakuCombiner
 
             ret.Sort((d1, d2) => d1.Time.CompareTo(d2.Time));
             return ret;
-        });
+        }, token);
+    }
 }
