@@ -19,7 +19,9 @@ public static class DanmakuHelper
     public static CreatorProvider Current { get; set; } = null!;
 
     public static RenderType RenderType { get; set; }
+
     public static bool IsRendering { get; set; }
+
     private static int _renderCount;
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)

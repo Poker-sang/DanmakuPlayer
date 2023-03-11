@@ -82,7 +82,7 @@ public static class DanmakuCombiner
     }
 
     public const int MinDanmakuSize = 10;
-    
+
     private static bool Similarity(DanmakuString p, DanmakuString q, AppConfig appConfig)
     {
         // 全等

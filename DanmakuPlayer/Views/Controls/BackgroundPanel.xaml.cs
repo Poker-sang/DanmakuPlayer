@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -12,14 +11,11 @@ using DanmakuPlayer.Services.DanmakuServices;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
-using Vanara.Extensions;
-using Vanara.PInvoke;
 using WinRT;
 using WinUI3Utilities;
 
@@ -33,9 +29,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     public BackgroundPanel()
     {
-        (_maximumXSize, _maximumYSize) = WindowHelper.GetScreenSize();
         AppContext.BackgroundPanel = this;
         InitializeComponent();
+        DragMoveAndResizeHelper.RootPanel = this;
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
         AppContext.Timer.Tick += (sender, _) =>
@@ -80,24 +76,24 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             var tempPool = await action();
 
-            ShowSnackBar($"已获取{tempPool.Count}条弹幕，正在过滤", false, "✧(≖ ◡ ≖✿)");
+            SnackBarHelper.ShowAndHide($"已获取{tempPool.Count}条弹幕，正在过滤", SnackBarHelper.Severity.Information, "✧(≖ ◡ ≖✿)");
 
             DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            ShowSnackBar($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", false, "('ヮ')");
+            SnackBarHelper.ShowAndHide($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", SnackBarHelper.Severity.Information, "('ヮ')");
 
             var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
 
-            ShowSnackBar($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", false, "(/・ω・)/");
+            SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
         }
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            ShowSnackBar("​( ´･_･)ﾉ(._.`) 发生异常了", true, e.Message);
+            SnackBarHelper.ShowAndHide("​( ´･_･)ﾉ(._.`) 发生异常了", SnackBarHelper.Severity.Error, e.Message);
         }
 
         if (TbBanner is not null)
@@ -130,33 +126,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         TryResume();
     }
-
-    #region SnackBar功能
-
-    private DateTime _closeSnakeBarTime;
-
-    /// <summary>
-    /// 出现信息并消失
-    /// </summary>
-    /// <param name="message">提示信息</param>
-    /// <param name="isError"><see langword="true"/>为错误信息，<see langword="false"/>为提示信息</param>
-    /// <param name="hint">信息附加内容</param>
-    /// <param name="mSec">信息持续时间</param>
-    private async void ShowSnackBar(string message, bool isError, string hint, int mSec = 3000)
-    {
-        _closeSnakeBarTime = DateTime.Now + TimeSpan.FromMicroseconds(mSec - 100);
-
-        RootSnackBar.Title = message;
-        RootSnackBar.Subtitle = hint;
-        RootSnackBar.IconSource.To<SymbolIconSource>().Symbol = isError ? Symbol.Important : Symbol.Accept;
-
-        RootSnackBar.IsOpen = true;
-        await Task.Delay(mSec);
-        if (DateTime.Now > _closeSnakeBarTime)
-            RootSnackBar.IsOpen = false;
-    }
-
-    #endregion
 
     #region 播放及暂停
 
@@ -246,187 +215,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #endregion
 
-    #region DragMove和放缩实现
-
-    // TODO 锚点位置和控件绑定
-
-    private const int MinimumOffset = 10;
-    private const int MinimumXSize = 1280;
-    private const int MinimumYSize = 720;
-    private readonly int _maximumXSize;
-    private readonly int _maximumYSize;
-    private POINT _mousePoint;
-    private PointerOperationType _type;
-
-    private InputSystemCursorShape _lastShape = InputSystemCursorShape.Arrow;
-
-    [Flags]
-    private enum PointerOperationType
-    {
-        /// <summary>
-        /// 用以区分有没有在根控件按下按钮
-        /// </summary>
-        None = 0,
-        Top = 1 << 0,
-        Bottom = 1 << 1,
-        Left = 1 << 2,
-        Right = 1 << 3,
-        LeftTop = Top | Left,
-        RightTop = Right | Top,
-        LeftBottom = Left | Bottom,
-        RightBottom = Right | Bottom,
-        Move = Top | Left | Right | Bottom
-    }
-
-    private void RootPointerMoved(object sender, PointerRoutedEventArgs e)
-    {
-        var frameworkElement = sender.To<FrameworkElement>();
-        var width = frameworkElement.ActualWidth;
-        var height = frameworkElement.ActualHeight;
-        var point = e.GetCurrentPoint(frameworkElement);
-        var position = point.Position;
-        const int o = MinimumOffset;
-
-        var pointerShape = InputSystemCursorShape.Arrow;
-        if (CurrentContext.OverlappedPresenter.State is not OverlappedPresenterState.Maximized)
-            switch (position._x, position._y, width - position._x, height - position._y)
-            {
-                case ( < o, < o, _, _):
-                case (_, _, < o, < o):
-                    pointerShape = InputSystemCursorShape.SizeNorthwestSoutheast;
-                    break;
-                case ( < o, _, _, < o):
-                case (_, < o, < o, _):
-                    pointerShape = InputSystemCursorShape.SizeNortheastSouthwest;
-                    break;
-                case ( < o, _, _, _):
-                case (_, _, < o, _):
-                    pointerShape = InputSystemCursorShape.SizeWestEast;
-                    break;
-                case (_, < o, _, _):
-                case (_, _, _, < o):
-                    pointerShape = InputSystemCursorShape.SizeNorthSouth;
-                    break;
-                case (_, _, _, _):
-                    break;
-            }
-
-        if (pointerShape != _lastShape)
-        {
-            ProtectedCursor?.Dispose();
-            ProtectedCursor = InputSystemCursor.Create(pointerShape);
-            _lastShape = pointerShape;
-        }
-
-        var properties = point.Properties;
-        if (!properties.IsLeftButtonPressed || _type is PointerOperationType.None)
-            return;
-
-        _ = User32.GetCursorPos(out var pt);
-
-        var xOffset = pt.X - _mousePoint.X;
-        var yOffset = pt.Y - _mousePoint.Y;
-
-        var offset = Vector2.DistanceSquared(Vector2.Zero, new(xOffset, yOffset));
-
-        if (offset < o)
-            return;
-
-        if (CurrentContext.OverlappedPresenter.State is OverlappedPresenterState.Maximized)
-        {
-            if (_type is PointerOperationType.Move)
-            {
-                var originalSize = CurrentContext.AppWindow.Size;
-                CurrentContext.OverlappedPresenter.Restore();
-                var size = CurrentContext.AppWindow.Size;
-                var rate = 1 - (double)size.Width / originalSize.Width;
-                CurrentContext.AppWindow.Move(new((int)(pt.X * rate), (int)(pt.Y * rate)));
-            }
-        }
-        else
-        {
-            var xPos = CurrentContext.AppWindow.Position.X;
-            var yPos = CurrentContext.AppWindow.Position.Y;
-            var xSize = CurrentContext.AppWindow.Size.Width;
-            var ySize = CurrentContext.AppWindow.Size.Height;
-
-            if (_type.IsFlagSet(PointerOperationType.Top))
-            {
-                yPos += yOffset;
-                var newYSize = ySize - yOffset;
-                if (MinimumYSize < newYSize && newYSize < _maximumYSize)
-                    ySize = newYSize;
-            }
-            if (_type.IsFlagSet(PointerOperationType.Bottom))
-            {
-                var newYSize = ySize + yOffset;
-                if (MinimumYSize < newYSize && newYSize < _maximumYSize)
-                    ySize = newYSize;
-                else
-                    yPos += yOffset;
-            }
-            if (_type.IsFlagSet(PointerOperationType.Left))
-            {
-                xPos += xOffset;
-                var newXSize = xSize - xOffset;
-                if (MinimumXSize < newXSize && newXSize < _maximumXSize)
-                    xSize = newXSize;
-            }
-            if (_type.IsFlagSet(PointerOperationType.Right))
-            {
-                var newXSize = xSize + xOffset;
-                if (MinimumXSize < newXSize && newXSize < _maximumXSize)
-                    xSize = newXSize;
-                else
-                    xPos += xOffset;
-            }
-
-            CurrentContext.AppWindow.MoveAndResize(new(xPos, yPos, xSize, ySize));
-        }
-
-        _mousePoint.X = pt.X;
-        _mousePoint.Y = pt.Y;
-    }
-
-    private void RootPointerPressed(object sender, PointerRoutedEventArgs e)
-    {
-        var frameworkElement = sender.To<FrameworkElement>();
-        var point = e.GetCurrentPoint(frameworkElement);
-        var properties = point.Properties;
-
-        if (!properties.IsLeftButtonPressed)
-            return;
-
-        var width = frameworkElement.ActualWidth;
-        var height = frameworkElement.ActualHeight;
-        var position = point.Position;
-
-        const int o = MinimumOffset;
-
-        _type = PointerOperationType.None;
-        if (position.X < o)
-            _type |= PointerOperationType.Left;
-        if (position.Y < o)
-            _type |= PointerOperationType.Top;
-        if (width - position.X < o)
-            _type |= PointerOperationType.Right;
-        if (height - position.Y < o)
-            _type |= PointerOperationType.Bottom;
-        if (_type is PointerOperationType.None)
-            _type = PointerOperationType.Move;
-
-        _ = frameworkElement.CapturePointer(e.Pointer);
-        _ = User32.GetCursorPos(out _mousePoint);
-    }
-
-    private void RootPointerReleased(object sender, PointerRoutedEventArgs e)
-    {
-        sender.To<UIElement>().ReleasePointerCaptures();
-        _type = PointerOperationType.None;
-    }
-
-    #endregion
-
     #endregion
 
     #region Title区按钮
@@ -438,12 +226,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = false;
-            ShowSnackBar("固定上层：关闭", false, "(°∀°)ﾉ");
+            SnackBarHelper.ShowAndHide("固定上层：关闭", SnackBarHelper.Severity.Information, "(°∀°)ﾉ");
         }
         else
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = true;
-            ShowSnackBar("固定上层：开启", false, "(・ω< )★");
+            SnackBarHelper.ShowAndHide("固定上层：开启", SnackBarHelper.Severity.Information, "(・ω< )★");
         }
     }
 
@@ -455,10 +243,11 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private async void ImportTapped(object sender, RoutedEventArgs e)
     {
-        if ((await DialogInput.ShowAsync()) is not { } cId)
+        if (await DialogInput.ShowAsync() is not { } cId)
             return;
 
-        ShowSnackBar("弹幕装填中...", false, "(｀・ω・´)");
+        SnackBarHelper.ShowAndHide("弹幕装填中...", SnackBarHelper.Severity.Information, "(｀・ω・´)");
+
         try
         {
             await LoadDanmaku(async () =>
@@ -479,7 +268,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            ShowSnackBar("━━Σ(ﾟДﾟ川)━ 未知的异常", true, ex.Message);
+            SnackBarHelper.ShowAndHide("━━Σ(ﾟДﾟ川)━ 未知的异常", SnackBarHelper.Severity.Error, ex.Message);
         }
     }
 
@@ -501,6 +290,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         else
             Resume();
     }
+
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new CreatorProvider(sender, _vm.AppConfig);
 
     private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
@@ -563,6 +353,11 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     #endregion
 
     #endregion
+
+    private void TeachingTipOnLoaded(object sender, RoutedEventArgs e)
+    {
+        SnackBarHelper.RootSnackBar = sender.To<TeachingTip>();
+    }
 
     #endregion
 }

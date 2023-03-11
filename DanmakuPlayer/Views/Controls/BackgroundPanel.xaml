@@ -10,9 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="RootDoubleTapped"
-    PointerMoved="RootPointerMoved"
-    PointerPressed="RootPointerPressed"
-    PointerReleased="RootPointerReleased"
     SizeChanged="RootSizeChanged"
     Unloaded="RootUnloaded"
     mc:Ignorable="d">
@@ -185,9 +182,5 @@
     </Border>
     <local:SettingDialog x:Name="DialogSetting" />
     <local:InputDialog x:Name="DialogInput" />
-    <TeachingTip x:Name="RootSnackBar" IsLightDismissEnabled="True">
-        <TeachingTip.IconSource>
-            <SymbolIconSource Symbol="Accept" />
-        </TeachingTip.IconSource>
-    </TeachingTip>
+    <TeachingTip x:Name="RootSnackBar" Loaded="TeachingTipOnLoaded" />
 </SwapChainPanel>
