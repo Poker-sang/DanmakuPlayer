@@ -67,20 +67,19 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsExpander Description="应用的前景色" Header="前景色">
-                    <labs:SettingsExpander.HeaderIcon>
+                <labs:SettingsCard Description="应用的前景色" Header="前景色">
+                    <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard HorizontalContentAlignment="Center" ContentAlignment="Vertical">
-                            <ColorPicker
-                                ColorChanged="ForegroundColorChanged"
-                                IsAlphaEnabled="True"
-                                IsMoreButtonVisible="True"
-                                Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
+                    </labs:SettingsCard.HeaderIcon>
+                    <uiControls:ColorPickerButton Loaded="ColorPickerButtonLoaded" SelectedColor="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}">
+                        <uiControls:ColorPickerButton.ColorPickerStyle>
+                            <Style TargetType="uiControls:ColorPicker">
+                                <Setter Property="IsAlphaEnabled" Value="True" />
+                                <Setter Property="IsMoreButtonVisible" Value="True" />
+                            </Style>
+                        </uiControls:ColorPickerButton.ColorPickerStyle>
+                    </uiControls:ColorPickerButton>
+                </labs:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="播放设置" />
                 <labs:SettingsCard Description="每次快进的秒数" Header="快进">

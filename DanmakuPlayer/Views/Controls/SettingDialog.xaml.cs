@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.WinUI.UI.Controls;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
@@ -61,11 +62,13 @@ public sealed partial class SettingDialog : UserControl
         };
     }
 
-    private void ForegroundColorChanged(ColorPicker sender, ColorChangedEventArgs e) => Parent.To<BackgroundPanel>().RaiseForegroundChanged();
+    private void ForegroundColorChanged(UIElement sender, ColorChangedEventArgs e) => Parent.To<BackgroundPanel>().RaiseForegroundChanged();
 
     private void ResetTimer(object sender, RoutedEventArgs e) => AppContext.ResetTimerInterval();
 
     private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadProvider);
+    
+    private void ColorPickerButtonLoaded(object sender, RoutedEventArgs e) => sender.To<ColorPickerButton>().ColorPicker.ColorChanged += ForegroundColorChanged;
 
     private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
@@ -82,6 +85,8 @@ public sealed partial class SettingDialog : UserControl
         e.Cancel = true;
         AppContext.SetDefaultAppConfig();
         OnPropertyChanged(nameof(Vm));
+        // TODO: ColorPicker 从外部绑定无法触发ColorChanged，且打开时会有两个绑定失败
+        ForegroundColorChanged(sender, null!);
     }
 
     private void AddRegexPattern(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e)

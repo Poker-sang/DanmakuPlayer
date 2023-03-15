@@ -173,6 +173,7 @@
             -->
             <Slider
                 VerticalAlignment="Center"
+                IsTabStop="False"
                 Maximum="{x:Bind _vm.TotalTime, Mode=OneWay}"
                 Minimum="0"
                 StepFrequency="0.1"

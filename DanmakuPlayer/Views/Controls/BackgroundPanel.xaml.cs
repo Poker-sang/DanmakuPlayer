@@ -355,16 +355,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         if (e.NewText is "")
             return;
-        if (e.NewText[^1] is '\r' or '\n')
+        if (e.NewText.Contains('\r') || e.NewText.Contains('\n'))
         {
-            if (TimeSpan.TryParse(e.NewText.Trim(), out var result))
+            if (TimeSpan.TryParse(e.NewText.Replace("\r", null).Replace("\n", null), out var result))
                 _vm.Time = result.TotalMinutes;
 
             _vm.InputtingTime = false;
-            e.Cancel = true;
-        }
-        else if (e.NewText.Contains('\r') || e.NewText.Contains('\n'))
-        {
             e.Cancel = true;
         }
     }
@@ -373,7 +369,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         var tb = sender.To<TextBox>();
         if (tb.IsEnabled)
+        {
             _ = tb.Focus(FocusState.Programmatic);
+            tb.SelectAll();
+        }
     }
 
     #endregion

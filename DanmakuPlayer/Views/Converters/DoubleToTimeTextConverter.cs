@@ -10,7 +10,11 @@ public class DoubleToTimeTextConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, string language) => ThrowHelper.InvalidCast<object>();
 
-    public static string ToTime(double sec) =>
-        ((int)sec / 60).ToString().PadLeft(2, '0') + ":" +
-        ((int)sec % 60).ToString().PadLeft(2, '0');
+    public static string ToTime(double sec)
+    {
+        var time = TimeSpan.FromSeconds(sec);
+        return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+    }
+    //  ((int)sec / 60).ToString().PadLeft(2, '0') + ":" +
+    // ((int)sec % 60).ToString().PadLeft(2, '0');
 }
