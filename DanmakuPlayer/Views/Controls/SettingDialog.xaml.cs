@@ -67,7 +67,7 @@ public sealed partial class SettingDialog : UserControl
     private void ResetTimer(object sender, RoutedEventArgs e) => AppContext.ResetTimerInterval();
 
     private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadProvider);
-    
+
     private void ColorPickerButtonLoaded(object sender, RoutedEventArgs e) => sender.To<ColorPickerButton>().ColorPicker.ColorChanged += ForegroundColorChanged;
 
     private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)

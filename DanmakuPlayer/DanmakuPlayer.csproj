@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+        <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
         <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
         <RootNamespace>DanmakuPlayer</RootNamespace>
         <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -11,6 +11,7 @@
         <UseWinUI>true</UseWinUI>
         <Nullable>enable</Nullable>
         <LangVersion>Preview</LangVersion>
+        <DefaultLanguage>zh-CN</DefaultLanguage>
         <EnableMsixTooling>true</EnableMsixTooling>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
@@ -40,21 +41,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.16" />
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.17" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
         <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230217.4" />
-        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230313.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
         <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-        <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.1" />
         <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.13" />
         <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.13" />
         <PackageReference Include="Vortice.Direct3D12" Version="2.4.2" />
         <PackageReference Include="Vortice.DXGI" Version="2.4.2" />
         <PackageReference Include="Vortice.WinUI" Version="2.4.2" />
-        <PackageReference Include="WinUI3Utilities" Version="1.0.13" />
+        <PackageReference Include="WinUI3Utilities" Version="1.0.14.2" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
-        <PackageReference Include="protobuf-net" Version="3.2.12" />
+        <PackageReference Include="protobuf-net" Version="3.2.16" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />
         <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>

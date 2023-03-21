@@ -18,6 +18,11 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _ = new MainWindow();
-        AppHelper.Initialize(WindowHelper.EstimatedWindowSize(), BackdropHelper.BackdropType.None);
+        AppHelper.Initialize(new()
+        {
+            Size = WindowHelper.EstimatedWindowSize(),
+            TitleBarType = TitleBarHelper.TitleBarType.AppWindow,
+            BackdropType = BackdropHelper.BackdropType.None
+        });
     }
 }
