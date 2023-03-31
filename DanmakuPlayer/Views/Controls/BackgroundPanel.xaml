@@ -2,12 +2,12 @@
     x:Class="DanmakuPlayer.Views.Controls.BackgroundPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:ctkConverters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:utilities="using:WinUI3Utilities"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="RootDoubleTapped"
     SizeChanged="RootSizeChanged"
@@ -49,7 +49,7 @@
         </xaml:CanvasControl.KeyboardAccelerators>
     </xaml:CanvasControl>
     <TextBlock
-        x:Name="TbBanner"
+        x:Name="BannerTextBlock"
         Grid.Row="1"
         Grid.Column="0"
         Grid.ColumnSpan="3"
@@ -113,13 +113,18 @@
         IsHitTestVisible="{x:Bind _vm.StartPlaying, Mode=OneWay}"
         PointerEntered="ControlPointerEntered"
         PointerExited="ControlPointerExited">
-        <controls:DockPanel
+        <Grid
             Margin="3,0,30,0"
             VerticalAlignment="Bottom"
             Visibility="{x:Bind _vm.PointerInControlArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
             <AppBarButton
+                Grid.Column="0"
                 Width="40"
-                controls:DockPanel.Dock="Left"
                 Foreground="{StaticResource Foreground}"
                 LabelPosition="Collapsed"
                 Tapped="PauseResumeTapped">
@@ -128,6 +133,7 @@
                 </AppBarButton.Icon>
             </AppBarButton>
             <Grid
+                Grid.Column="1"
                 Margin="10,0"
                 Background="Transparent"
                 Tapped="TimeTextTapped">
@@ -138,19 +144,16 @@
                     Visibility="{x:Bind _vm.NavigateInputtingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBlock
                         VerticalAlignment="Center"
-                        controls:DockPanel.Dock="Left"
                         Foreground="{StaticResource Foreground}"
                         Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Right" />
                     <TextBlock
                         VerticalAlignment="Center"
-                        controls:DockPanel.Dock="Left"
                         Foreground="{StaticResource Foreground}"
                         Text="-"
                         TextAlignment="Center" />
                     <TextBlock
                         VerticalAlignment="Center"
-                        controls:DockPanel.Dock="Left"
                         Foreground="{StaticResource Foreground}"
                         Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Left" />
@@ -172,6 +175,7 @@
                 PointerReleased="TimePointerReleased"
             -->
             <Slider
+                Grid.Column="2"
                 VerticalAlignment="Center"
                 IsTabStop="False"
                 Maximum="{x:Bind _vm.TotalTime, Mode=OneWay}"
@@ -179,9 +183,9 @@
                 StepFrequency="0.1"
                 ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
                 Value="{x:Bind _vm.Time, Mode=TwoWay}" />
-        </controls:DockPanel>
+        </Grid>
     </Border>
     <local:SettingDialog x:Name="DialogSetting" />
     <local:InputDialog x:Name="DialogInput" />
-    <TeachingTip x:Name="RootSnackBar" Loaded="TeachingTipOnLoaded" />
+    <TeachingTip Loaded="{x:Bind utilities:SnackBarHelper.TeachingTipLoaded}" />
 </SwapChainPanel>

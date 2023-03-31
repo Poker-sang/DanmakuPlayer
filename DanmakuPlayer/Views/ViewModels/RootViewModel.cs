@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using DanmakuPlayer.Services;
 
 namespace DanmakuPlayer.Views.ViewModels;
 
@@ -20,8 +21,6 @@ public partial class RootViewModel : ObservableObject
 
     [ObservableProperty] private bool _startPlaying;
 
-    [ObservableProperty] private bool _isPlaying;
-
     [ObservableProperty] private double _time;
 
     [ObservableProperty] private double _totalTime;
@@ -40,9 +39,22 @@ public partial class RootViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(NavigateInputtingTime))]
     private bool _inputtingTime;
 
-    public bool NavigateInputtingTime => !_inputtingTime;
+    public bool NavigateInputtingTime => !InputtingTime;
 
 #pragma warning disable CA1822
     public AppConfig AppConfig => AppContext.AppConfig;
+
+    public bool IsPlaying
+    {
+        get => DispatcherTimerHelper.IsRunning;
+        set
+        {
+            if (value != DispatcherTimerHelper.IsRunning)
+            {
+                DispatcherTimerHelper.IsRunning = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 #pragma warning restore CA1822
 }

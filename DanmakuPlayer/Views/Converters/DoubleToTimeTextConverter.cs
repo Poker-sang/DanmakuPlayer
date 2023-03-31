@@ -15,6 +15,5 @@ public class DoubleToTimeTextConverter : IValueConverter
         var time = TimeSpan.FromSeconds(sec);
         return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
     }
-    //  ((int)sec / 60).ToString().PadLeft(2, '0') + ":" +
-    // ((int)sec % 60).ToString().PadLeft(2, '0');
+    // ((int)sec / 60).ToString().PadLeft(2, '0') + ":" + ((int)sec % 60).ToString().PadLeft(2, '0');
 }

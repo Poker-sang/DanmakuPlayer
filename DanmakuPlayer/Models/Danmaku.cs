@@ -304,6 +304,5 @@ public record Danmaku(
         return true;
     }
 
-
     #endregion
 }

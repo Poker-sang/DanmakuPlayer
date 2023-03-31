@@ -12,7 +12,6 @@ public partial class App : Application
         CurrentContext.Title = nameof(DanmakuPlayer);
         AppContext.Initialize();
         HttpClientHelper.Initialize();
-        AppContext.ResetTimerInterval();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)

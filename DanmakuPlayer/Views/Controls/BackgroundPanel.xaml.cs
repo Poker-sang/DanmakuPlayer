@@ -36,22 +36,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         DragMoveAndResizeHelper.RootPanel = this;
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
-        AppContext.Timer.Tick += (sender, _) =>
-        {
-            if (_vm.Time < _vm.TotalTime)
-            {
-                if (_vm.IsPlaying)
-                {
-                    _vm.Time += sender.To<DispatcherTimer>().Interval.TotalSeconds;
-                    DanmakuCanvas.Invalidate();
-                }
-            }
-            else
-            {
-                Pause();
-                _vm.Time = 0;
-            }
-        };
+        DispatcherTimerHelper.Tick += TimerTick;
+
         _filter = new DanmakuFilter
         {
             DanmakuCombiner.Combine,
@@ -109,8 +95,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             SnackBarHelper.ShowAndHide("​( ´･_･)ﾉ(._.`) 发生异常了", SnackBarHelper.Severity.Error, e.Message);
         }
 
-        if (TbBanner is not null)
-            _ = Children.Remove(TbBanner);
+        if (BannerTextBlock is not null)
+            _ = Children.Remove(BannerTextBlock);
         _vm.StartPlaying = true;
     }
 
@@ -153,6 +139,27 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region 播放及暂停
 
+    private DateTime _lastTime;
+
+    private void TimerTick(object? sender, object e)
+    {
+        var now = DateTime.Now;
+        if (_vm.Time < _vm.TotalTime)
+        {
+            if (_vm.IsPlaying)
+            {
+                _vm.Time += (now - _lastTime).TotalSeconds;
+                DanmakuCanvas.Invalidate();
+            }
+        }
+        else
+        {
+            Pause();
+            _vm.Time = 0;
+        }
+        _lastTime = now;
+    }
+
     private bool _needResume;
 
     private void TryPause()
@@ -170,16 +177,15 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void Resume()
     {
-        _vm.IsPlaying = true;
+        _lastTime = DateTime.Now;
         DanmakuHelper.RenderType = RenderType.RenderAlways;
-        AppContext.Timer.Start();
+        _vm.IsPlaying = true;
     }
 
     private void Pause()
     {
-        _vm.IsPlaying = false;
         DanmakuHelper.RenderType = RenderType.RenderOnce;
-        AppContext.Timer.Stop();
+        _vm.IsPlaying = false;
     }
 
     #endregion
@@ -199,8 +205,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 break;
             case OverlappedPresenterState.Restored:
                 CurrentContext.OverlappedPresenter.Maximize();
-                break;
-            default:
                 break;
         }
     }
@@ -317,7 +321,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             Resume();
     }
 
-    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new CreatorProvider(sender, _vm.AppConfig);
+    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender, _vm.AppConfig);
 
     private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
 
@@ -378,11 +382,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     #endregion
 
     #endregion
-
-    private void TeachingTipOnLoaded(object sender, RoutedEventArgs e)
-    {
-        SnackBarHelper.RootSnackBar = sender.To<TeachingTip>();
-    }
 
     #endregion
 }

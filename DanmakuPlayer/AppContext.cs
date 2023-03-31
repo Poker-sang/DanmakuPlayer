@@ -1,7 +1,5 @@
-using System;
 using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using Microsoft.UI.Xaml;
 using Windows.Storage;
 using WinUI3Utilities.Attributes;
 
@@ -20,7 +18,7 @@ public static partial class AppContext
 #if FIRST_TIME
         || true
 #endif
-            ? new AppConfig() : appConfigurations;
+            ? new() : appConfigurations;
     }
 
     public static void SetDefaultAppConfig() => AppConfig = new();
@@ -30,8 +28,4 @@ public static partial class AppContext
     public static BackgroundPanel BackgroundPanel { get; set; } = null!;
 
     public static CanvasControl DanmakuCanvas { get; set; } = null!;
-
-    public static DispatcherTimer Timer { get; } = new();
-
-    public static void ResetTimerInterval() => Timer.Interval = TimeSpan.FromSeconds(1d / (AppConfig.PlayFramePerSecond * AppConfig.PlaySpeed));
 }

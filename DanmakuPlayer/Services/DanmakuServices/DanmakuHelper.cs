@@ -38,7 +38,7 @@ public static class DanmakuHelper
                 }
 
                 Current.Dispose();
-                Current = new CreatorProvider(sender, appConfig);
+                Current = new(sender, appConfig);
                 RenderType = RenderType.SetFlags(RenderType.ReloadProvider, false);
             }
 

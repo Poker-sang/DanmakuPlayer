@@ -6,7 +6,6 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:DanmakuPlayer.Models"
-    xmlns:uiControls="using:CommunityToolkit.WinUI.UI.Controls"
     Unloaded="OnUnloaded"
     mc:Ignorable="d">
     <ContentDialog
@@ -17,14 +16,20 @@
         PrimaryButtonClick="InquireClick"
         PrimaryButtonText="获取视频弹幕"
         SecondaryButtonClick="SelectClick">
-        <uiControls:DockPanel Margin="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <TextBox
                 x:Name="TbInput"
-                uiControls:DockPanel.Dock="Top"
+                Grid.Row="0"
                 PlaceholderText="输入视频的网址" />
-            <InfoBar x:Name="IbMessage" uiControls:DockPanel.Dock="Top" />
+            <InfoBar x:Name="IbMessage" Grid.Row="1" />
             <ListView
                 x:Name="LvPage"
+                Grid.Row="2"
                 DoubleTapped="SelectClick"
                 SelectionChanged="SelectionChanged"
                 SelectionMode="Single">
@@ -40,6 +45,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </uiControls:DockPanel>
+        </Grid>
     </ContentDialog>
 </UserControl>

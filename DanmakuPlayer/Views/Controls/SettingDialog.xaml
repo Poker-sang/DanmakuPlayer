@@ -9,7 +9,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
     xmlns:system="using:System"
-    xmlns:uiControls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style
@@ -67,19 +66,21 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsCard Description="应用的前景色" Header="前景色">
-                    <labs:SettingsCard.HeaderIcon>
+                <labs:SettingsExpander Description="应用的前景色" Header="前景色">
+                    <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
-                    </labs:SettingsCard.HeaderIcon>
-                    <uiControls:ColorPickerButton Loaded="ColorPickerButtonLoaded" SelectedColor="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}">
-                        <uiControls:ColorPickerButton.ColorPickerStyle>
-                            <Style TargetType="uiControls:ColorPicker">
-                                <Setter Property="IsAlphaEnabled" Value="True" />
-                                <Setter Property="IsMoreButtonVisible" Value="True" />
-                            </Style>
-                        </uiControls:ColorPickerButton.ColorPickerStyle>
-                    </uiControls:ColorPickerButton>
-                </labs:SettingsCard>
+                    </labs:SettingsExpander.HeaderIcon>
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard HorizontalContentAlignment="Center" ContentAlignment="Vertical">
+                            <ColorPicker
+                                ColorChanged="ForegroundColorChanged"
+                                IsAlphaEnabled="True"
+                                IsMoreButtonVisible="True"
+                                Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+
                 <!--  播放设置  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="播放设置" />
                 <labs:SettingsCard Description="每次快进的秒数" Header="快进">
@@ -239,7 +240,6 @@
                                     BorderThickness="1"
                                     CornerRadius="4">
                                     <AutoSuggestBox
-                                        uiControls:DockPanel.Dock="Top"
                                         PlaceholderText="输入一条正则表达式，并点击“+”添加"
                                         QueryIcon="Add"
                                         QuerySubmitted="AddRegexPattern"
@@ -253,12 +253,16 @@
                                     ItemsSource="{x:Bind Vm.PatternsCollection}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="system:String">
-                                            <uiControls:DockPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
                                                 <Button
+                                                    Grid.Column="1"
                                                     Width="40"
                                                     Height="25"
                                                     HorizontalContentAlignment="Center"
-                                                    uiControls:DockPanel.Dock="Right"
                                                     Background="Transparent"
                                                     BorderThickness="0"
                                                     Tag="{x:Bind}"
@@ -269,10 +273,11 @@
                                                         Symbol="Cancel" />
                                                 </Button>
                                                 <TextBlock
+                                                    Grid.Column="0"
                                                     VerticalAlignment="Center"
                                                     Text="{x:Bind}"
                                                     TextAlignment="Left" />
-                                            </uiControls:DockPanel>
+                                            </Grid>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
