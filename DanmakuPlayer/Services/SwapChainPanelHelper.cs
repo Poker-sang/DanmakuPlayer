@@ -97,7 +97,7 @@ public static class SwapChainPanelHelper
             AlphaFormat = 1 // AcSrcAlpha
         };
 
-        var bRet = User32.UpdateLayeredWindow(hWnd, hDcScreen, pos, sizeBitmap, hDcMem, new POINT(), 0, bf, User32.UpdateLayeredWindowFlags.ULW_ALPHA);
+        var bRet = User32.UpdateLayeredWindow(hWnd, hDcScreen, pos, sizeBitmap, hDcMem, new(), 0, bf, User32.UpdateLayeredWindowFlags.ULW_ALPHA);
 
         _ = Gdi32.SelectObject(hDcMem, hBitmapOld);
         _ = Gdi32.DeleteDC(hDcMem);

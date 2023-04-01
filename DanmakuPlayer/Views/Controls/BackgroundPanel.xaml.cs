@@ -38,7 +38,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         DispatcherTimerHelper.Tick += TimerTick;
 
-        _filter = new DanmakuFilter
+        _filter = new()
         {
             DanmakuCombiner.Combine,
             DanmakuRegex.Match

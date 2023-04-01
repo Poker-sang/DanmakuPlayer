@@ -1,4 +1,5 @@
-using DanmakuRoomList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
+using DanmakuRoomRollList = System.Collections.Generic.LinkedList<(float BottomPos, DanmakuPlayer.Models.IDanmakuWidth Danmaku)>;
+using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
 
 namespace DanmakuPlayer.Models;
 
@@ -7,11 +8,11 @@ namespace DanmakuPlayer.Models;
 /// </summary>
 public class DanmakuContext
 {
-    public DanmakuContext(float viewHeight)
+    public DanmakuContext(float viewHeight, int duration)
     {
-        _ = StaticRoom.AddFirst((viewHeight, -Danmaku.Space));
-        _ = RollRoom.AddFirst((viewHeight, -Danmaku.Space));
-        _ = InverseRoom.AddFirst((viewHeight, -Danmaku.Space));
+        _ = StaticRoom.AddFirst((viewHeight, 0));
+        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-duration)));
+        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-duration)));
     }
 
     /// <summary>
@@ -35,19 +36,19 @@ public class DanmakuContext
     /// 静止弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomList StaticRoom { get; } = new();
+    public DanmakuRoomStaticList StaticRoom { get; } = new();
 
     /// <summary>
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomList RollRoom { get; } = new();
+    public DanmakuRoomRollList RollRoom { get; } = new();
 
     /// <summary>
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomList InverseRoom { get; } = new();
+    public DanmakuRoomRollList InverseRoom { get; } = new();
 
     /// <summary>
     /// 正在顶部弹幕数

@@ -49,7 +49,7 @@ public class CreatorProvider : IDisposable
     public static CanvasTextFormat GetTextFormat(float size)
     {
         if (!Formats.TryGetValue(size, out var value))
-            Formats[size] = value = new CanvasTextFormat
+            Formats[size] = value = new()
             {
                 FontFamily = AppContext.AppConfig.DanmakuFont,
                 FontSize = size
@@ -62,7 +62,7 @@ public class CreatorProvider : IDisposable
     public CanvasSolidColorBrush GetBrush(in uint color)
     {
         if (!Brushes.TryGetValue(color, out var value))
-            Brushes[color] = value = new CanvasSolidColorBrush(Creator, color.GetColor());
+            Brushes[color] = value = new(Creator, color.GetColor());
         return value;
     }
 

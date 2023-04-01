@@ -42,7 +42,6 @@ public static class DanmakuCombiner
         foreach (var t in q)
             edCounts[t] = edCounts.GetValueOrDefault(t, 0) - 1;
 
-
         return edCounts.Values.Sum(Math.Abs);
     }
 
@@ -164,7 +163,7 @@ public static class DanmakuCombiner
                 }
 
                 if (addNew)
-                    danmakuChunk.Enqueue((str, new List<Danmaku> { danmaku }));
+                    danmakuChunk.Enqueue((str, new() { danmaku }));
             }
 
             while (danmakuChunk.Count > 0)
@@ -187,7 +186,6 @@ public static class DanmakuCombiner
                         case DanmakuMode.Top when mode is DanmakuMode.Bottom:
                             mode = danmaku.Mode;
                             break;
-                        default: break;
                     }
 
                 var represent = new Danmaku(

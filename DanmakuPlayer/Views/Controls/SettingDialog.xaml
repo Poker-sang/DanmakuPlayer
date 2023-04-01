@@ -293,7 +293,7 @@
                 </labs:SettingsCard>
                 <!--  关于  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="关于" />
-                <labs:SettingsExpander Header="关于 DanmakuPlayer v3.00">
+                <labs:SettingsExpander Header="关于 DanmakuPlayer v3.10">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE946;" />
                     </labs:SettingsExpander.HeaderIcon>
