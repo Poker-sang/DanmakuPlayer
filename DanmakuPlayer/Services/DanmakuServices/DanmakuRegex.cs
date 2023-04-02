@@ -11,10 +11,16 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuRegex
 {
-    public static async Task<IEnumerable<Danmaku>> Match(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token) =>
-        await Task.Run(() =>
-        {
-            var regexPatterns = JsonSerializer.Deserialize<string[]>(appConfig.RegexPatterns) ?? Array.Empty<string>();
-            return regexPatterns.Aggregate(pool, (current, pattern) => current.Where(d => !Regex.IsMatch(d.Text, pattern)));
-        }, token);
+    public static async Task<IEnumerable<Danmaku>> Match(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    {
+        return !appConfig.DanmakuEnableRegex
+            ? pool
+            : await Task.Run(() =>
+            {
+                var regexPatterns = JsonSerializer.Deserialize<string[]>(appConfig.RegexPatterns) ??
+                                    Array.Empty<string>();
+                return regexPatterns.Aggregate(pool,
+                    (current, pattern) => current.Where(d => !Regex.IsMatch(d.Text, pattern)));
+            }, token);
+    }
 }

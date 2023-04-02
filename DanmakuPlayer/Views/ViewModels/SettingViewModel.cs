@@ -16,5 +16,7 @@ public partial class SettingViewModel : ObservableObject
 
     public ObservableCollection<string> PatternsCollection { get; }
 
+#pragma warning disable CA1822 // 将成员标记为 static
     public AppConfig AppConfig => AppContext.AppConfig;
+#pragma warning restore CA1822 // 将成员标记为 static
 }

@@ -80,7 +80,14 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-
+                <!--  渲染设置  -->
+                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="渲染设置" />
+                <labs:SettingsCard Description="提前渲染并存储，会占用更高内存" Header="提前渲染">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE81C;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" Toggled="ResetProvider" />
+                </labs:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="播放设置" />
                 <labs:SettingsCard Description="每次快进的秒数" Header="快进">
@@ -171,11 +178,11 @@
                 </labs:SettingsCard>
                 <!--  弹幕滤过  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="弹幕滤过" />
-                <labs:SettingsExpander Description="是否合并滚动、底端、顶端弹幕" Header="弹幕合并">
+                <labs:SettingsExpander Description="是否合并滚动、底端、顶端弹幕（下次加载弹幕时生效）" Header="弹幕合并">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEA3C;" />
                     </labs:SettingsExpander.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" Toggled="ResetProvider" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
                             Description="内容相近合并（∈[0, 10]）&#13;=0：禁用，≤3：宽松，≤5：中等，≤8：严格"
@@ -187,7 +194,6 @@
                                 StepFrequency="1"
                                 TickFrequency="1"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.MaxDistance, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
@@ -200,7 +206,6 @@
                                 StepFrequency="1"
                                 TickFrequency="1"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.MaxCosine, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
@@ -213,22 +218,21 @@
                                 StepFrequency="5"
                                 TickFrequency="5"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.TimeSpan, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Description="是否跨滚动、顶端、底端模式合并弹幕"
                             Header="跨类型"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
-                            <ToggleSwitch IsOn="{x:Bind Vm.CrossMode, Mode=TwoWay}" Toggled="ResetProvider" />
+                            <ToggleSwitch IsOn="{x:Bind Vm.CrossMode, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <labs:SettingsExpander
-                    Description="使用正则表达式屏蔽弹幕"
+                    Description="使用正则表达式屏蔽弹幕（下次加载弹幕时生效）"
                     Header="正则筛选"
                     HeaderIcon="Filter">
-                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" Toggled="ResetProvider" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
                             HorizontalContentAlignment="Stretch"
@@ -293,7 +297,7 @@
                 </labs:SettingsCard>
                 <!--  关于  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="关于" />
-                <labs:SettingsExpander Header="关于 DanmakuPlayer v3.10">
+                <labs:SettingsExpander Header="关于 DanmakuPlayer v3.20">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE946;" />
                     </labs:SettingsExpander.HeaderIcon>

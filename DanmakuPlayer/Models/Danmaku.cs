@@ -56,16 +56,6 @@ public partial record Danmaku(
         var layout = layoutExists ? provider.Layouts[ToString()] : provider.GetNewLayout(this);
         LayoutWidth = layout.LayoutBounds.Width;
         _layoutHeight = layout.LayoutBounds.Height;
-        // 如果覆盖了，并且不允许覆盖，则返回true，否则false
-        bool OverlapPredicate(bool overlap)
-        {
-            // 是否覆盖
-            if (!overlap || provider.AppConfig.DanmakuAllowOverlap)
-                return false;
-            if (!layoutExists)
-                layout.Dispose();
-            return true;
-        }
 
         NeedRender = false;
         switch (Mode)
@@ -101,6 +91,18 @@ public partial record Danmaku(
             provider.Layouts.Add(ToString(), layout);
         NeedRender = true;
         return true;
+
+        // 如果覆盖了，并且不允许覆盖，则返回true，否则false
+        // 本函数所有分支都会调用本本地函数
+        bool OverlapPredicate(bool overlap)
+        {
+            // 是否覆盖
+            if (!overlap || provider.AppConfig.DanmakuAllowOverlap)
+                return false;
+            if (!layoutExists)
+                layout.Dispose();
+            return true;
+        }
     }
 
     public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, float time)
@@ -108,6 +110,7 @@ public partial record Danmaku(
         // 外部实现逻辑：if (Time <= time && time - provider.AppConfig.Speed < Time)
         if (!NeedRender)
             return;
+        
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
         var color = provider.GetBrush(Color);

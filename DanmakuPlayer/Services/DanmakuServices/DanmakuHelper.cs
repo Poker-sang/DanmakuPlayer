@@ -44,26 +44,33 @@ public static class DanmakuHelper
 
             var context = new DanmakuContext((float)sender.ActualHeight, appConfig.DanmakuDuration);
             var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
+            if (!appConfig.RenderBefore)
+                Current.ClearLayouts();
 
             _renderCount = count;
             RenderType = RenderType.SetFlags(RenderType.RenderInit, false);
         }
 
-        if (RenderType.IsFlagSet(RenderType.RenderOnce))
+        if (RenderType.IsFlagSet(RenderType.RenderOnce) || RenderType.IsFlagSet(RenderType.RenderAlways))
         {
             e.DrawingSession.Clear(Colors.Transparent);
 
-            foreach (var t in DisplayingDanmaku(time, appConfig))
-                t.OnRender(e.DrawingSession, Current, time);
+            if (!appConfig.RenderBefore)
+            {
+                Current.ClearLayoutRefCount();
+                foreach (var t in DisplayingDanmaku(time, appConfig))
+                {
+                    Current.AddLayoutRef(t);
+                    t.OnRender(e.DrawingSession, Current, time);
+                }
+                Current.ClearUnusedLayoutRef();
+            }
+            else
+                foreach (var t in DisplayingDanmaku(time, appConfig))
+                    t.OnRender(e.DrawingSession, Current, time);
 
-            RenderType = RenderType.SetFlags(RenderType.RenderOnce, false);
-        }
-        else if (RenderType.IsFlagSet(RenderType.RenderAlways))
-        {
-            e.DrawingSession.Clear(Colors.Transparent);
-
-            foreach (var t in DisplayingDanmaku(time, appConfig))
-                t.OnRender(e.DrawingSession, Current, time);
+            if (RenderType.IsFlagSet(RenderType.RenderOnce))
+                RenderType = RenderType.SetFlags(RenderType.RenderOnce, false);
         }
 
         IsRendering = false;
@@ -71,23 +78,11 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = Array.Empty<Danmaku>();
 
-    public static async Task<int> PoolRenderInit(CanvasControl canvas, CancellationToken token)
+    public static async Task<int> Render(CanvasControl canvas, RenderType renderType, CancellationToken token)
     {
-        RenderType = RenderType.RenderInit;
+        RenderType = renderType;
         await WaitForRender(canvas, token);
         return _renderCount;
-    }
-
-    public static async Task ResetProvider(CanvasControl canvas, CancellationToken token)
-    {
-        RenderType = RenderType.ReloadProvider | RenderType.RenderInit;
-        await WaitForRender(canvas, token);
-    }
-
-    public static async Task ResetFormat(CanvasControl canvas, CancellationToken token)
-    {
-        RenderType = RenderType.ReloadFormats | RenderType.ReloadProvider | RenderType.RenderInit;
-        await WaitForRender(canvas, token);
     }
 
     private static async Task WaitForRender(CanvasControl canvas, CancellationToken token)
@@ -104,8 +99,10 @@ public static class DanmakuHelper
         if (firstIndex is -1)
             return Array.Empty<Danmaku>();
         var lastIndex = Array.FindLastIndex(Pool, t => t.Time <= time);
+#pragma warning disable IDE0046 // 转换为条件表达式
         if (lastIndex < firstIndex)
             return Array.Empty<Danmaku>();
         return Pool[firstIndex..(lastIndex + 1)];
+#pragma warning restore IDE0046 // 转换为条件表达式
     }
 }

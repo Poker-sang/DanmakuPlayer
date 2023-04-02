@@ -25,9 +25,9 @@ public enum RenderType
     /// <summary>
     /// 重新加载<see cref="CreatorProvider"/>
     /// </summary>
-    ReloadProvider = 1 << 3,
+    ReloadProvider = (1 << 3) | RenderInit,
     /// <summary>
     /// 重新加载<see cref="CreatorProvider.Formats"/>
     /// </summary>
-    ReloadFormats = 1 << 4,
+    ReloadFormats = (1 << 4) | ReloadProvider,
 }

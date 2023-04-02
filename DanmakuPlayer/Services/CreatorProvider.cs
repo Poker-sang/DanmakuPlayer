@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -44,6 +45,45 @@ public class CreatorProvider : IDisposable
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
     public Dictionary<string, CanvasTextLayout> Layouts { get; } = new();
 
+    #region 计数器
+
+    /// <summary>
+    /// 内容和对应渲染布局的引用计数
+    /// </summary>
+    /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
+    public Dictionary<string, int> LayoutsCounter { get; } = new();
+
+    public void AddLayoutRef(Danmaku danmaku)
+    {
+        var danmakuString = danmaku.ToString();
+        if (!LayoutsCounter.ContainsKey(danmakuString))
+        {
+            LayoutsCounter[danmakuString] = 0;
+            Layouts[danmakuString] = GetNewLayout(danmaku);
+        }
+        ++LayoutsCounter[danmakuString];
+    }
+
+    public void ClearLayoutRefCount()
+    {
+        foreach (var counter in LayoutsCounter) 
+            LayoutsCounter[counter.Key] = 0;
+    }
+
+    public void ClearUnusedLayoutRef()
+    {
+        var list = LayoutsCounter.Where(pair => pair.Value < 1).Select(pair => pair.Key);
+
+        foreach (var danmakuString in list)
+        {
+            Layouts[danmakuString].Dispose();
+            _ = Layouts.Remove(danmakuString);
+            _ = LayoutsCounter.Remove(danmakuString);
+        }
+    }
+
+    #endregion
+
     #region Get类方法
 
     public static CanvasTextFormat GetTextFormat(float size)
@@ -73,6 +113,13 @@ public class CreatorProvider : IDisposable
         foreach (var format in Formats)
             format.Value.Dispose();
         Formats.Clear();
+    }
+
+    public void ClearLayouts()
+    {
+        foreach (var layout in Layouts)
+            layout.Value.Dispose();
+        Layouts.Clear();
     }
 
     public void Dispose()

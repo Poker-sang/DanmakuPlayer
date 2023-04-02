@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
+using Vortice.Direct3D12;
 using WinRT;
 using WinUI3Utilities;
 
@@ -76,14 +77,14 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            SnackBarHelper.ShowAndHide($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在渲染", SnackBarHelper.Severity.Information, "('ヮ')");
+            SnackBarHelper.ShowAndHide($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在计算渲染", SnackBarHelper.Severity.Information, "('ヮ')");
 
-            var renderedCount = await DanmakuHelper.PoolRenderInit(DanmakuCanvas, _cancellationTokenSource.Token);
+            var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
 
-            SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已装载，渲染率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
+            SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已就绪，装载率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
         }
         catch (TaskCanceledException)
         {
@@ -113,21 +114,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         try
         {
-            switch (renderType)
-            {
-                case RenderType.RenderInit:
-                    _ = await DanmakuHelper.PoolRenderInit(DanmakuCanvas, _cancellationTokenSource.Token);
-                    break;
-                case RenderType.ReloadProvider:
-                    await DanmakuHelper.ResetProvider(DanmakuCanvas, _cancellationTokenSource.Token);
-                    break;
-                case RenderType.ReloadFormats:
-                    await DanmakuHelper.ResetFormat(DanmakuCanvas, _cancellationTokenSource.Token);
-                    break;
-                default:
-                    ThrowHelper.ArgumentOutOfRange(renderType);
-                    break;
-            }
+            _ = await DanmakuHelper.Render(DanmakuCanvas, renderType, _cancellationTokenSource.Token);
         }
         catch (TaskCanceledException)
         {

@@ -43,6 +43,16 @@ public partial record AppConfig
 
     #endregion
 
+    #region 渲染设置
+
+    /// <summary>
+    /// 提前渲染并存储，会占用更高内存
+    /// </summary>
+    /// <remarks>default: <see langword="false"/></remarks>
+    public bool RenderBefore { get; set; } = true;
+
+    #endregion
+
     #region 弹幕设置
 
     /// <summary>
@@ -84,7 +94,6 @@ public partial record AppConfig
     public bool DanmakuEnableMerge { get; set; } = true;
 
     public int MaxCosine { get; set; } = 6;
-
 
     public int MaxDistance { get; set; } = 5;
 

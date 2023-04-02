@@ -13,15 +13,16 @@ public static class HttpClientHelper
 {
     public static void Initialize() { }
 
-    public static HttpClient Client { get; } = new(new HttpClientHandler
-    {
-        AutomaticDecompression = DecompressionMethods.Deflate,
-        // ServerCertificateCustomValidationCallback = (_, _, _, _) => true
-    })
-    {
-        Timeout = new(0, 0, 0, 8000),
-        MaxResponseContentBufferSize = ((long)2 << 30) - 1
-    };
+    public static HttpClient Client { get; } =
+        new(new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.Deflate,
+            // ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        })
+        {
+            Timeout = new(0, 0, 0, 8000),
+            MaxResponseContentBufferSize = ((long)2 << 30) - 1
+        };
 
     private static bool _shouldRefreshHeader = true;
     public static HttpClient InitializeHeader(this HttpClient client, Dictionary<string, string>? header = null)
@@ -42,11 +43,9 @@ public static class HttpClientHelper
 
         Debug.WriteLine($"[{nameof(HttpClientHelper)}]::{nameof(InitializeHeader)}(): Header: [");
         foreach (var i in client.DefaultRequestHeaders)
-        {
             Debug.WriteLine($"  {i.Key}:{string.Join(';', i.Value)},");
-        }
 
-        Debug.WriteLine($"]");
+        Debug.WriteLine("]");
         return client;
     }
 
@@ -59,9 +58,7 @@ public static class HttpClientHelper
     public static async Task<Stream?> TryDownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         var response = await Client.InitializeHeader(header).GetAsync(uri, token);
-        if (response.IsSuccessStatusCode)
-            return await Client.InitializeHeader(header).GetStreamAsync(uri, token);
-        return null;
+        return response.IsSuccessStatusCode ? await Client.InitializeHeader(header).GetStreamAsync(uri, token) : null;
     }
 
     public static Task<byte[]> DownloadBytesAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)

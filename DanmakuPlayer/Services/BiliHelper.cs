@@ -50,15 +50,14 @@ public static partial class BiliHelper
     private static async Task<IEnumerable<VideoPage>> GetCIds(Task<JsonDocument> jd)
     {
         var response = await jd;
-        if (CheckSuccess(response))
-            return response.RootElement.GetProperty("data")
+        return CheckSuccess(response)
+            ? response.RootElement.GetProperty("data")
                 .EnumerateArray()
                 .Select(episode => new VideoPage(
                     episode.GetProperty("cid").GetInt32(),
                     episode.GetProperty("page").GetInt32().ToString(),
-                    episode.GetProperty("part").GetString()!));
-
-        return Array.Empty<VideoPage>();
+                    episode.GetProperty("part").GetString()!))
+            : Array.Empty<VideoPage>();
     }
 
     public static Task<IEnumerable<VideoPage>> Av2CIds(int av, CancellationToken token) => GetCIds(BiliApis.GetVideoPageList(av, token));
@@ -84,8 +83,8 @@ public static partial class BiliHelper
     public static async Task<IEnumerable<VideoPage>> Ss2CIds(int seasonId, CancellationToken token)
     {
         var response = await BiliApis.GetBangumiEpisode(seasonId, token);
-        if (CheckSuccess(response))
-            return response.RootElement
+        return CheckSuccess(response)
+            ? response.RootElement
                 .GetProperty("result")
                 .GetProperty("main_section")
                 .GetProperty("episodes")
@@ -93,19 +92,19 @@ public static partial class BiliHelper
                 .Select(episode => new VideoPage(
                     episode.GetProperty("cid").GetInt32(),
                     episode.GetProperty("title").GetString()!,
-                    episode.GetProperty("long_title").GetString()!));
-        return Array.Empty<VideoPage>();
+                    episode.GetProperty("long_title").GetString()!))
+            : Array.Empty<VideoPage>();
     }
 
     public static async Task<int> Md2Ss(int mediaId, CancellationToken token)
     {
         var response = await BiliApis.GetBangumiInfo(mediaId, token);
-        if (CheckSuccess(response))
-            return response.RootElement
+        return CheckSuccess(response)
+            ? response.RootElement
                 .GetProperty("result")
                 .GetProperty("media")
-                .GetProperty("season_id").GetInt32();
-        return -1;
+                .GetProperty("season_id").GetInt32()
+            : -1;
     }
 
     [GeneratedRegex(@"(av|md|ss|ep)[0-9]+")]
@@ -118,7 +117,6 @@ public static partial class BiliHelper
     {
         Error, AvId, BvId, CId, MediaId, SeasonId, EpisodeId
     }
-
 
     public static CodeType Match(this string url, out string result)
     {
