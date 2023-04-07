@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DanmakuRoomRollList = System.Collections.Generic.LinkedList<(float BottomPos, DanmakuPlayer.Models.IDanmakuWidth Danmaku)>;
 using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
 
@@ -8,11 +9,19 @@ namespace DanmakuPlayer.Models;
 /// </summary>
 public class DanmakuContext
 {
-    public DanmakuContext(float viewHeight, int duration)
+    public DanmakuContext(float viewHeight, AppConfig appConfig)
     {
         _ = StaticRoom.AddFirst((viewHeight, 0));
-        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-duration)));
-        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-duration)));
+        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuDuration)));
+        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuDuration)));
+        if (appConfig.DanmakuCountRollEnableLimit)
+            Roll = new(appConfig.DanmakuCountRollLimit);
+        if (appConfig.DanmakuCountBottomEnableLimit)
+            Bottom = new(appConfig.DanmakuCountBottomLimit);
+        if (appConfig.DanmakuCountTopEnableLimit)
+            Top = new(appConfig.DanmakuCountTopLimit);
+        if (appConfig.DanmakuCountInverseEnableLimit)
+            Inverse = new(appConfig.DanmakuCountInverseLimit);
     }
 
     /// <summary>
@@ -33,6 +42,12 @@ public class DanmakuContext
 #pragma warning restore IDE0052 // 删除未读的私有成员
 
     /// <summary>
+    /// 滚动弹幕空间
+    /// <inheritdoc cref="DocProvider"/>
+    /// </summary>
+    public DanmakuRoomRollList RollRoom { get; } = new();
+
+    /// <summary>
     /// 静止弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
@@ -42,26 +57,25 @@ public class DanmakuContext
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomRollList RollRoom { get; } = new();
-
-    /// <summary>
-    /// 滚动弹幕空间
-    /// <inheritdoc cref="DocProvider"/>
-    /// </summary>
     public DanmakuRoomRollList InverseRoom { get; } = new();
 
     /// <summary>
-    /// 正在顶部弹幕数
+    /// 正在顶部的弹幕
     /// </summary>
-    public int StaticTopCount { get; set; }
+    public Queue<Danmaku> Top { get; } = null!;
 
     /// <summary>
-    /// 正在底部弹幕数
+    /// 正在底部的弹幕
     /// </summary>
-    public int StaticBottomCount { get; set; }
+    public Queue<Danmaku> Bottom { get; } = null!;
 
     /// <summary>
-    /// 正在滚动弹幕数
+    /// 正在滚动的弹幕
     /// </summary>
-    public int RollCount { get; set; }
+    public Queue<Danmaku> Roll { get; } = null!;
+
+    /// <summary>
+    /// 正在逆向滚动的弹幕
+    /// </summary>
+    public Queue<Danmaku> Inverse { get; } = null!;
 }

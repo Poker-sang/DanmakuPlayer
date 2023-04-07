@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
@@ -44,7 +45,7 @@ public partial record Danmaku(
     /// <summary>
     /// 是否需要渲染（取决于是否允许重叠）
     /// </summary>
-    public bool NeedRender { get; private set; } = true;
+    public bool NeedRender { get; private set; }
 
     /// <summary>
     /// 初始化渲染
@@ -52,12 +53,24 @@ public partial record Danmaku(
     /// <returns>是否需要渲染</returns>
     public bool RenderInit(DanmakuContext context, CreatorProvider provider)
     {
+        NeedRender = false;
+
+        // 是否超过弹幕数量限制
+        if (Mode switch
+        {
+            DanmakuMode.Roll => provider.AppConfig.DanmakuCountRollEnableLimit && CountReachLimit(context.Roll, provider.AppConfig.DanmakuCountRollLimit),
+            DanmakuMode.Bottom => provider.AppConfig.DanmakuCountBottomEnableLimit && CountReachLimit(context.Bottom, provider.AppConfig.DanmakuCountBottomLimit),
+            DanmakuMode.Top => provider.AppConfig.DanmakuCountTopEnableLimit && CountReachLimit(context.Top, provider.AppConfig.DanmakuCountTopLimit),
+            DanmakuMode.Inverse => provider.AppConfig.DanmakuCountInverseEnableLimit && CountReachLimit(context.Inverse, provider.AppConfig.DanmakuCountInverseLimit),
+            _ => false
+        })
+            return false;
+
         var layoutExists = provider.Layouts.ContainsKey(ToString());
         var layout = layoutExists ? provider.Layouts[ToString()] : provider.GetNewLayout(this);
         LayoutWidth = layout.LayoutBounds.Width;
         _layoutHeight = layout.LayoutBounds.Height;
 
-        NeedRender = false;
         switch (Mode)
         {
             case DanmakuMode.Roll:
@@ -89,8 +102,38 @@ public partial record Danmaku(
 
         if (!layoutExists)
             provider.Layouts.Add(ToString(), layout);
+        switch (Mode)
+        {
+            case DanmakuMode.Roll:
+                context.Roll?.Enqueue(this);
+                break;
+            case DanmakuMode.Bottom:
+                context.Bottom?.Enqueue(this);
+                break;
+            case DanmakuMode.Top:
+                context.Top?.Enqueue(this);
+                break;
+            case DanmakuMode.Inverse:
+                context.Inverse?.Enqueue(this);
+                break;
+        }
         NeedRender = true;
         return true;
+
+        // 达到限制数返回true，否则false
+        bool CountReachLimit(Queue<Danmaku> queue, int limit)
+        {
+            while (queue.Count is not 0)
+            {
+                var danmaku = queue.Peek();
+                if (danmaku.Time + provider.AppConfig.DanmakuDuration < Time)
+                    _ = queue.Dequeue();
+                else
+                    break;
+            }
+
+            return queue.Count >= limit;
+        }
 
         // 如果覆盖了，并且不允许覆盖，则返回true，否则false
         // 本函数所有分支都会调用本本地函数
@@ -110,7 +153,7 @@ public partial record Danmaku(
         // 外部实现逻辑：if (Time <= time && time - provider.AppConfig.Speed < Time)
         if (!NeedRender)
             return;
-        
+
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
         var color = provider.GetBrush(Color);

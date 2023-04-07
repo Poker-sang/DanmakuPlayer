@@ -55,7 +55,7 @@
         <PackageReference Include="Vortice.Direct3D12" Version="2.4.2" />
         <PackageReference Include="Vortice.DXGI" Version="2.4.2" />
         <PackageReference Include="Vortice.WinUI" Version="2.4.2" />
-        <PackageReference Include="WinUI3Utilities" Version="1.1.0" />
+        <PackageReference Include="WinUI3Utilities" Version="1.1.0.3" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
         <PackageReference Include="protobuf-net" Version="3.2.16" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />

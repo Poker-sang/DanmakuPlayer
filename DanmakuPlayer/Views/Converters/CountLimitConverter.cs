@@ -1,0 +1,21 @@
+using System;
+using Microsoft.UI.Xaml.Data;
+using WinUI3Utilities;
+
+namespace DanmakuPlayer.Views.Converters;
+
+public class CountLimitConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        var v = value.To<double>();
+        return v switch
+        {
+            -1 => "不限",
+            > -1 => (int)v,
+            _ => ThrowHelper.ArgumentOutOfRange<double, string>(v)
+        };
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
+}

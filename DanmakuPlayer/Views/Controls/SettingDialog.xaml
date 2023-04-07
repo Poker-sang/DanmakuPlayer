@@ -28,6 +28,7 @@
             </Style.Setters>
         </Style>
         <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
+        <converters:CountLimitConverter x:Key="CountLimitConverter" />
     </UserControl.Resources>
     <ContentDialog
         Title="设置"
@@ -98,7 +99,7 @@
                         Maximum="20"
                         Minimum="1"
                         StepFrequency="1"
-                        TickFrequency="1"
+                        TickFrequency="5"
                         TickPlacement="Outside"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </labs:SettingsCard>
@@ -110,7 +111,7 @@
                         Maximum="2"
                         Minimum="0.5"
                         StepFrequency="0.25"
-                        TickFrequency="0.25"
+                        TickFrequency="0.5"
                         TickPlacement="Outside"
                         ValueChanged="ResetTimer"
                         Value="{x:Bind Vm.PlaySpeed, Mode=TwoWay}" />
@@ -122,7 +123,8 @@
                     <Slider
                         Maximum="100"
                         Minimum="5"
-                        TickFrequency="5"
+                        StepFrequency="1"
+                        TickFrequency="20"
                         TickPlacement="Outside"
                         ValueChanged="ResetTimer"
                         Value="{x:Bind Vm.PlayFramePerSecond, Mode=TwoWay}" />
@@ -149,7 +151,7 @@
                         Maximum="1"
                         Minimum="0.1"
                         StepFrequency="0.1"
-                        TickFrequency="0.1"
+                        TickFrequency="0.2"
                         TickPlacement="Outside"
                         ValueChanged="DanmakuOpacityChanged"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
@@ -171,7 +173,7 @@
                         Maximum="2"
                         Minimum="0.5"
                         StepFrequency="0.1"
-                        TickFrequency="0.1"
+                        TickFrequency="0.5"
                         TickPlacement="Outside"
                         ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
@@ -192,9 +194,9 @@
                                 Maximum="10"
                                 Minimum="0"
                                 StepFrequency="1"
-                                TickFrequency="1"
+                                TickFrequency="2"
                                 TickPlacement="Outside"
-                                Value="{x:Bind Vm.MaxDistance, Mode=TwoWay}" />
+                                Value="{x:Bind Vm.DanmakuMergeMaxDistance, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Description="词频合并（∈[0, 10]）&#13;=10：禁用，≥8：宽松，≥6：中等，≥3：严格"
@@ -204,9 +206,9 @@
                                 Maximum="10"
                                 Minimum="0"
                                 StepFrequency="1"
-                                TickFrequency="1"
+                                TickFrequency="2"
                                 TickPlacement="Outside"
-                                Value="{x:Bind Vm.MaxCosine, Mode=TwoWay}" />
+                                Value="{x:Bind Vm.DanmakuMergeMaxCosine, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Description="超过秒数外的相似弹幕不会被合并（∈[0, 60]）"
@@ -216,15 +218,15 @@
                                 Maximum="60"
                                 Minimum="0"
                                 StepFrequency="5"
-                                TickFrequency="5"
+                                TickFrequency="10"
                                 TickPlacement="Outside"
-                                Value="{x:Bind Vm.TimeSpan, Mode=TwoWay}" />
+                                Value="{x:Bind Vm.DanmakuMergeTimeSpan, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Description="是否跨滚动、顶端、底端模式合并弹幕"
                             Header="跨类型"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
-                            <ToggleSwitch IsOn="{x:Bind Vm.CrossMode, Mode=TwoWay}" />
+                            <ToggleSwitch IsOn="{x:Bind Vm.DanmakuMergeCrossMode, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
@@ -295,6 +297,57 @@
                     </labs:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuAllowOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
                 </labs:SettingsCard>
+                <labs:SettingsExpander Description="弹幕数量" Header="弹幕的数量限制">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xECA5;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard Header="滚动弹幕数量限制">
+                            <Slider
+                                Maximum="100"
+                                Minimum="-1"
+                                StepFrequency="1"
+                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
+                                TickFrequency="20"
+                                TickPlacement="Outside"
+                                ValueChanged="ResetProvider"
+                                Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard Header="底端弹幕数量限制">
+                            <Slider
+                                Maximum="100"
+                                Minimum="-1"
+                                StepFrequency="1"
+                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
+                                TickFrequency="20"
+                                TickPlacement="Outside"
+                                ValueChanged="ResetProvider"
+                                Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard Header="顶端弹幕数量限制">
+                            <Slider
+                                Maximum="100"
+                                Minimum="-1"
+                                StepFrequency="1"
+                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
+                                TickFrequency="20"
+                                TickPlacement="Outside"
+                                ValueChanged="ResetProvider"
+                                Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard Header="逆向弹幕数量限制">
+                            <Slider
+                                Maximum="100"
+                                Minimum="-1"
+                                StepFrequency="1"
+                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
+                                TickFrequency="20"
+                                TickPlacement="Outside"
+                                ValueChanged="ResetProvider"
+                                Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
                 <!--  关于  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="关于" />
                 <labs:SettingsExpander Header="关于 DanmakuPlayer v3.20">

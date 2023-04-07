@@ -18,7 +18,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
-using Vortice.Direct3D12;
 using WinRT;
 using WinUI3Utilities;
 

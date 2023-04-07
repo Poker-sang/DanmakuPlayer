@@ -42,7 +42,7 @@ public static class DanmakuHelper
                 RenderType = RenderType.SetFlags(RenderType.ReloadProvider, false);
             }
 
-            var context = new DanmakuContext((float)sender.ActualHeight, appConfig.DanmakuDuration);
+            var context = new DanmakuContext((float)sender.ActualHeight, appConfig);
             var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
             if (!appConfig.RenderBefore)
                 Current.ClearLayouts();

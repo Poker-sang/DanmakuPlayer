@@ -89,20 +89,20 @@ public static class DanmakuCombiner
         if (p.Original == q.Original)
             return true;
 
-        if (appConfig.MaxDistance is not 0)
+        if (appConfig.DanmakuMergeMaxDistance is not 0)
         {
             // 内容相近
             var dis = EditDistance(p.Original, q.Original);
             if (p.Length + q.Length < MinDanmakuSize
-                    ? dis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
-                    : dis <= appConfig.MaxDistance)
+                    ? dis < (p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize - 1
+                    : dis <= appConfig.DanmakuMergeMaxDistance)
                 return true;
 
             // 谐音
             var pyDis = EditDistance(p.Pinyin, q.Pinyin);
             if (p.Length + q.Length < MinDanmakuSize
-                    ? pyDis < (p.Length + q.Length) * appConfig.MaxDistance / MinDanmakuSize - 1
-                    : pyDis <= appConfig.MaxDistance)
+                    ? pyDis < (p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize - 1
+                    : pyDis <= appConfig.DanmakuMergeMaxDistance)
                 return true;
 
             // 完全不相似
@@ -110,11 +110,11 @@ public static class DanmakuCombiner
                 return false;
         }
 
-        if (appConfig.MaxCosine is 10)
+        if (appConfig.DanmakuMergeMaxCosine is 10)
         {
             // 词频
             var cos = CosineDistanceSquare(p.Gram, q.Gram) * 10;
-            if (cos >= appConfig.MaxCosine)
+            if (cos >= appConfig.DanmakuMergeMaxCosine)
                 return true;
         }
 
@@ -152,12 +152,12 @@ public static class DanmakuCombiner
 
                     var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
                     while (danmakuChunk.Count > 0 &&
-                           danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.TimeSpan)
+                           danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.DanmakuMergeTimeSpan)
                         outDanmaku.Add(danmakuChunk.Dequeue().Peers);
 
                     var addNew = true;
                     foreach (var (_, peers) in danmakuChunk
-                                 .Where(chunk => appConfig.CrossMode || danmaku.Mode == chunk.Peers[0].Mode)
+                                 .Where(chunk => appConfig.DanmakuMergeCrossMode || danmaku.Mode == chunk.Peers[0].Mode)
                                  .Where(chunk => Similarity(str, chunk.Str, appConfig)))
                     {
                         peers.Add(danmaku);
@@ -193,7 +193,7 @@ public static class DanmakuCombiner
 
                     var represent = new Danmaku(
                         (peers.Count > 5 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
-                        peers[Math.Min(peers.Count * appConfig.RepresentativePercent / 100, peers.Count - 1)].Time,
+                        peers[Math.Min(peers.Count * appConfig.DanmakuMergeRepresentativePercent / 100, peers.Count - 1)].Time,
                         mode,
                         (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
                         (uint)peers.Average(t => t.Color),

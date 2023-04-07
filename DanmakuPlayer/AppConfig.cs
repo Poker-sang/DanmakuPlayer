@@ -49,7 +49,7 @@ public partial record AppConfig
     /// 提前渲染并存储，会占用更高内存
     /// </summary>
     /// <remarks>default: <see langword="false"/></remarks>
-    public bool RenderBefore { get; set; } = true;
+    public bool RenderBefore { get; set; } = false;
 
     #endregion
 
@@ -85,6 +85,54 @@ public partial record AppConfig
     /// <remarks>default: <see langword="true"/></remarks>
     public bool DanmakuAllowOverlap { get; set; }
 
+    #region 数量设置
+
+    /// <summary>
+    /// 是否限制滚动弹幕数量
+    /// </summary>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public bool DanmakuCountRollEnableLimit => DanmakuCountRollLimit is not -1;
+
+    /// <summary>
+    /// 限制滚动弹幕的数量
+    /// </summary>
+    public int DanmakuCountRollLimit { get; set; } = -1;
+
+    /// <summary>
+    /// 是否限制底端弹幕数量
+    /// </summary>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public bool DanmakuCountBottomEnableLimit => DanmakuCountBottomLimit is not -1;
+
+    /// <summary>
+    /// 限制底端弹幕的数量
+    /// </summary>
+    public int DanmakuCountBottomLimit { get; set; } = -1;
+
+    /// <summary>
+    /// 是否限制顶端弹幕数量
+    /// </summary>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public bool DanmakuCountTopEnableLimit => DanmakuCountTopLimit is not -1;
+
+    /// <summary>
+    /// 限制顶端弹幕的数量
+    /// </summary>
+    public int DanmakuCountTopLimit { get; set; } = -1;
+
+    /// <summary>
+    /// 是否限制逆向弹幕数量
+    /// </summary>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public bool DanmakuCountInverseEnableLimit => DanmakuCountInverseLimit is not -1;
+
+    /// <summary>
+    /// 限制逆向弹幕的数量
+    /// </summary>
+    public int DanmakuCountInverseLimit { get; set; } = -1;
+
+    #endregion
+
     #region 合并设置
 
     /// <summary>
@@ -93,15 +141,16 @@ public partial record AppConfig
     /// <remarks>default: <see langword="true"/></remarks>
     public bool DanmakuEnableMerge { get; set; } = true;
 
-    public int MaxCosine { get; set; } = 6;
+    public int DanmakuMergeMaxCosine { get; set; } = 6;
 
-    public int MaxDistance { get; set; } = 5;
+    public int DanmakuMergeMaxDistance { get; set; } = 5;
 
-    public int TimeSpan { get; set; } = 20;
+    public int DanmakuMergeTimeSpan { get; set; } = 20;
 
-    public bool CrossMode { get; set; } = false;
+    public bool DanmakuMergeCrossMode { get; set; } = false;
 
-    public int RepresentativePercent { get; set; } = 50;
+    // TODO: 优化合并弹幕代表性算法
+    public int DanmakuMergeRepresentativePercent { get; set; } = 50;
 
     #endregion
 
