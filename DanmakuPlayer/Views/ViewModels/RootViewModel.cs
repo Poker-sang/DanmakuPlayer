@@ -21,7 +21,15 @@ public partial class RootViewModel : ObservableObject
 
     [ObservableProperty] private bool _startPlaying;
 
-    [ObservableProperty] private double _time;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Time))]
+    private double _actualTime;
+
+    public double Time
+    {
+        get => ActualTime * AppConfig.PlaySpeed;
+        set => ActualTime = value / AppConfig.PlaySpeed;
+    }
 
     [ObservableProperty] private double _totalTime;
 

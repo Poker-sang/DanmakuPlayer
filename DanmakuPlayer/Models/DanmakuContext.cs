@@ -12,8 +12,8 @@ public class DanmakuContext
     public DanmakuContext(float viewHeight, AppConfig appConfig)
     {
         _ = StaticRoom.AddFirst((viewHeight, 0));
-        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuDuration)));
-        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuDuration)));
+        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDuration)));
+        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDuration)));
         if (appConfig.DanmakuCountRollEnableLimit)
             Roll = new(appConfig.DanmakuCountRollLimit);
         if (appConfig.DanmakuCountBottomEnableLimit)

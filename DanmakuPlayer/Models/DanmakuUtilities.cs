@@ -12,7 +12,7 @@ public partial record Danmaku
 {
     private double GetDistance(CreatorProvider provider, IDanmakuWidth previous)
     {
-        var endTime = previous.Time + provider.AppConfig.DanmakuDuration;
+        var endTime = previous.Time + provider.AppConfig.DanmakuActualDuration;
 
         return (LayoutWidth <= previous.LayoutWidth
                    ? GetPosition(previous, Time) - GetPosition(this, Time)
@@ -20,7 +20,7 @@ public partial record Danmaku
                - previous.LayoutWidth;
 
         // 末端位置
-        double GetPosition(IDanmakuWidth danmaku, float t) => (t - danmaku.Time) * (provider.ViewWidth + danmaku.LayoutWidth) / provider.AppConfig.DanmakuDuration;
+        double GetPosition(IDanmakuWidth danmaku, float t) => (t - danmaku.Time) * (provider.ViewWidth + danmaku.LayoutWidth) / provider.AppConfig.DanmakuActualDuration;
     }
 
     #region Roll

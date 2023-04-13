@@ -95,11 +95,12 @@ public static class DanmakuHelper
 
     public static Danmaku[] DisplayingDanmaku(float time, AppConfig appConfig)
     {
-        var firstIndex = Array.FindIndex(Pool, t => t.Time > time - appConfig.DanmakuDuration);
+        var firstIndex = Array.FindIndex(Pool, t => t.Time > time - appConfig.DanmakuActualDuration);
         if (firstIndex is -1)
             return Array.Empty<Danmaku>();
         var lastIndex = Array.FindLastIndex(Pool, t => t.Time <= time);
 #pragma warning disable IDE0046 // 转换为条件表达式
+        // ReSharper disable once ConvertIfStatementToReturnStatement
         if (lastIndex < firstIndex)
             return Array.Empty<Danmaku>();
         return Pool[firstIndex..(lastIndex + 1)];

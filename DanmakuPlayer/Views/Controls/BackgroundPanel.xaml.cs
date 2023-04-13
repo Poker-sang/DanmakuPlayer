@@ -81,7 +81,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
-            _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuDuration;
+            _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuActualDuration;
 
             SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已就绪，装载率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
         }
@@ -134,7 +134,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         {
             if (_vm.IsPlaying)
             {
-                _vm.Time += (now - _lastTime).TotalSeconds;
+                _vm.ActualTime += (now - _lastTime).TotalSeconds;
                 DanmakuCanvas.Invalidate();
             }
         }

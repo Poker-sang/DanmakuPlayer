@@ -21,7 +21,7 @@ public partial class App : Application
         {
             Size = WindowHelper.EstimatedWindowSize(),
             TitleBarType = TitleBarHelper.TitleBarType.AppWindow,
-            BackdropType = BackdropHelper.BackdropType.None
+            BackdropType = BackdropType.None
         });
     }
 }

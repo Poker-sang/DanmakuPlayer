@@ -68,6 +68,12 @@ public sealed partial class SettingDialog : UserControl
 
     private void ResetProvider(object sender, RoutedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadProvider);
 
+    private void ResetTimerAndProvider(object sender, RoutedEventArgs e)
+    {
+        ResetTimer(sender, e);
+        ResetProvider(sender, e);
+    }
+
     private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
         var value = (float)sender.To<Slider>().Value;

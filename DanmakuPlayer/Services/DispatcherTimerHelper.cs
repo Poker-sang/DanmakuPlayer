@@ -7,10 +7,10 @@ public static class DispatcherTimerHelper
 {
     private static DispatcherTimer Timer { get; } = new()
     {
-        Interval = TimeSpan.FromSeconds(1d / (AppContext.AppConfig.PlayFramePerSecond * AppContext.AppConfig.PlaySpeed))
+        Interval = TimeSpan.FromSeconds(1d / AppContext.AppConfig.PlayFramePerSecond)
     };
 
-    public static void ResetTimerInterval() => Timer.Interval = TimeSpan.FromSeconds(1d / (AppContext.AppConfig.PlayFramePerSecond * AppContext.AppConfig.PlaySpeed));
+    public static void ResetTimerInterval() => Timer.Interval = TimeSpan.FromSeconds(1d / AppContext.AppConfig.PlayFramePerSecond);
 
     public static bool IsRunning
     {

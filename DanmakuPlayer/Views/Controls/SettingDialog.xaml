@@ -113,10 +113,10 @@
                         StepFrequency="0.25"
                         TickFrequency="0.5"
                         TickPlacement="Outside"
-                        ValueChanged="ResetTimer"
+                        ValueChanged="ResetTimerAndProvider"
                         Value="{x:Bind Vm.PlaySpeed, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard Description="越高体验越好、内存占用越多" Header="播放帧数">
+                <labs:SettingsCard Description="帧数越高弹幕越流畅、内存占用越多（过高可能卡顿甚至崩溃）" Header="播放帧数">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE916;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -141,6 +141,7 @@
                         StepFrequency="1"
                         TickFrequency="1"
                         TickPlacement="Outside"
+                        ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard Description="弹幕的透明度" Header="弹幕透明度">

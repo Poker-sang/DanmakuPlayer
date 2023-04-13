@@ -66,7 +66,7 @@ public class CreatorProvider : IDisposable
 
     public void ClearLayoutRefCount()
     {
-        foreach (var counter in LayoutsCounter) 
+        foreach (var counter in LayoutsCounter)
             LayoutsCounter[counter.Key] = 0;
     }
 

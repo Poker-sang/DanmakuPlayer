@@ -78,12 +78,12 @@ public partial record Danmaku(
                     return false;
                 break;
             case DanmakuMode.Bottom:
-                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuDuration + Time, OverlapPredicate))
+                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
                     return false;
                 _staticPosition = new((float)(provider.ViewWidth - LayoutWidth) / 2, _showPositionY);
                 break;
             case DanmakuMode.Top:
-                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuDuration + Time, OverlapPredicate))
+                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
                     return false;
                 _staticPosition = new((float)(provider.ViewWidth - LayoutWidth) / 2, _showPositionY);
                 break;
@@ -126,7 +126,7 @@ public partial record Danmaku(
             while (queue.Count is not 0)
             {
                 var danmaku = queue.Peek();
-                if (danmaku.Time + provider.AppConfig.DanmakuDuration < Time)
+                if (danmaku.Time + provider.AppConfig.DanmakuActualDuration < Time)
                     _ = queue.Dequeue();
                 else
                     break;
@@ -160,14 +160,14 @@ public partial record Danmaku(
         switch (Mode)
         {
             case DanmakuMode.Roll:
-                renderTarget.DrawTextLayout(layout, new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuDuration)), _showPositionY), color);
+                renderTarget.DrawTextLayout(layout, new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration)), _showPositionY), color);
                 break;
             case DanmakuMode.Bottom:
             case DanmakuMode.Top:
                 renderTarget.DrawTextLayout(layout, _staticPosition, color);
                 break;
             case DanmakuMode.Inverse:
-                renderTarget.DrawTextLayout(layout, new((float)(((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuDuration) - width), _showPositionY), color);
+                renderTarget.DrawTextLayout(layout, new((float)(((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY), color);
                 break;
             case DanmakuMode.Advanced:
             case DanmakuMode.Code:
