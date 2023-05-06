@@ -4,6 +4,7 @@ using System.Linq;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 
@@ -45,6 +46,12 @@ public class CreatorProvider : IDisposable
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
     public Dictionary<string, CanvasTextLayout> Layouts { get; } = new();
 
+    /// <summary>
+    /// 渲染布局描边
+    /// </summary>
+    /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
+    public Dictionary<string, CanvasGeometry> Geometries { get; } = new();
+
     #region 计数器
 
     /// <summary>
@@ -60,6 +67,8 @@ public class CreatorProvider : IDisposable
         {
             LayoutsCounter[danmakuString] = 0;
             Layouts[danmakuString] = GetNewLayout(danmaku);
+            if (AppConfig.DanmakuEnableStrokes)
+                Geometries[danmakuString] = CanvasGeometry.CreateText(Layouts[danmakuString]);
         }
         ++LayoutsCounter[danmakuString];
     }
@@ -77,7 +86,9 @@ public class CreatorProvider : IDisposable
         foreach (var danmakuString in list)
         {
             Layouts[danmakuString].Dispose();
+            Geometries[danmakuString]?.Dispose();
             _ = Layouts.Remove(danmakuString);
+            _ = Geometries.Remove(danmakuString);
             _ = LayoutsCounter.Remove(danmakuString);
         }
     }
@@ -119,7 +130,10 @@ public class CreatorProvider : IDisposable
     {
         foreach (var layout in Layouts)
             layout.Value.Dispose();
+        foreach (var geometry in Geometries)
+            geometry.Value.Dispose();
         Layouts.Clear();
+        Geometries.Clear();
     }
 
     public void Dispose()
@@ -130,8 +144,6 @@ public class CreatorProvider : IDisposable
             brush.Value.Dispose();
         Brushes.Clear();
 
-        foreach (var layout in Layouts)
-            layout.Value.Dispose();
-        Layouts.Clear();
+        ClearLayouts();
     }
 }

@@ -10,7 +10,7 @@ public partial record AppConfig
     /// <summary>
     /// 主题
     /// </summary>
-    /// <remarks>default: 0</remarks>
+    /// <remarks>default: 0 ∈ [0, 2]</remarks>
     public int Theme { get; set; }
 
     /// <summary>
@@ -26,19 +26,19 @@ public partial record AppConfig
     /// <summary>
     /// 快进速度(second)
     /// </summary>
-    /// <remarks>default: 5</remarks>
+    /// <remarks>default: 5 ∈ [1, 20]</remarks>
     public int PlayFastForward { get; set; } = 5;
 
     /// <summary>
     /// 倍速(times)
     /// </summary>
-    /// <remarks>default: 1</remarks>
+    /// <remarks>default: 1 ∈ [0.5, 2]</remarks>
     public double PlaySpeed { get; set; } = 1;
 
     /// <summary>
     /// 帧率(second)
     /// </summary>
-    /// <remarks>PlayFramePerSecond ∈ [5, 100], default: 25</remarks>
+    /// <remarks>default: 25 ∈ [5, 100]</remarks>
     public int PlayFramePerSecond { get; set; } = 25;
 
     #endregion
@@ -58,7 +58,7 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕显示速度（过屏时间(second)）
     /// </summary>
-    /// <remarks>DanmakuDuration ∈ [5, 20], default: 15</remarks>
+    /// <remarks>default: 15 ∈ [5, 20]</remarks>
     public int DanmakuDuration { get; set; } = 15;
 
     /// <inheritdoc cref="DanmakuDuration"/>
@@ -69,7 +69,7 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕透明度
     /// </summary>
-    /// <remarks>Opacity ∈ [0.1, 1], default: 0.7</remarks>
+    /// <remarks>default: 0.7 ∈ [0.1, 1]</remarks>
     public float DanmakuOpacity { get; set; } = 0.7f;
 
     /// <summary>
@@ -81,14 +81,36 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕大小缩放
     /// </summary>
-    /// <remarks>DanmakuScale ∈ [0.5, 2], default: 1</remarks>
+    /// <remarks>default: 1 ∈ [0.5, 2]</remarks>
     public float DanmakuScale { get; set; } = 1;
 
     /// <summary>
     /// 弹幕是否允许重叠
     /// </summary>
     /// <remarks>default: <see langword="true"/></remarks>
-    public bool DanmakuAllowOverlap { get; set; }
+    public bool DanmakuEnableOverlap { get; set; }
+
+    #region 描边设置
+
+    /// <summary>
+    /// 弹幕是否允许描边
+    /// </summary>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public bool DanmakuEnableStrokes => DanmakuStrokeWidth is not 0;
+
+    /// <summary>
+    /// 弹幕描边宽度
+    /// </summary>
+    /// <remarks>default: 1 ∈ [0, 5]（0时禁用）</remarks>
+    public int DanmakuStrokeWidth { get; set; } = 1;
+
+    /// <summary>
+    /// 弹幕描边颜色
+    /// </summary>
+    /// <remarks>default: 0xFFA9A9A9</remarks>
+    public uint DanmakuStrokeColor { get; set; } = 0xFFA9A9A9;
+
+    #endregion
 
     #region 数量设置
 
@@ -101,6 +123,7 @@ public partial record AppConfig
     /// <summary>
     /// 限制滚动弹幕的数量
     /// </summary>
+    /// <remarks>default: -1 ∈ [-1, 100]（-1时禁用）</remarks>
     public int DanmakuCountRollLimit { get; set; } = -1;
 
     /// <summary>
@@ -112,6 +135,7 @@ public partial record AppConfig
     /// <summary>
     /// 限制底端弹幕的数量
     /// </summary>
+    /// <remarks>default: -1 ∈ [-1, 100]（-1时禁用）</remarks>
     public int DanmakuCountBottomLimit { get; set; } = -1;
 
     /// <summary>
@@ -123,6 +147,7 @@ public partial record AppConfig
     /// <summary>
     /// 限制顶端弹幕的数量
     /// </summary>
+    /// <remarks>default: -1 ∈ [-1, 100]（-1时禁用）</remarks>
     public int DanmakuCountTopLimit { get; set; } = -1;
 
     /// <summary>
@@ -134,6 +159,7 @@ public partial record AppConfig
     /// <summary>
     /// 限制逆向弹幕的数量
     /// </summary>
+    /// <remarks>default: -1 ∈ [-1, 100]（-1时禁用）</remarks>
     public int DanmakuCountInverseLimit { get; set; } = -1;
 
     #endregion

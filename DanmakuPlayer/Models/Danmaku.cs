@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
 using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Geometry;
+using Microsoft.UI;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
@@ -66,9 +70,10 @@ public partial record Danmaku(
         })
             return false;
 
-        var layoutExists = provider.Layouts.ContainsKey(ToString());
-        var layout = layoutExists ? provider.Layouts[ToString()] : provider.GetNewLayout(this);
-        LayoutWidth = layout.LayoutBounds.Width;
+        var layoutExists = provider.Layouts.TryGetValue(ToString(), out var layout);
+        if (!layoutExists)
+            layout = provider.GetNewLayout(this);
+        LayoutWidth = layout!.LayoutBounds.Width;
         _layoutHeight = layout.LayoutBounds.Height;
 
         switch (Mode)
@@ -140,7 +145,7 @@ public partial record Danmaku(
         bool OverlapPredicate(bool overlap)
         {
             // 是否覆盖
-            if (!overlap || provider.AppConfig.DanmakuAllowOverlap)
+            if (!overlap || provider.AppConfig.DanmakuEnableOverlap)
                 return false;
             if (!layoutExists)
                 layout.Dispose();
@@ -156,27 +161,28 @@ public partial record Danmaku(
 
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
-        var color = provider.GetBrush(Color);
-        switch (Mode)
+        var brush = provider.GetBrush(Color);
+        var outlineBrush = (CanvasSolidColorBrush)null!;
+        var geometry = (CanvasGeometry)null!;
+        if (provider.AppConfig.DanmakuEnableStrokes)
         {
-            case DanmakuMode.Roll:
-                renderTarget.DrawTextLayout(layout, new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration)), _showPositionY), color);
-                break;
-            case DanmakuMode.Bottom:
-            case DanmakuMode.Top:
-                renderTarget.DrawTextLayout(layout, _staticPosition, color);
-                break;
-            case DanmakuMode.Inverse:
-                renderTarget.DrawTextLayout(layout, new((float)(((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY), color);
-                break;
-            case DanmakuMode.Advanced:
-            case DanmakuMode.Code:
-            case DanmakuMode.Bas:
-                break;
-            default:
-                ThrowHelper.ArgumentOutOfRange(Mode);
-                break;
+            outlineBrush = provider.GetBrush(provider.AppConfig.DanmakuStrokeColor);
+            geometry = CanvasGeometry.CreateText(layout);
         }
+
+        if (Mode is DanmakuMode.Advanced or DanmakuMode.Code or DanmakuMode.Bas)
+            return;
+
+        var pos = Mode switch
+        {
+            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
+            DanmakuMode.Bottom or DanmakuMode.Top => _staticPosition,
+            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY),
+            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
+        };
+        renderTarget.DrawTextLayout(layout, pos, brush);
+        if (provider.AppConfig.DanmakuEnableStrokes)
+            renderTarget.DrawGeometry(geometry, pos, outlineBrush, provider.AppConfig.DanmakuStrokeWidth);
     }
 
     public override string ToString() => $"{Text},{Color},{Size}";

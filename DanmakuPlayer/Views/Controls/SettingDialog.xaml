@@ -29,6 +29,7 @@
         </Style>
         <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <converters:CountLimitConverter x:Key="CountLimitConverter" />
+        <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
     </UserControl.Resources>
     <ContentDialog
         Title="设置"
@@ -179,6 +180,31 @@
                         ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </labs:SettingsCard>
+                <labs:SettingsExpander Description="描边宽度" Header="弹幕描边">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <SymbolIcon Symbol="FontColor" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <Slider
+                        Maximum="5"
+                        Minimum="0"
+                        StepFrequency="1"
+                        TickFrequency="1"
+                        TickPlacement="Outside"
+                        Value="{x:Bind Vm.DanmakuStrokeWidth, Mode=TwoWay}" />
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            HorizontalContentAlignment="Center"
+                            ContentAlignment="Vertical"
+                            Description="弹幕描边的颜色"
+                            Header="描边颜色"
+                            IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
+                            <ColorPicker
+                                IsAlphaEnabled="True"
+                                IsMoreButtonVisible="True"
+                                Color="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
                 <!--  弹幕滤过  -->
                 <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="弹幕滤过" />
                 <labs:SettingsExpander Description="是否合并滚动、底端、顶端弹幕（下次加载弹幕时生效）" Header="弹幕合并">
@@ -296,7 +322,7 @@
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF156;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuAllowOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
                 </labs:SettingsCard>
                 <labs:SettingsExpander Description="弹幕数量" Header="弹幕的数量限制">
                     <labs:SettingsExpander.HeaderIcon>
