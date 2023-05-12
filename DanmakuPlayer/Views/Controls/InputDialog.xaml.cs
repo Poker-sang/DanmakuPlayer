@@ -31,7 +31,7 @@ public sealed partial class InputDialog : UserControl
 
     #region 操作
 
-    private static void ShowSecondButton(ContentDialog sender) => sender.SecondaryButtonText = "选择此视频";
+    private static void ShowSecondButton(ContentDialog sender) => sender.SecondaryButtonText = InputDialogResources.SelectThisVideo;
 
     private static void HideSecondButton(ContentDialog sender)
     {
@@ -67,7 +67,7 @@ public sealed partial class InputDialog : UserControl
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
-        _codeType = TbInput.Text.Match(out var match);
+        _codeType = InputBox.Text.Match(out var match);
         var code = 0;
         if (_codeType is not BiliHelper.CodeType.BvId and not BiliHelper.CodeType.Error)
             code = int.Parse(match);
@@ -76,7 +76,7 @@ public sealed partial class InputDialog : UserControl
             switch (_codeType)
             {
                 case BiliHelper.CodeType.Error:
-                    ShowInfoBar("未匹配到相应的视频！", true);
+                    ShowInfoBar(InputDialogResources.VideoUnmatched, true);
                     break;
                 case BiliHelper.CodeType.AvId:
                     ItemsSource = (await BiliHelper.Av2CIds(code, _cancellationTokenSource.Token)).ToArray();
@@ -114,21 +114,21 @@ public sealed partial class InputDialog : UserControl
         switch (ItemsSource.Length)
         {
             case 0:
-                ShowInfoBar("未匹配到相应的视频！", true);
+                ShowInfoBar(InputDialogResources.VideoUnmatched, true);
                 break;
             case 1:
                 _cId = ItemsSource[0].CId;
                 sender.Hide();
                 break;
             case > 1:
-                LvPage.ItemsSource = ItemsSource;
-                ShowInfoBar("请选择一个视频：", false);
+                VideoPageView.ItemsSource = ItemsSource;
+                ShowInfoBar(InputDialogResources.PleaseSelectAVideo, false);
                 ShowSecondButton(sender);
                 break;
         }
     }
 
-    private void SelectClick(object sender, object e) => SelectConfirm(LvPage);
+    private void SelectClick(object sender, object e) => SelectConfirm(VideoPageView);
 
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) => Content.To<ContentDialog>().IsSecondaryButtonEnabled = true;
 

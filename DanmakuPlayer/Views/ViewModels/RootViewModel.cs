@@ -33,8 +33,6 @@ public partial class RootViewModel : ObservableObject
 
     [ObservableProperty] private double _totalTime;
 
-    [ObservableProperty] private double _defaultInputTime;
-
     [ObservableProperty] private bool _topMost;
 
     [ObservableProperty] private bool _pointerInTitleArea;
@@ -44,10 +42,10 @@ public partial class RootViewModel : ObservableObject
     [ObservableProperty] private bool _pointerInControlArea;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NavigateInputtingTime))]
-    private bool _inputtingTime;
+    [NotifyPropertyChangedFor(nameof(NavigateEditingTime))]
+    private bool _editingTime;
 
-    public bool NavigateInputtingTime => !InputtingTime;
+    public bool NavigateEditingTime => !EditingTime;
 
 #pragma warning disable CA1822
     public AppConfig AppConfig => AppContext.AppConfig;

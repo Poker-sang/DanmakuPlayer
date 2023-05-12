@@ -9,12 +9,10 @@
     Unloaded="OnUnloaded"
     mc:Ignorable="d">
     <ContentDialog
-        Title="在线获取弹幕"
+        x:Uid="/InputDialog/InputDialog"
         CloseButtonClick="CloseButtonClick"
-        CloseButtonText="取消"
         DefaultButton="Close"
         PrimaryButtonClick="InquireClick"
-        PrimaryButtonText="获取视频弹幕"
         SecondaryButtonClick="SelectClick">
         <Grid>
             <Grid.RowDefinitions>
@@ -23,12 +21,12 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBox
-                x:Name="TbInput"
-                Grid.Row="0"
-                PlaceholderText="输入视频的网址" />
+                x:Name="InputBox"
+                x:Uid="/InputDialog/InputBox"
+                Grid.Row="0" />
             <InfoBar x:Name="IbMessage" Grid.Row="1" />
             <ListView
-                x:Name="LvPage"
+                x:Name="VideoPageView"
                 Grid.Row="2"
                 DoubleTapped="SelectClick"
                 SelectionChanged="SelectionChanged"

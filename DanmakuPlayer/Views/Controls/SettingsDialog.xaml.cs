@@ -17,11 +17,11 @@ using WinUI3Utilities;
 namespace DanmakuPlayer.Views.Controls;
 
 [INotifyPropertyChanged]
-public sealed partial class SettingDialog : UserControl
+public sealed partial class SettingsDialog : UserControl
 {
     [ObservableProperty] private SettingViewModel _vm = new();
 
-    public SettingDialog() => InitializeComponent();
+    public SettingsDialog() => InitializeComponent();
 
     public async Task ShowAsync() => await Content.To<ContentDialog>().ShowAsync();
 

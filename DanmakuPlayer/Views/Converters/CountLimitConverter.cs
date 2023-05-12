@@ -11,7 +11,7 @@ public class CountLimitConverter : IValueConverter
         var v = value.To<double>();
         return v switch
         {
-            -1 => "不限",
+            -1 => SettingsDialogResources.Unlimited,
             > -1 => (int)v,
             _ => ThrowHelper.ArgumentOutOfRange<double, string>(v)
         };

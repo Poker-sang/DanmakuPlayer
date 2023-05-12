@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="DanmakuPlayer.Views.Controls.SettingDialog"
+    x:Class="DanmakuPlayer.Views.Controls.SettingsDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
@@ -32,34 +32,32 @@
         <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
     </UserControl.Resources>
     <ContentDialog
-        Title="设置"
+        x:Uid="/SettingsDialog/SettingsDialog"
         CloseButtonClick="CloseClick"
-        CloseButtonText="关闭"
         DefaultButton="Close"
-        PrimaryButtonClick="SetDefaultAppConfigClick"
-        PrimaryButtonText="恢复默认设置">
+        PrimaryButtonClick="SetDefaultAppConfigClick">
         <ScrollViewer>
             <StackPanel MinWidth="550">
                 <!--  应用设置  -->
-                <TextBlock Style="{StaticResource FirstSettingHeaderStyle}" Text="应用设置" />
-                <labs:SettingsExpander Description="应用的主题色" Header="主题">
+                <TextBlock x:Uid="/SettingsDialog/AppHeader" Style="{StaticResource FirstSettingHeaderStyle}" />
+                <labs:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE771;" />
                     </labs:SettingsExpander.HeaderIcon>
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard ContentAlignment="Left">
                             <RadioButtons SelectedIndex="{x:Bind Vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
-                                <RadioButton Content="跟随系统">
+                                <RadioButton x:Uid="/SettingsDialog/RadioButtonSystemTheme">
                                     <RadioButton.Tag>
                                         <x:Int32>0</x:Int32>
                                     </RadioButton.Tag>
                                 </RadioButton>
-                                <RadioButton Content="浅色">
+                                <RadioButton x:Uid="/SettingsDialog/RadioButtonLightTheme">
                                     <RadioButton.Tag>
                                         <x:Int32>1</x:Int32>
                                     </RadioButton.Tag>
                                 </RadioButton>
-                                <RadioButton Content="深色">
+                                <RadioButton x:Uid="/SettingsDialog/RadioButtonDarkTheme">
                                     <RadioButton.Tag>
                                         <x:Int32>2</x:Int32>
                                     </RadioButton.Tag>
@@ -68,7 +66,7 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsExpander Description="应用的前景色" Header="前景色">
+                <labs:SettingsExpander x:Uid="/SettingsDialog/AppForegroundExpander">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </labs:SettingsExpander.HeaderIcon>
@@ -83,16 +81,16 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <!--  渲染设置  -->
-                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="渲染设置" />
-                <labs:SettingsCard Description="提前渲染并存储，会占用更高内存" Header="提前渲染">
+                <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE81C;" />
                     </labs:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" Toggled="ResetProvider" />
                 </labs:SettingsCard>
                 <!--  播放设置  -->
-                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="播放设置" />
-                <labs:SettingsCard Description="每次快进的秒数" Header="快进">
+                <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEB9D;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -104,10 +102,7 @@
                         TickPlacement="Outside"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard
-                    Description="是否按倍速播放"
-                    Header="播放倍速"
-                    HeaderIcon="Play">
+                <labs:SettingsCard x:Uid="/SettingsDialog/PlaySpeedCard" HeaderIcon="Play">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -117,7 +112,7 @@
                         ValueChanged="ResetTimerAndProvider"
                         Value="{x:Bind Vm.PlaySpeed, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard Description="帧数越高弹幕越流畅、内存占用越多（过高可能卡顿甚至崩溃）" Header="播放帧数">
+                <labs:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE916;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -131,11 +126,8 @@
                         Value="{x:Bind Vm.PlayFramePerSecond, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <!--  弹幕设置  -->
-                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="弹幕设置" />
-                <labs:SettingsCard
-                    Description="每条弹幕在屏幕上的停留秒数"
-                    Header="弹幕速度"
-                    HeaderIcon="Clock">
+                <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="Clock">
                     <Slider
                         Maximum="20"
                         Minimum="5"
@@ -145,7 +137,7 @@
                         ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard Description="弹幕的透明度" Header="弹幕透明度">
+                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEF3C;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -158,19 +150,13 @@
                         ValueChanged="DanmakuOpacityChanged"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard
-                    Description="从计算机内已安装的字体搜索"
-                    Header="弹幕字体"
-                    HeaderIcon="Font">
+                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="Font">
                     <ComboBox
                         ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}"
                         SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}"
                         SelectionChanged="DanmakuFontChanged" />
                 </labs:SettingsCard>
-                <labs:SettingsCard
-                    Description="弹幕缩放倍数"
-                    Header="弹幕大小"
-                    HeaderIcon="FontSize">
+                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="FontSize">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -180,7 +166,7 @@
                         ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsExpander Description="描边宽度" Header="弹幕描边">
+                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander">
                     <labs:SettingsExpander.HeaderIcon>
                         <SymbolIcon Symbol="FontColor" />
                     </labs:SettingsExpander.HeaderIcon>
@@ -193,10 +179,9 @@
                         Value="{x:Bind Vm.DanmakuStrokeWidth, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
                             HorizontalContentAlignment="Center"
                             ContentAlignment="Vertical"
-                            Description="弹幕描边的颜色"
-                            Header="描边颜色"
                             IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
                             <ColorPicker
                                 IsAlphaEnabled="True"
@@ -206,17 +191,14 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <!--  弹幕滤过  -->
-                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="弹幕滤过" />
-                <labs:SettingsExpander Description="是否合并滚动、底端、顶端弹幕（下次加载弹幕时生效）" Header="弹幕合并">
+                <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEA3C;" />
                     </labs:SettingsExpander.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
-                            Description="内容相近合并（∈[0, 10]）&#13;=0：禁用，≤3：宽松，≤5：中等，≤8：严格"
-                            Header="编辑距离"
-                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Minimum="0"
@@ -225,10 +207,7 @@
                                 TickPlacement="Outside"
                                 Value="{x:Bind Vm.DanmakuMergeMaxDistance, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Description="词频合并（∈[0, 10]）&#13;=10：禁用，≥8：宽松，≥6：中等，≥3：严格"
-                            Header="向量余弦"
-                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Minimum="0"
@@ -237,10 +216,7 @@
                                 TickPlacement="Outside"
                                 Value="{x:Bind Vm.DanmakuMergeMaxCosine, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Description="超过秒数外的相似弹幕不会被合并（∈[0, 60]）"
-                            Header="时间跨度"
-                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="60"
                                 Minimum="0"
@@ -249,18 +225,12 @@
                                 TickPlacement="Outside"
                                 Value="{x:Bind Vm.DanmakuMergeTimeSpan, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Description="是否跨滚动、顶端、底端模式合并弹幕"
-                            Header="跨类型"
-                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuMergeCrossMode, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsExpander
-                    Description="使用正则表达式屏蔽弹幕（下次加载弹幕时生效）"
-                    Header="正则筛选"
-                    HeaderIcon="Filter">
+                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="Filter">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
@@ -273,7 +243,7 @@
                                     BorderThickness="1"
                                     CornerRadius="4">
                                     <AutoSuggestBox
-                                        PlaceholderText="输入一条正则表达式，并点击“+”添加"
+                                        x:Uid="/SettingsDialog/AddRegexPatternAutoSuggestBox"
                                         QueryIcon="Add"
                                         QuerySubmitted="AddRegexPattern"
                                         TextChanged="RegexPatternChanged" />
@@ -318,18 +288,18 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsCard Description="是否允许弹幕重叠" Header="弹幕重叠">
+                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF156;" />
                     </labs:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
                 </labs:SettingsCard>
-                <labs:SettingsExpander Description="弹幕数量" Header="弹幕的数量限制">
+                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xECA5;" />
                     </labs:SettingsExpander.HeaderIcon>
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard Header="滚动弹幕数量限制">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard">
                             <Slider
                                 Maximum="100"
                                 Minimum="-1"
@@ -340,7 +310,7 @@
                                 ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard Header="底端弹幕数量限制">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
                             <Slider
                                 Maximum="100"
                                 Minimum="-1"
@@ -351,7 +321,7 @@
                                 ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard Header="顶端弹幕数量限制">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
                             <Slider
                                 Maximum="100"
                                 Minimum="-1"
@@ -362,7 +332,7 @@
                                 ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard Header="逆向弹幕数量限制">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard">
                             <Slider
                                 Maximum="100"
                                 Minimum="-1"
@@ -376,28 +346,28 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <!--  关于  -->
-                <TextBlock Style="{StaticResource SettingHeaderStyle}" Text="关于" />
-                <labs:SettingsExpander Header="关于 DanmakuPlayer v3.20">
+                <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE946;" />
                     </labs:SettingsExpander.HeaderIcon>
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
+                            x:Uid="/SettingsDialog/MailCard"
                             Click="NavigateUriClick"
-                            Description="poker_sang@outlook.com"
-                            Header="邮箱"
+                            Description="{x:Bind rs:ConstantStrings.Mail}"
                             HeaderIcon="Mail"
                             IsClickEnabled="True"
-                            Tag="{x:Bind rs:ConstantStrings.MailUri}">
-                            <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
+                            Tag="{x:Bind rs:ConstantStrings.MailToUri}">
                             <labs:SettingsCard.ActionIcon>
+                                <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
                         </labs:SettingsCard>
                         <labs:SettingsCard
+                            x:Uid="/SettingsDialog/AuthorCard"
                             Click="NavigateUriClick"
-                            Description="扑克"
-                            Header="作者"
+                            Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.AuthorUri}">
                             <labs:SettingsCard.HeaderIcon>
@@ -409,8 +379,7 @@
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Click="NavigateUriClick"
-                            Description="2639914082"
-                            Header="QQ"
+                            Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.QqUri}">
                             <labs:SettingsCard.HeaderIcon>
@@ -421,9 +390,9 @@
                             </labs:SettingsCard.ActionIcon>
                         </labs:SettingsCard>
                         <labs:SettingsCard
+                            x:Uid="/SettingsDialog/RepositoryCard"
                             Click="NavigateUriClick"
-                            Description="DanmakuPlayer"
-                            Header="仓库"
+                            Description="{x:Bind rs:ConstantStrings.AppName}"
                             HeaderIcon="Library"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}">
@@ -434,9 +403,8 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <labs:SettingsCard
+                    x:Uid="/SettingsDialog/LicenseCard"
                     Click="NavigateUriClick"
-                    Description="GNU General Public License v3.0"
-                    Header="License"
                     IsClickEnabled="True"
                     Tag="{x:Bind rs:ConstantStrings.LicenseUri}">
                     <labs:SettingsCard.HeaderIcon>

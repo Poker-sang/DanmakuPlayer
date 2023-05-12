@@ -30,7 +30,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ### 界面
 
-* [x] 调整透明度
+* [x] 透明窗口
 
 * [x] 固定最上层
 
@@ -110,7 +110,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.20
+版本：3.30
 
 ## 联系方式
 
@@ -120,4 +120,4 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 QQ：[2639914082](http://wpa.qq.com/msgrd?v=3&uin=2639914082&site=qq&menu=yes)
 
-2022.11.22
+2023.5.13

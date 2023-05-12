@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
+using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
+using DanmakuPlayer.Views.Converters;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -20,6 +22,7 @@ using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
+using RenderType = DanmakuPlayer.Enums.RenderType;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -71,19 +74,19 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         {
             var tempPool = await action(_cancellationTokenSource.Token);
 
-            SnackBarHelper.ShowAndHide($"已获取{tempPool.Count}条弹幕，正在过滤", SnackBarHelper.Severity.Information, "✧(≖ ◡ ≖✿)");
+            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), SnackBarHelper.Severity.Information, Emoticon.Okay);
 
             DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            SnackBarHelper.ShowAndHide($"已过滤为{DanmakuHelper.Pool.Length}条弹幕，剩余{filtrateRate}%，正在计算渲染", SnackBarHelper.Severity.Information, "('ヮ')");
+            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), SnackBarHelper.Severity.Information, Emoticon.Okay);
 
             var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuActualDuration;
 
-            SnackBarHelper.ShowAndHide($"{DanmakuHelper.Pool.Length}条弹幕已就绪，装载率{filtrateRate}%*{renderRate}%={totalRate}%", SnackBarHelper.Severity.Ok, "(/・ω・)/");
+            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), SnackBarHelper.Severity.Ok, Emoticon.Okay);
         }
         catch (TaskCanceledException)
         {
@@ -92,7 +95,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            SnackBarHelper.ShowAndHide("​( ´･_･)ﾉ(._.`) 发生异常了", SnackBarHelper.Severity.Error, e.Message);
+            SnackBarHelper.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, SnackBarHelper.Severity.Error, e.Message);
         }
 
         if (BannerTextBlock is not null)
@@ -205,15 +208,13 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void RootUnloaded(object sender, RoutedEventArgs e)
     {
-        DanmakuCanvas.RemoveFromVisualTree();
-        DanmakuCanvas = null;
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }
 
     #region 快进快退快捷键
 
-    private void RewindInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    private void RewindInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
     {
         if (_vm.Time - _vm.AppConfig.PlayFastForward < 0)
             _vm.Time = 0;
@@ -221,7 +222,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             _vm.Time -= _vm.AppConfig.PlayFastForward;
     }
 
-    private void FastForwardInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    private void FastForwardInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
     {
         if (_vm.Time + _vm.AppConfig.PlayFastForward > _vm.TotalTime)
             _vm.Time = 0;
@@ -242,12 +243,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = false;
-            SnackBarHelper.ShowAndHide("固定上层：关闭", SnackBarHelper.Severity.Information, "(°∀°)ﾉ");
+            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOff, SnackBarHelper.Severity.Information, Emoticon.Okay);
         }
         else
         {
             _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = true;
-            SnackBarHelper.ShowAndHide("固定上层：开启", SnackBarHelper.Severity.Information, "(・ω< )★");
+            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOn, SnackBarHelper.Severity.Information, Emoticon.Okay);
         }
     }
 
@@ -262,7 +263,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (await DialogInput.ShowAsync() is not { } cId)
             return;
 
-        SnackBarHelper.ShowAndHide("弹幕装填中...", SnackBarHelper.Severity.Information, "(｀・ω・´)");
+        SnackBarHelper.ShowAndHide(MainPanelResources.DanmakuLoading, SnackBarHelper.Severity.Information, Emoticon.Okay);
 
         try
         {
@@ -271,10 +272,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
                 var tempPool = new List<Danmaku>();
                 for (var i = 0; ; ++i)
                 {
-                    await using var danmaku = await DanmakuPlayer.Resources.BiliApis.GetDanmaku(cId, i + 1, token);
+                    await using var danmaku = await BiliApis.GetDanmaku(cId, i + 1, token);
                     if (danmaku is null)
                         break;
-                    var reply = Serializer.Deserialize<Resources.DmSegMobileReply>(danmaku);
+                    var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
                     tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
                 }
 
@@ -284,7 +285,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            SnackBarHelper.ShowAndHide("━━Σ(ﾟДﾟ川)━ 未知的异常", SnackBarHelper.Severity.Error, ex.Message);
+            SnackBarHelper.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, SnackBarHelper.Severity.Error, ex.Message);
         }
     }
 
@@ -311,9 +312,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
 
-    private void TimePointerPressed(object sender, PointerRoutedEventArgs e) => TryPause();
+    // private void TimePointerPressed(object sender, PointerRoutedEventArgs e) => TryPause();
 
-    private void TimePointerReleased(object sender, PointerRoutedEventArgs e) => TryResume();
+    // private void TimePointerReleased(object sender, PointerRoutedEventArgs e) => TryResume();
 
     #endregion
 
@@ -335,27 +336,27 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void TimeTextTapped(object sender, TappedRoutedEventArgs e)
     {
-        _vm.DefaultInputTime = _vm.Time;
-        _vm.InputtingTime = true;
+        TimeText.Text = DoubleToTimeTextConverter.ToTime(_vm.Time);
+        _vm.EditingTime = true;
     }
 
-    private void TimeTextLostFocus(object sender, RoutedEventArgs e) => _vm.InputtingTime = false;
+    private void TimeTextLostFocus(object sender, RoutedEventArgs e) => _vm.EditingTime = false;
 
-    private void TimeTextBeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs e)
+    private void TimeTextInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
     {
-        if (e.NewText is "")
-            return;
-        if (e.NewText.Contains('\r') || e.NewText.Contains('\n'))
-        {
-            if (TimeSpan.TryParse(e.NewText.Replace("\r", null).Replace("\n", null), out var result))
-                _vm.Time = result.TotalMinutes;
+        if (TimeSpan.TryParse(TimeText.Text/*.ReplaceLineEndings("")*/, out var result))
+            _vm.Time = Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
+            {
+                0 => result.TotalDays,
+                1 => result.TotalMinutes,
+                2 => result.TotalSeconds,
+                _ => 1
+            }, _vm.TotalTime), 0);
 
-            _vm.InputtingTime = false;
-            e.Cancel = true;
-        }
+        _vm.EditingTime = false;
     }
 
-    private void TimeTextIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private void TimeTextIsEditing(object sender, DependencyPropertyChangedEventArgs e)
     {
         var tb = sender.To<TextBox>();
         if (tb.IsEnabled)

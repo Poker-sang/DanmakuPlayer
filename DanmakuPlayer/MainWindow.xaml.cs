@@ -20,6 +20,7 @@ public sealed partial class MainWindow : Window
 
     ~MainWindow()
     {
+        DispatcherTimerHelper.IsRunning = false;
         SwapChainPanelHelper.Dispose();
         DanmakuHelper.Current.Dispose();
         CreatorProvider.DisposeFormats();
