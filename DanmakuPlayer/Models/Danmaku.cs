@@ -99,6 +99,7 @@ public partial record Danmaku(
             case DanmakuMode.Advanced:
             case DanmakuMode.Code:
             case DanmakuMode.Bas:
+                return false;
                 break;
             default:
                 ThrowHelper.ArgumentOutOfRange(Mode);

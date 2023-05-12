@@ -131,48 +131,50 @@ public static class DanmakuCombiner
             {
                 var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
                 var outDanmaku = new List<List<Danmaku>>();
+                var ret = new List<Danmaku>();
 
-                foreach (var danmaku in pool.Where(danmaku =>
-                             danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom))
-                {
-                    var text = danmaku.Text;
-
-                    if (text is "")
-                        continue;
-
-                    for (var i = 0; i < FullAngleChars.Length; ++i)
-                        text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
-
-                    var pinyin = "";
-                    foreach (var c in danmaku.Text)
-                        if (ChineseChar.IsValidChar(c))
-                            pinyin += new ChineseChar(c).Pinyins[0];
-                        else
-                            pinyin += c;
-
-                    var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
-                    while (danmakuChunk.Count > 0 &&
-                           danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.DanmakuMergeTimeSpan)
-                        outDanmaku.Add(danmakuChunk.Dequeue().Peers);
-
-                    var addNew = true;
-                    foreach (var (_, peers) in danmakuChunk
-                                 .Where(chunk => appConfig.DanmakuMergeCrossMode || danmaku.Mode == chunk.Peers[0].Mode)
-                                 .Where(chunk => Similarity(str, chunk.Str, appConfig)))
+                foreach (var danmaku in pool)
+                    if (danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom)
                     {
-                        peers.Add(danmaku);
-                        addNew = false;
-                        break;
-                    }
+                        var text = danmaku.Text;
 
-                    if (addNew)
-                        danmakuChunk.Enqueue((str, new() { danmaku }));
-                }
+                        if (text is "")
+                            continue;
+
+                        for (var i = 0; i < FullAngleChars.Length; ++i)
+                            text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
+
+                        var pinyin = "";
+                        foreach (var c in danmaku.Text)
+                            if (ChineseChar.IsValidChar(c))
+                                pinyin += new ChineseChar(c).Pinyins[0];
+                            else
+                                pinyin += c;
+
+                        var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
+                        while (danmakuChunk.Count > 0 &&
+                               danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.DanmakuMergeTimeSpan)
+                            outDanmaku.Add(danmakuChunk.Dequeue().Peers);
+
+                        var addNew = true;
+                        foreach (var (_, peers) in danmakuChunk
+                                     .Where(chunk => appConfig.DanmakuMergeCrossMode || danmaku.Mode == chunk.Peers[0].Mode)
+                                     .Where(chunk => Similarity(str, chunk.Str, appConfig)))
+                        {
+                            peers.Add(danmaku);
+                            addNew = false;
+                            break;
+                        }
+
+                        if (addNew)
+                            danmakuChunk.Enqueue((str, new() { danmaku }));
+                    }
+                    else
+                        ret.Add(danmaku);
 
                 while (danmakuChunk.Count > 0)
                     outDanmaku.Add(danmakuChunk.Dequeue().Peers);
 
-                var ret = new List<Danmaku>();
                 foreach (var peers in outDanmaku)
                 {
                     if (peers.Count is 1)
