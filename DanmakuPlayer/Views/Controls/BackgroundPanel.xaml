@@ -40,8 +40,7 @@
         Grid.ColumnSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        KeyboardAcceleratorPlacementMode="Hidden"
-        Opacity="{x:Bind _vm.DanmakuOpacity, Mode=OneWay}">
+        KeyboardAcceleratorPlacementMode="Hidden">
         <xaml:CanvasControl.KeyboardAccelerators>
             <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
             <KeyboardAccelerator Key="Left" Invoked="RewindInvoked" />

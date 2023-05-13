@@ -162,6 +162,12 @@ public partial record AppConfig
     /// <remarks>default: -1 ∈ [-1, 100]（-1时禁用）</remarks>
     public int DanmakuCountInverseLimit { get; set; } = -1;
 
+    /// <summary>
+    /// 允许M7高级弹幕的数量
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool DanmakuCountM7Enable { get; set; } = true;
+
     #endregion
 
     #region 合并设置

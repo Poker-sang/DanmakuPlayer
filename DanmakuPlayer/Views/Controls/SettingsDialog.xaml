@@ -147,7 +147,7 @@
                         StepFrequency="0.1"
                         TickFrequency="0.2"
                         TickPlacement="Outside"
-                        ValueChanged="DanmakuOpacityChanged"
+                        ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="Font">
@@ -342,6 +342,9 @@
                                 TickPlacement="Outside"
                                 ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard">
+                            <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" Toggled="ResetProvider" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>

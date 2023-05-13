@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -293,7 +292,11 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         var file = await PickerHelper.PickSingleFileAsync();
         if (file is not null)
-            await LoadDanmaku(async token => BiliHelper.ToDanmaku(await XDocument.LoadAsync(File.OpenRead(file.Path), LoadOptions.None, token)).ToList());
+            await LoadDanmaku(async token =>
+            {
+                await using var stream = File.OpenRead(file.Path);
+                return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
+            });
     }
 
     #endregion

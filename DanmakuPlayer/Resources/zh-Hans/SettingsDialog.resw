@@ -311,4 +311,7 @@
   <data name="Unlimited" xml:space="preserve">
     <value>不限</value>
   </data>
+  <data name="DanmakuCountM7EnableCard.Header" xml:space="preserve">
+    <value>开启M7高级弹幕</value>
+  </data>
 </root>

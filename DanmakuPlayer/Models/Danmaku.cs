@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using DanmakuPlayer.Enums;
+using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
-using Microsoft.UI;
+using Microsoft.Graphics.Canvas.Text;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
@@ -37,9 +39,9 @@ public partial record Danmaku(
     private double _layoutHeight;
 
     /// <summary>
-    /// 静止弹幕显示的位置
+    /// 静止弹幕显示的X坐标
     /// </summary>
-    private Vector2 _staticPosition;
+    private float _showPositionX;
 
     /// <summary>
     /// 弹幕显示的Y坐标
@@ -50,6 +52,11 @@ public partial record Danmaku(
     /// 是否需要渲染（取决于是否允许重叠）
     /// </summary>
     public bool NeedRender { get; private set; }
+
+    /// <summary>
+    /// 高级弹幕信息
+    /// </summary>
+    public AdvancedDanmaku? AdvancedInfo { get; private set; }
 
     /// <summary>
     /// 初始化渲染
@@ -66,9 +73,25 @@ public partial record Danmaku(
             DanmakuMode.Bottom => provider.AppConfig.DanmakuCountBottomEnableLimit && CountReachLimit(context.Bottom, provider.AppConfig.DanmakuCountBottomLimit),
             DanmakuMode.Top => provider.AppConfig.DanmakuCountTopEnableLimit && CountReachLimit(context.Top, provider.AppConfig.DanmakuCountTopLimit),
             DanmakuMode.Inverse => provider.AppConfig.DanmakuCountInverseEnableLimit && CountReachLimit(context.Inverse, provider.AppConfig.DanmakuCountInverseLimit),
-            _ => false
+            DanmakuMode.Advanced => !provider.AppConfig.DanmakuCountM7Enable,
+            _ => true
         })
             return false;
+
+        if (Mode is DanmakuMode.Advanced)
+        {
+            try
+            {
+                AdvancedInfo = AdvancedDanmaku.Parse(Text);
+            }
+            catch
+            {
+                return false;
+            }
+
+            NeedRender = true;
+            return true;
+        }
 
         var layoutExists = provider.Layouts.TryGetValue(ToString(), out var layout);
         if (!layoutExists)
@@ -85,21 +108,17 @@ public partial record Danmaku(
             case DanmakuMode.Bottom:
                 if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
                     return false;
-                _staticPosition = new((float)(provider.ViewWidth - LayoutWidth) / 2, _showPositionY);
+                _showPositionX = (float)(provider.ViewWidth - LayoutWidth) / 2;
                 break;
             case DanmakuMode.Top:
                 if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
                     return false;
-                _staticPosition = new((float)(provider.ViewWidth - LayoutWidth) / 2, _showPositionY);
+                _showPositionX = (float)(provider.ViewWidth - LayoutWidth) / 2;
                 break;
             case DanmakuMode.Inverse:
                 if (!TopDownRollDanmaku(provider, context.InverseRoom, OverlapPredicate))
                     return false;
                 break;
-            case DanmakuMode.Advanced:
-            case DanmakuMode.Code:
-            case DanmakuMode.Bas:
-                return false;
             default:
                 ThrowHelper.ArgumentOutOfRange(Mode);
                 break;
@@ -107,6 +126,7 @@ public partial record Danmaku(
 
         if (!layoutExists)
             provider.Layouts.Add(ToString(), layout);
+
         switch (Mode)
         {
             case DanmakuMode.Roll:
@@ -155,29 +175,63 @@ public partial record Danmaku(
 
     public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, float time)
     {
-        // 外部实现逻辑：if (Time <= time && time - provider.AppConfig.Speed < Time)
         if (!NeedRender)
+            return;
+
+        var t = time - Time;
+
+        if (Mode is DanmakuMode.Advanced)
+        {
+            if (!(0 <= t) || !(t < AdvancedInfo!.Duration))
+                return;
+
+            var aPos = AdvancedInfo.GetPosition(t, (float)provider.ViewWidth, (float)provider.ViewHeight);
+            var aOpacity = AdvancedInfo.GetOpacity(t);
+            using var aBrush = new CanvasSolidColorBrush(renderTarget, Color.GetColor((byte)(aOpacity * 0xFF)));
+            using var aFormat = new CanvasTextFormat
+            {
+                FontFamily = AdvancedInfo.Font,
+                FontSize = Size
+            };
+            using var aLayout = new CanvasTextLayout(renderTarget, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
+
+            var lastTransform = renderTarget.Transform;
+
+            if (AdvancedInfo.ZFlip is not 0)
+                renderTarget.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
+
+            renderTarget.DrawTextLayout(aLayout, aPos, aBrush);
+
+            if (AdvancedInfo.Outline)
+            {
+                using var aGeometry = CanvasGeometry.CreateText(aLayout);
+                using var aOutlineBrush = new CanvasSolidColorBrush(renderTarget, provider.AppConfig.DanmakuStrokeColor.GetColor((byte)(aOpacity * 0xFF / 2)));
+                renderTarget.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+            }
+            renderTarget.Transform = lastTransform;
+
+            return;
+        }
+
+        if (!(0 <= t) || !(t < provider.AppConfig.DanmakuActualDuration))
             return;
 
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
-        var brush = provider.GetBrush(Color);
+        var brush = provider.GetBrush(Color, provider.AppConfig.DanmakuOpacity);
         var outlineBrush = (CanvasSolidColorBrush)null!;
         var geometry = (CanvasGeometry)null!;
         if (provider.AppConfig.DanmakuEnableStrokes)
         {
-            outlineBrush = provider.GetBrush(provider.AppConfig.DanmakuStrokeColor);
-            geometry = CanvasGeometry.CreateText(layout);
+            outlineBrush = provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, provider.AppConfig.DanmakuOpacity / 2);
+            geometry = provider.Geometries[ToString()];
         }
-
-        if (Mode is DanmakuMode.Advanced or DanmakuMode.Code or DanmakuMode.Bas)
-            return;
 
         var pos = Mode switch
         {
-            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
-            DanmakuMode.Bottom or DanmakuMode.Top => _staticPosition,
-            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * (time - Time) / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY),
+            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
+            DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
+            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY),
             _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
         };
         renderTarget.DrawTextLayout(layout, pos, brush);
@@ -186,4 +240,32 @@ public partial record Danmaku(
     }
 
     public override string ToString() => $"{Text},{Color},{Size}";
+
+    public static Danmaku Parse(DanmakuElem elem)
+    {
+        return new(
+            elem.Content,
+            elem.Progress / 1000f,
+            (DanmakuMode)elem.Mode,
+            elem.Fontsize,
+            elem.Color,
+            (ulong)elem.Ctime,
+            (DanmakuPool)elem.Pool,
+            elem.midHash);
+    }
+
+    public static Danmaku Parse(XElement xElement)
+    {
+        var tempInfo = xElement.Attribute("p")!.Value.Split(',');
+        var size = int.Parse(tempInfo[2]);
+        return new(
+            xElement.Value,
+            float.Parse(tempInfo[0]),
+            Enum.Parse<DanmakuMode>(tempInfo[1]),
+            size,
+            uint.Parse(tempInfo[3]),
+            ulong.Parse(tempInfo[4]),
+            Enum.Parse<DanmakuPool>(tempInfo[5]),
+            tempInfo[6]);
+    }
 }

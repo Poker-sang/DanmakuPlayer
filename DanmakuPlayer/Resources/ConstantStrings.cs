@@ -9,7 +9,7 @@ public static class ConstantStrings
 
     public static string AppTitle => AppInfoResources.AppTitle;
 
-    public static string AppAboutHeader => $"关于 {AppTitle} v3.20";
+    public static string AppAboutHeader => $"关于 {AppTitle} v3.40";
 
     public const string AuthorUri = "https://github.com/Poker-sang/";
 

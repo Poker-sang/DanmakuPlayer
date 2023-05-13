@@ -4,11 +4,11 @@ namespace DanmakuPlayer.Services;
 
 public static class ColorHelper
 {
-    public static unsafe Color GetColor(this uint color)
+    public static unsafe Color GetColor(this uint color, byte alpha = 0xFF)
     {
         var ptr = &color;
         var c = (byte*)ptr;
-        return Color.FromArgb(0xFF, c[2], c[1], c[0]);
+        return Color.FromArgb(alpha, c[2], c[1], c[0]);
     }
 
     public static unsafe Color GetAlphaColor(this uint color)

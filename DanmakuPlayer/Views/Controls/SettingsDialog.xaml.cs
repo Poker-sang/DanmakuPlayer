@@ -9,7 +9,6 @@ using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using WinUI3Utilities;
@@ -72,14 +71,6 @@ public sealed partial class SettingsDialog : UserControl
     {
         ResetTimer(sender, e);
         ResetProvider(sender, e);
-    }
-
-    private void DanmakuOpacityChanged(object sender, RangeBaseValueChangedEventArgs e)
-    {
-        var value = (float)sender.To<Slider>().Value;
-
-        if (AppContext.DanmakuCanvas != null!)
-            AppContext.DanmakuCanvas.Opacity = value;
     }
 
     private void DanmakuFontChanged(object sender, SelectionChangedEventArgs e) => AppContext.BackgroundPanel.ReloadDanmaku(RenderType.ReloadFormats);

@@ -24,6 +24,10 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ![conbined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/conbined.png)
 
+### M7高级弹幕
+
+![conbined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/m7.png)
+
 ## 使用说明
 
 ⚠️：指实现比较困难的功能
@@ -90,7 +94,11 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 * [x] 弹幕阴影、描边等效果
 
-* [ ] ⚠️ 高级弹幕
+* [x] M7高级弹幕基础功能
+
+* [ ] ⚠️ M7高级弹幕Y轴翻转、跟踪拾取
+
+* [ ] ⚠️ M9代码弹幕
 
 ### 其他
 
@@ -110,7 +118,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.30
+版本：3.40
 
 ## 联系方式
 

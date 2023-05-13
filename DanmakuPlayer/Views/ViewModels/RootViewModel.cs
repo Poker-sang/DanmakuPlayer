@@ -13,12 +13,6 @@ public partial class RootViewModel : ObservableObject
         set => SetProperty(AppConfig.Foreground, value, AppConfig, (@setting, @value) => @setting.Foreground = @value);
     }
 
-    public float DanmakuOpacity
-    {
-        get => AppConfig.DanmakuOpacity;
-        set => SetProperty(AppConfig.DanmakuOpacity, value, AppConfig, (@setting, @value) => @setting.DanmakuOpacity = @value);
-    }
-
     [ObservableProperty] private bool _startPlaying;
 
     [ObservableProperty]

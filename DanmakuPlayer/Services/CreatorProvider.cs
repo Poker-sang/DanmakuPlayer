@@ -86,8 +86,11 @@ public class CreatorProvider : IDisposable
         foreach (var danmakuString in list)
         {
             Layouts[danmakuString].Dispose();
-            Geometries[danmakuString]?.Dispose();
-            _ = Layouts.Remove(danmakuString);
+            if (Geometries.TryGetValue(danmakuString, out var geometry))
+            {
+                geometry.Dispose();
+                _ = Layouts.Remove(danmakuString);
+            }
             _ = Geometries.Remove(danmakuString);
             _ = LayoutsCounter.Remove(danmakuString);
         }
@@ -110,10 +113,10 @@ public class CreatorProvider : IDisposable
 
     public CanvasTextLayout GetNewLayout(Danmaku danmaku) => new(Creator, danmaku.Text, GetTextFormat(danmaku.Size * AppConfig.DanmakuScale), int.MaxValue, int.MaxValue);
 
-    public CanvasSolidColorBrush GetBrush(in uint color)
+    public CanvasSolidColorBrush GetBrush(uint color, float alpha)
     {
         if (!Brushes.TryGetValue(color, out var value))
-            Brushes[color] = value = new(Creator, color.GetColor());
+            Brushes[color] = value = new(Creator, color.GetColor((byte)(0xFF * alpha)));
         return value;
     }
 
@@ -132,6 +135,7 @@ public class CreatorProvider : IDisposable
             layout.Value.Dispose();
         foreach (var geometry in Geometries)
             geometry.Value.Dispose();
+        LayoutsCounter.Clear();
         Layouts.Clear();
         Geometries.Clear();
     }
