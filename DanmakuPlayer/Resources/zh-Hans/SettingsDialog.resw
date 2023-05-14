@@ -248,10 +248,10 @@
   <data name="LicenseCard.Description" xml:space="preserve">
     <value>GNU General Public License v3.0</value>
   </data>
-  <data name="AppForegroundExpander.Description" xml:space="preserve">
+  <data name="AppForegroundCard.Description" xml:space="preserve">
     <value>应用的前景色</value>
   </data>
-  <data name="AppForegroundExpander.Header" xml:space="preserve">
+  <data name="AppForegroundCard.Header" xml:space="preserve">
     <value>前景色</value>
   </data>
   <data name="AppHeader.Text" xml:space="preserve">

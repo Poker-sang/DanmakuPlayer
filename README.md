@@ -14,7 +14,8 @@
 
 ## 预览
 
-B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.bilibili.com/video/BV1Js411o76u)
+B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.bilibili.com/video/BV1Js411o76u)和
+[【半年制作量】东方mmd：永远亭争夺战（pv风 踩点 特效向）](https://www.bilibili.com/video/BV1QA411t76e)
 
 ### 完整弹幕
 
@@ -26,7 +27,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ### M7高级弹幕
 
-![conbined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/m7.png)
+![m7](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/m7.png)
 
 ## 使用说明
 
@@ -124,7 +125,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 作者：[扑克](https://github.com/Poker-sang)
 
-邮箱：poker_sang@outlook.com
+邮箱：[poker_sang@outlook.com](mailto:poker_sang@outlook.com)
 
 QQ：[2639914082](http://wpa.qq.com/msgrd?v=3&uin=2639914082&site=qq&menu=yes)
 

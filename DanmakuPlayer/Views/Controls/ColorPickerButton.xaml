@@ -1,0 +1,32 @@
+<!--  Copyright (c) Microsoft Corporation and Contributors.  -->
+<!--  Licensed under the MIT License.  -->
+
+<UserControl
+    x:Class="DanmakuPlayer.Views.Controls.ColorPickerButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DanmakuPlayer.Views.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Button Padding="0">
+        <StackPanel Orientation="Horizontal">
+            <Border
+                Width="24"
+                Height="24"
+                Margin="4"
+                CornerRadius="4">
+                <Border.Background>
+                    <SolidColorBrush Color="{x:Bind ColorPicker.Color, Mode=TwoWay}" />
+                </Border.Background>
+            </Border>
+            <FontIcon
+                Margin="8,4,10,4"
+                FontSize="12"
+                Glyph="&#xE019;" />
+        </StackPanel>
+        <Button.Flyout>
+            <Flyout Placement="Left" />
+        </Button.Flyout>
+    </Button>
+</UserControl>

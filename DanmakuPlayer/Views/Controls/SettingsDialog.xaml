@@ -66,20 +66,20 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <labs:SettingsExpander x:Uid="/SettingsDialog/AppForegroundExpander">
-                    <labs:SettingsExpander.HeaderIcon>
+                <labs:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
+                    <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard HorizontalContentAlignment="Center" ContentAlignment="Vertical">
+                    </labs:SettingsCard.HeaderIcon>
+                    <local:ColorPickerButton>
+                        <local:ColorPickerButton.ColorPicker>
                             <ColorPicker
                                 ColorChanged="ForegroundColorChanged"
                                 IsAlphaEnabled="True"
                                 IsMoreButtonVisible="True"
                                 Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
+                        </local:ColorPickerButton.ColorPicker>
+                    </local:ColorPickerButton>
+                </labs:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
                 <labs:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard">
@@ -178,15 +178,15 @@
                         TickPlacement="Outside"
                         Value="{x:Bind Vm.DanmakuStrokeWidth, Mode=TwoWay}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
-                            x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
-                            HorizontalContentAlignment="Center"
-                            ContentAlignment="Vertical"
-                            IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
-                            <ColorPicker
-                                IsAlphaEnabled="True"
-                                IsMoreButtonVisible="True"
-                                Color="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuStrokeColorCard" IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
+                            <local:ColorPickerButton>
+                                <local:ColorPickerButton.ColorPicker>
+                                    <ColorPicker
+                                        IsAlphaEnabled="True"
+                                        IsMoreButtonVisible="True"
+                                        Color="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
+                                </local:ColorPickerButton.ColorPicker>
+                            </local:ColorPickerButton>
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
@@ -321,7 +321,7 @@
                                 ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
+                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard">
                             <Slider
                                 Maximum="100"
                                 Minimum="-1"
@@ -381,6 +381,7 @@
                             </labs:SettingsCard.ActionIcon>
                         </labs:SettingsCard>
                         <labs:SettingsCard
+                            x:Uid="/SettingsDialog/QqCard"
                             Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
@@ -396,9 +397,11 @@
                             x:Uid="/SettingsDialog/RepositoryCard"
                             Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
-                            HeaderIcon="Library"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}">
+                            <labs:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE7B8;" />
+                            </labs:SettingsCard.HeaderIcon>
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>

@@ -20,6 +20,7 @@
 
     <ItemGroup>
         <None Remove="Views\Controls\BackgroundPanel.xaml" />
+        <None Remove="Views\Controls\ColorPickerButton.xaml" />
         <None Remove="Views\Controls\InputDialog.xaml" />
         <None Remove="Views\Controls\SettingsDialog.xaml" />
         <Page Update="Views\Controls\InputDialog.xaml">
@@ -65,6 +66,16 @@
 
     <PropertyGroup>
         <EnableDefaultPriItems>false</EnableDefaultPriItems>
+        <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <PackageCertificateKeyFile>DanmakuPlayer_TemporaryKey.pfx</PackageCertificateKeyFile>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppxBundle>Never</AppxBundle>
+        <AppInstallerUri>C:\WorkSpace\DanmakuPlayer\DanmakuPlayer</AppInstallerUri>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
     <Target Name="InjectAdditionalFiles" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">
         <ItemGroup>
