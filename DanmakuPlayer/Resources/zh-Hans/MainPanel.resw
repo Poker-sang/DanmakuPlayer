@@ -136,10 +136,10 @@
     <value>已获取{0}条弹幕，正在过滤</value>
   </data>
   <data name="TopMostOff" xml:space="preserve">
-    <value>固定上层：开启</value>
+    <value>固定上层：关闭</value>
   </data>
   <data name="TopMostOn" xml:space="preserve">
-    <value>固定上层：关闭</value>
+    <value>固定上层：开启</value>
   </data>
   <data name="UnknownException" xml:space="preserve">
     <value>未知的异常</value>

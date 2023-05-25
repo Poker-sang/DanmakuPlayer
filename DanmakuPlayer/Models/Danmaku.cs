@@ -199,6 +199,9 @@ public partial record Danmaku(
 
             if (AdvancedInfo.ZFlip is not 0)
                 renderTarget.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
+            // Y轴翻转没有完全实现，Win2D无法实现三维变换效果
+            if (AdvancedInfo.YFlip is not 0)
+                renderTarget.Transform *= Matrix3x2.CreateSkew(0, AdvancedInfo.YFlip, aPos);
 
             renderTarget.DrawTextLayout(aLayout, aPos, aBrush);
 

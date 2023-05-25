@@ -163,7 +163,7 @@ public partial record AppConfig
     public int DanmakuCountInverseLimit { get; set; } = -1;
 
     /// <summary>
-    /// 允许M7高级弹幕的数量
+    /// 允许M7高级弹幕
     /// </summary>
     /// <remarks>default: <see langword="true"/></remarks>
     public bool DanmakuCountM7Enable { get; set; } = true;
