@@ -297,7 +297,7 @@
     <value>渲染设置</value>
   </data>
   <data name="SettingsDialog.CloseButtonText" xml:space="preserve">
-    <value>关闭</value>
+    <value>保存并关闭</value>
   </data>
   <data name="SettingsDialog.PrimaryButtonText" xml:space="preserve">
     <value>恢复默认设置</value>

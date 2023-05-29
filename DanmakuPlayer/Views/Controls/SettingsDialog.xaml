@@ -256,25 +256,12 @@
                                     ItemsSource="{x:Bind Vm.PatternsCollection}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="system:String">
-                                            <Grid>
+                                            <Grid Tag="{x:Bind}" Tapped="RemoveTapped">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <Button
-                                                    Grid.Column="1"
-                                                    Width="40"
-                                                    Height="25"
-                                                    HorizontalContentAlignment="Center"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Tag="{x:Bind}"
-                                                    Tapped="RemoveTapped">
-                                                    <SymbolIcon
-                                                        Width="20"
-                                                        Height="15"
-                                                        Symbol="Cancel" />
-                                                </Button>
+                                                <SymbolIcon Grid.Column="1" Symbol="Cancel" />
                                                 <TextBlock
                                                     Grid.Column="0"
                                                     VerticalAlignment="Center"
