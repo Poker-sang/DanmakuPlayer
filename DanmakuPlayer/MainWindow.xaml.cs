@@ -13,9 +13,10 @@ public sealed partial class MainWindow : Window
 
         InitializeComponent();
 
-        SwapChainPanelHelper.SetSwapChainPanel(RootPanel, (nint)CurrentContext.HWnd);
+        SwapChainPanelHelper.SetSwapChainPanel(RootPanel, (nint)AppWindow.Id.Value);
         CurrentContext.OverlappedPresenter.IsResizable = false;
         CurrentContext.OverlappedPresenter.SetBorderAndTitleBar(false, false);
+        CurrentContext.OverlappedPresenter.IsAlwaysOnTop = AppContext.AppConfig.TopMost;
     }
 
     ~MainWindow()

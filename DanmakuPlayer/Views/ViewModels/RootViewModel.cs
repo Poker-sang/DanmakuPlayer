@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.ViewModels;
 
@@ -10,7 +11,7 @@ public partial class RootViewModel : ObservableObject
     public uint Foreground
     {
         get => AppConfig.Foreground;
-        set => SetProperty(AppConfig.Foreground, value, AppConfig, (@setting, @value) => @setting.Foreground = @value);
+        set => SetProperty(AppConfig.Foreground, value, AppConfig, (setting, value) => setting.Foreground = value);
     }
 
     [ObservableProperty] private bool _startPlaying;
@@ -27,7 +28,18 @@ public partial class RootViewModel : ObservableObject
 
     [ObservableProperty] private double _totalTime;
 
-    [ObservableProperty] private bool _topMost;
+    public bool TopMost
+    {
+        get => AppConfig.TopMost;
+        set
+        {
+            if (value == AppConfig.TopMost)
+                return;
+            CurrentContext.OverlappedPresenter.IsAlwaysOnTop = AppConfig.TopMost = value;
+            OnPropertyChanged();
+            AppContext.SaveConfiguration(AppConfig);
+        }
+    }
 
     [ObservableProperty] private bool _pointerInTitleArea;
 

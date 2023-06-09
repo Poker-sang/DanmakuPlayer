@@ -239,16 +239,13 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void FrontTapped(object sender, RoutedEventArgs e)
     {
-        if (CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
-        {
-            _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = false;
-            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOff, SnackBarHelper.Severity.Information, Emoticon.Okay);
-        }
+        _vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
+        if (_vm.TopMost)
+            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOn, SnackBarHelper.Severity.Information,
+                Emoticon.Okay);
         else
-        {
-            _vm.TopMost = CurrentContext.OverlappedPresenter.IsAlwaysOnTop = true;
-            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOn, SnackBarHelper.Severity.Information, Emoticon.Okay);
-        }
+            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOff, SnackBarHelper.Severity.Information,
+                Emoticon.Okay);
     }
 
     private async void SettingTapped(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();

@@ -66,6 +66,9 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
+                <labs:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="Pin">
+                    <ToggleSwitch IsOn="{x:Bind TopMost, Mode=TwoWay}" />
+                </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />

@@ -14,6 +14,12 @@ public partial record AppConfig
     public int Theme { get; set; }
 
     /// <summary>
+    /// 固定最前
+    /// </summary>
+    /// <remarks>default: <see langword="false"/></remarks>
+    public bool TopMost { get; set; } = false;
+
+    /// <summary>
     /// 前景色
     /// </summary>
     /// <remarks>default: 0xFFA9A9A9</remarks>

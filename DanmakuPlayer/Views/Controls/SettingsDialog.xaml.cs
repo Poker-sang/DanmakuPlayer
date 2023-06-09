@@ -12,10 +12,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using WinUI3Utilities;
+using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
 [INotifyPropertyChanged]
+[DependencyProperty<bool>("TopMost")]
 public sealed partial class SettingsDialog : UserControl
 {
     [ObservableProperty] private SettingViewModel _vm = new();

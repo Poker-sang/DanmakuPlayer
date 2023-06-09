@@ -314,4 +314,10 @@
   <data name="DanmakuCountM7EnableCard.Header" xml:space="preserve">
     <value>开启M7高级弹幕</value>
   </data>
+  <data name="TopMostCard.Description" xml:space="preserve">
+    <value>保持窗口在所有其他窗口之前</value>
+  </data>
+  <data name="TopMostCard.Header" xml:space="preserve">
+    <value>固定最前</value>
+  </data>
 </root>
