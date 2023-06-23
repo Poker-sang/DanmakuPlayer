@@ -47,19 +47,19 @@
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-        <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230502000" />
+        <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.5.1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230602002" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
         <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-        <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.2" />
-        <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.14" />
-        <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.14" />
-        <PackageReference Include="Vortice.Direct3D12" Version="2.4.2" />
-        <PackageReference Include="Vortice.DXGI" Version="2.4.2" />
-        <PackageReference Include="Vortice.WinUI" Version="2.4.2" />
-        <PackageReference Include="WinUI3Utilities" Version="1.1.3" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="6.0.0" />
+        <PackageReference Include="Vanara.PInvoke.Gdi32" Version="3.4.15" />
+        <PackageReference Include="Vanara.PInvoke.User32" Version="3.4.15" />
+        <PackageReference Include="Vortice.Direct3D12" Version="3.2.0" />
+        <PackageReference Include="Vortice.DXGI" Version="3.2.0" />
+        <PackageReference Include="Vortice.WinUI" Version="3.2.0" />
+        <PackageReference Include="WinUI3Utilities" Version="1.1.3.2" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
-        <PackageReference Include="protobuf-net" Version="3.2.16" />
+        <PackageReference Include="protobuf-net" Version="3.2.26" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />
         <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>
@@ -74,7 +74,7 @@
         <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
         <AppxBundle>Never</AppxBundle>
-        <AppInstallerUri>C:\WorkSpace\DanmakuPlayer\DanmakuPlayer</AppInstallerUri>
+        <AppInstallerUri>C:\WorkSpace\DanmakuPlayer</AppInstallerUri>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
     <Target Name="InjectAdditionalFiles" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">

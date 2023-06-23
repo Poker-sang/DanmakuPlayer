@@ -192,9 +192,6 @@ public partial record AppConfig
 
     public bool DanmakuMergeCrossMode { get; set; } = false;
 
-    // TODO: 优化合并弹幕代表性算法
-    public int DanmakuMergeRepresentativePercent { get; set; } = 50;
-
     #endregion
 
     #region 正则设置

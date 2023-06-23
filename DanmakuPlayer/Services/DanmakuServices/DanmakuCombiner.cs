@@ -194,8 +194,8 @@ public static class DanmakuCombiner
                         }
 
                     var represent = new Danmaku(
-                        (peers.Count > 5 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
-                        peers[Math.Min(peers.Count * appConfig.DanmakuMergeRepresentativePercent / 100, peers.Count - 1)].Time,
+                        (peers.Count > 4 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
+                        peers.Average(t => t.Time),
                         mode,
                         (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
                         (uint)peers.Average(t => t.Color),
