@@ -28,7 +28,7 @@ public sealed partial class SettingsDialog : UserControl
 
     #region 事件处理
 
-    private void NavigateUriClick(object sender, RoutedEventArgs e)
+    private void NavigateUriTapped(object sender, TappedRoutedEventArgs e)
     {
         using var process = new Process
         {

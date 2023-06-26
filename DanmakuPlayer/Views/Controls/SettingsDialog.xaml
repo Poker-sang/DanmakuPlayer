@@ -347,11 +347,11 @@
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
                             x:Uid="/SettingsDialog/MailCard"
-                            Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.Mail}"
                             HeaderIcon="Mail"
                             IsClickEnabled="True"
-                            Tag="{x:Bind rs:ConstantStrings.MailToUri}">
+                            Tag="{x:Bind rs:ConstantStrings.MailToUri}"
+                            Tapped="NavigateUriTapped">
                             <labs:SettingsCard.ActionIcon>
                                 <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
                                 <FontIcon Glyph="&#xE8A7;" />
@@ -359,10 +359,10 @@
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Uid="/SettingsDialog/AuthorCard"
-                            Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
-                            Tag="{x:Bind rs:ConstantStrings.AuthorUri}">
+                            Tag="{x:Bind rs:ConstantStrings.AuthorUri}"
+                            Tapped="NavigateUriTapped">
                             <labs:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.GitHubSvgPath}" />
                             </labs:SettingsCard.HeaderIcon>
@@ -372,10 +372,10 @@
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Uid="/SettingsDialog/QqCard"
-                            Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
-                            Tag="{x:Bind rs:ConstantStrings.QqUri}">
+                            Tag="{x:Bind rs:ConstantStrings.QqUri}"
+                            Tapped="NavigateUriTapped">
                             <labs:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.QqSvgPath}" />
                             </labs:SettingsCard.HeaderIcon>
@@ -385,10 +385,10 @@
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Uid="/SettingsDialog/RepositoryCard"
-                            Click="NavigateUriClick"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
                             IsClickEnabled="True"
-                            Tag="{x:Bind rs:ConstantStrings.RepositoryUri}">
+                            Tag="{x:Bind rs:ConstantStrings.RepositoryUri}"
+                            Tapped="NavigateUriTapped">
                             <labs:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE7B8;" />
                             </labs:SettingsCard.HeaderIcon>
@@ -400,9 +400,9 @@
                 </labs:SettingsExpander>
                 <labs:SettingsCard
                     x:Uid="/SettingsDialog/LicenseCard"
-                    Click="NavigateUriClick"
                     IsClickEnabled="True"
-                    Tag="{x:Bind rs:ConstantStrings.LicenseUri}">
+                    Tag="{x:Bind rs:ConstantStrings.LicenseUri}"
+                    Tapped="NavigateUriTapped">
                     <labs:SettingsCard.HeaderIcon>
                         <PathIcon Data="{x:Bind rs:ConstantStrings.GnuSvgPath}" />
                     </labs:SettingsCard.HeaderIcon>

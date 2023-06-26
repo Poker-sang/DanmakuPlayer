@@ -235,9 +235,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region Title区按钮
 
-    private void CloseTapped(object sender, RoutedEventArgs e) => CurrentContext.App.Exit();
+    private void CloseTapped(object sender, TappedRoutedEventArgs e) => CurrentContext.App.Exit();
 
-    private void FrontTapped(object sender, RoutedEventArgs e)
+    private void FrontTapped(object sender, TappedRoutedEventArgs e)
     {
         _vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
         if (_vm.TopMost)
@@ -254,7 +254,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region Import区按钮
 
-    private async void ImportTapped(object sender, RoutedEventArgs e)
+    private async void ImportTapped(object sender, TappedRoutedEventArgs e)
     {
         if (await DialogInput.ShowAsync() is not { } cId)
             return;
@@ -285,7 +285,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         }
     }
 
-    private async void FileTapped(object sender, RoutedEventArgs e)
+    private async void FileTapped(object sender, TappedRoutedEventArgs e)
     {
         var file = await PickerHelper.PickSingleFileAsync();
         if (file is not null)
