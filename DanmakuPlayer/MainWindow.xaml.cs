@@ -17,6 +17,8 @@ public sealed partial class MainWindow : Window
         CurrentContext.OverlappedPresenter.IsResizable = false;
         CurrentContext.OverlappedPresenter.SetBorderAndTitleBar(false, false);
         CurrentContext.OverlappedPresenter.IsAlwaysOnTop = AppContext.AppConfig.TopMost;
+
+        Activate();
     }
 
     ~MainWindow()

@@ -73,19 +73,19 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         {
             var tempPool = await action(_cancellationTokenSource.Token);
 
-            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), SnackBarHelper.Severity.Information, Emoticon.Okay);
+            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), TeachingTipSeverity.Information, Emoticon.Okay);
 
             DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), SnackBarHelper.Severity.Information, Emoticon.Okay);
+            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), TeachingTipSeverity.Information, Emoticon.Okay);
 
             var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuActualDuration;
 
-            SnackBarHelper.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), SnackBarHelper.Severity.Ok, Emoticon.Okay);
+            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
         }
         catch (TaskCanceledException)
         {
@@ -94,7 +94,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            SnackBarHelper.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, SnackBarHelper.Severity.Error, e.Message);
+            RootTeachingTip.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, TeachingTipSeverity.Error, e.Message);
         }
 
         if (BannerTextBlock is not null)
@@ -241,10 +241,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         _vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
         if (_vm.TopMost)
-            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOn, SnackBarHelper.Severity.Information,
+            RootTeachingTip.ShowAndHide(MainPanelResources.TopMostOn, TeachingTipSeverity.Information,
                 Emoticon.Okay);
         else
-            SnackBarHelper.ShowAndHide(MainPanelResources.TopMostOff, SnackBarHelper.Severity.Information,
+            RootTeachingTip.ShowAndHide(MainPanelResources.TopMostOff, TeachingTipSeverity.Information,
                 Emoticon.Okay);
     }
 
@@ -259,7 +259,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (await DialogInput.ShowAsync() is not { } cId)
             return;
 
-        SnackBarHelper.ShowAndHide(MainPanelResources.DanmakuLoading, SnackBarHelper.Severity.Information, Emoticon.Okay);
+        RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
 
         try
         {
@@ -281,7 +281,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            SnackBarHelper.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, SnackBarHelper.Severity.Error, ex.Message);
+            RootTeachingTip.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, TeachingTipSeverity.Error, ex.Message);
         }
     }
 

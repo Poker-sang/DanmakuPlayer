@@ -192,5 +192,5 @@
     </Border>
     <local:SettingsDialog x:Name="DialogSetting" TopMost="{x:Bind _vm.TopMost, Mode=TwoWay}" />
     <local:InputDialog x:Name="DialogInput" />
-    <TeachingTip Loaded="{x:Bind utilities:SnackBarHelper.TeachingTipLoaded}" />
+    <TeachingTip x:Name="RootTeachingTip" />
 </SwapChainPanel>
