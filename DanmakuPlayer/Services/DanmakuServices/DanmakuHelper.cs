@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
+using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
 using Vanara.Extensions;
@@ -44,7 +45,13 @@ public static class DanmakuHelper
 
             var context = new DanmakuContext((float)sender.ActualHeight, appConfig);
             var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
-            if (!appConfig.RenderBefore)
+            if (appConfig.RenderBefore)
+            {
+                if (appConfig.DanmakuEnableStrokes)
+                    foreach (var (danmakuString, layout) in Current.Layouts)
+                        Current.Geometries[danmakuString] = CanvasGeometry.CreateText(layout);
+            }
+            else
                 Current.ClearLayouts();
 
             _renderCount = count;
@@ -55,7 +62,10 @@ public static class DanmakuHelper
         {
             e.DrawingSession.Clear(Colors.Transparent);
 
-            if (!appConfig.RenderBefore)
+            if (appConfig.RenderBefore)
+                foreach (var t in DisplayingDanmaku(time, appConfig))
+                    t.OnRender(e.DrawingSession, Current, time);
+            else
             {
                 Current.ClearLayoutRefCount();
                 foreach (var t in DisplayingDanmaku(time, appConfig))
@@ -63,11 +73,9 @@ public static class DanmakuHelper
                     Current.AddLayoutRef(t);
                     t.OnRender(e.DrawingSession, Current, time);
                 }
+
                 Current.ClearUnusedLayoutRef();
             }
-            else
-                foreach (var t in DisplayingDanmaku(time, appConfig))
-                    t.OnRender(e.DrawingSession, Current, time);
 
             if (RenderType.IsFlagSet(RenderType.RenderOnce))
                 RenderType = RenderType.SetFlags(RenderType.RenderOnce, false);
