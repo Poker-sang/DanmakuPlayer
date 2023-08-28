@@ -67,7 +67,7 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 <labs:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="Pin">
-                    <ToggleSwitch IsOn="{x:Bind TopMost, Mode=TwoWay}" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
                     <labs:SettingsCard.HeaderIcon>
@@ -76,7 +76,6 @@
                     <local:ColorPickerButton>
                         <local:ColorPickerButton.ColorPicker>
                             <ColorPicker
-                                ColorChanged="ForegroundColorChanged"
                                 IsAlphaEnabled="True"
                                 IsMoreButtonVisible="True"
                                 Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
@@ -89,7 +88,7 @@
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE81C;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" Toggled="ResetProvider" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
@@ -105,15 +104,17 @@
                         TickPlacement="Outside"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/PlaySpeedCard" HeaderIcon="Play">
+                <labs:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEC57;" />
+                    </labs:SettingsCard.HeaderIcon>
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
                         StepFrequency="0.25"
                         TickFrequency="0.5"
                         TickPlacement="Outside"
-                        ValueChanged="ResetTimerAndProvider"
-                        Value="{x:Bind Vm.PlaySpeed, Mode=TwoWay}" />
+                        Value="{x:Bind Vm.PlaybackRate, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard">
                     <labs:SettingsCard.HeaderIcon>
@@ -125,7 +126,6 @@
                         StepFrequency="1"
                         TickFrequency="20"
                         TickPlacement="Outside"
-                        ValueChanged="ResetTimer"
                         Value="{x:Bind Vm.PlayFramePerSecond, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <!--  弹幕设置  -->
@@ -137,7 +137,6 @@
                         StepFrequency="1"
                         TickFrequency="1"
                         TickPlacement="Outside"
-                        ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard">
@@ -150,14 +149,10 @@
                         StepFrequency="0.1"
                         TickFrequency="0.2"
                         TickPlacement="Outside"
-                        ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="Font">
-                    <ComboBox
-                        ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}"
-                        SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}"
-                        SelectionChanged="DanmakuFontChanged" />
+                    <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="FontSize">
                     <Slider
@@ -166,7 +161,6 @@
                         StepFrequency="0.1"
                         TickFrequency="0.5"
                         TickPlacement="Outside"
-                        ValueChanged="ResetProvider"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander">
@@ -282,7 +276,7 @@
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF156;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" Toggled="ResetProvider" />
+                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
                 </labs:SettingsCard>
                 <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander">
                     <labs:SettingsExpander.HeaderIcon>
@@ -297,7 +291,6 @@
                                 ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
                                 TickFrequency="20"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
@@ -308,7 +301,6 @@
                                 ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
                                 TickFrequency="20"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard">
@@ -319,7 +311,6 @@
                                 ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
                                 TickFrequency="20"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard">
@@ -330,14 +321,26 @@
                                 ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
                                 TickFrequency="20"
                                 TickPlacement="Outside"
-                                ValueChanged="ResetProvider"
                                 Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard">
-                            <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" Toggled="ResetProvider" />
+                            <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
+
+                <!--  WebView2设置  -->
+                <TextBlock x:Uid="/SettingsDialog/WebView2Header" Style="{StaticResource SettingHeaderStyle}" />
+                <labs:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="Globe">
+                    <ToggleSwitch IsOn="{x:Bind Vm.EnableWebView2, Mode=TwoWay}" />
+                </labs:SettingsCard>
+                <labs:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE72E;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
+                </labs:SettingsCard>
+
                 <!--  关于  -->
                 <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
                 <labs:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}">

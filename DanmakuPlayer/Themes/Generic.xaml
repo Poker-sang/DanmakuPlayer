@@ -1,0 +1,8 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DanmakuPlayer">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Views/Controls/CollapsibleArea.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

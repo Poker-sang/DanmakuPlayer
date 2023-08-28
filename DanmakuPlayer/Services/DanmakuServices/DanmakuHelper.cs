@@ -103,7 +103,7 @@ public static class DanmakuHelper
 
     public static Danmaku[] DisplayingDanmaku(float time, AppConfig appConfig)
     {
-        var actualDuration = Math.Max(10, appConfig.DanmakuDuration) * appConfig.PlaySpeed;
+        var actualDuration = Math.Max(10, appConfig.DanmakuDuration) * appConfig.PlaybackRate;
 
         var firstIndex = Array.FindIndex(Pool, t => t.Time > time - actualDuration);
         if (firstIndex is -1)

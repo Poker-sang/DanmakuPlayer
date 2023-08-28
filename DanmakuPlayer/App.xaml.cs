@@ -1,3 +1,4 @@
+using System;
 using DanmakuPlayer.Services;
 using Microsoft.UI.Xaml;
 using WinUI3Utilities;
@@ -8,6 +9,7 @@ public partial class App : Application
 {
     public App()
     {
+        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--remote-debugging-port=9222");
         InitializeComponent();
         CurrentContext.Title = nameof(DanmakuPlayer);
         AppContext.Initialize();

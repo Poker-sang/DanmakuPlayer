@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Windows.UI;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
@@ -27,14 +29,18 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class BackgroundPanel : SwapChainPanel
 {
-    public void RaiseForegroundChanged() => _vm.RaiseForegroundChanged();
+#pragma warning disable CA1822, IDE0079 // 将成员标记为 static
+    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
+    private Color TransparentColor => Color.FromArgb(0xff / 2, 0, 0, 0);
+#pragma warning restore CA1822, IDE0079
 
-    private readonly RootViewModel _vm = new();
+    public RootViewModel Vm { get; } = new();
 
     public BackgroundPanel()
     {
         AppContext.BackgroundPanel = this;
         InitializeComponent();
+        LockWebView2Button.Icon = new FontIcon { Glyph = Vm.LockWebView2 ? "\uE785" : "\uE72E" };
         DragMoveAndResizeHelper.RootPanel = this;
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
@@ -65,8 +71,11 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 
-        _vm.TotalTime = 0;
-        _vm.Time = 0;
+        if (!WebView.HasVideo)
+        {
+            Vm.TotalTime = 0;
+            Vm.Time = 0;
+        }
         DanmakuHelper.ClearPool();
 
         try
@@ -75,7 +84,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), TeachingTipSeverity.Information, Emoticon.Okay);
 
-            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, _vm.AppConfig, _cancellationTokenSource.Token);
+            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), TeachingTipSeverity.Information, Emoticon.Okay);
@@ -83,7 +92,8 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
-            _vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + _vm.AppConfig.DanmakuActualDuration;
+            if (!WebView.HasVideo)
+                Vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + Vm.AppConfig.DanmakuActualDuration;
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
         }
@@ -97,9 +107,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             RootTeachingTip.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, TeachingTipSeverity.Error, e.Message);
         }
 
-        if (BannerTextBlock is not null)
-            _ = Children.Remove(BannerTextBlock);
-        _vm.StartPlaying = true;
+        Vm.StartPlaying = true;
     }
 
     public async void ReloadDanmaku(RenderType renderType)
@@ -125,26 +133,43 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         TryResume();
     }
 
+    public void ResetProvider() => ReloadDanmaku(RenderType.ReloadProvider);
+
+    public void DanmakuFontChanged() => ReloadDanmaku(RenderType.ReloadFormats);
+
     #region 播放及暂停
 
     private DateTime _lastTime;
 
+    private int _tickCount;
+
     private void TimerTick(object? sender, object e)
     {
         var now = DateTime.Now;
-        if (_vm.Time < _vm.TotalTime)
+        if (Vm.Time < Vm.TotalTime)
         {
-            if (_vm.IsPlaying)
+            if (Vm.IsPlaying)
             {
-                _vm.ActualTime += (now - _lastTime).TotalSeconds;
+                Vm.ActualTime += (now - _lastTime).TotalSeconds;
                 DanmakuCanvas.Invalidate();
             }
         }
         else
         {
             Pause();
-            _vm.Time = 0;
+            Vm.Time = 0;
         }
+
+        if (WebView.HasVideo)
+        {
+            ++_tickCount;
+            if (_tickCount is 10)
+            {
+                _tickCount = 0;
+                UpdateTime();
+            }
+        }
+
         _lastTime = now;
     }
 
@@ -152,7 +177,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void TryPause()
     {
-        _needResume = _vm.IsPlaying;
+        _needResume = Vm.IsPlaying;
         Pause();
     }
 
@@ -163,17 +188,38 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         _needResume = false;
     }
 
-    private void Resume()
+    private async void Resume()
     {
         _lastTime = DateTime.Now;
         DanmakuHelper.RenderType = RenderType.RenderAlways;
-        _vm.IsPlaying = true;
+        Vm.IsPlaying = true;
+        if (WebView.HasVideo)
+        {
+            await WebView.PlayAsync();
+            UpdateTime();
+        }
     }
 
-    private void Pause()
+    private async void Pause()
     {
         DanmakuHelper.RenderType = RenderType.RenderOnce;
-        _vm.IsPlaying = false;
+        Vm.IsPlaying = false;
+        if (WebView.HasVideo)
+        {
+            await WebView.PauseAsync();
+            UpdateTime();
+        }
+    }
+
+    private async void UpdateTime(double? time = null)
+    {
+        Vm.Time = time ?? await WebView.CurrentTimeAsync();
+    }
+
+    public async void TrySetPlaybackRate()
+    {
+        if (WebView.HasVideo)
+            await WebView.SetPlaybackRateAsync(Vm.AppConfig.PlaybackRate);
     }
 
     #endregion
@@ -184,17 +230,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region SwapChainPanel事件
 
-    private void RootDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void MaximizeRestoreTapped(object sender, RoutedEventArgs e)
     {
-        switch (CurrentContext.OverlappedPresenter.State)
-        {
-            case OverlappedPresenterState.Maximized:
-                CurrentContext.OverlappedPresenter.Restore();
-                break;
-            case OverlappedPresenterState.Restored:
-                CurrentContext.OverlappedPresenter.Maximize();
-                break;
-        }
+        Vm.IsMaximized = !Vm.IsMaximized;
     }
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
@@ -211,26 +249,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         _cancellationTokenSource.Dispose();
     }
 
-    #region 快进快退快捷键
-
-    private void RewindInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
-    {
-        if (_vm.Time - _vm.AppConfig.PlayFastForward < 0)
-            _vm.Time = 0;
-        else
-            _vm.Time -= _vm.AppConfig.PlayFastForward;
-    }
-
-    private void FastForwardInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
-    {
-        if (_vm.Time + _vm.AppConfig.PlayFastForward > _vm.TotalTime)
-            _vm.Time = 0;
-        else
-            _vm.Time += _vm.AppConfig.PlayFastForward;
-    }
-
-    #endregion
-
     #endregion
 
     #region Title区按钮
@@ -239,16 +257,37 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void FrontTapped(object sender, TappedRoutedEventArgs e)
     {
-        _vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
-        if (_vm.TopMost)
-            RootTeachingTip.ShowAndHide(MainPanelResources.TopMostOn, TeachingTipSeverity.Information,
-                Emoticon.Okay);
-        else
-            RootTeachingTip.ShowAndHide(MainPanelResources.TopMostOff, TeachingTipSeverity.Information,
-                Emoticon.Okay);
+        Vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
+        RootTeachingTip.ShowAndHide(
+            Vm.TopMost ? MainPanelResources.TopMostOn : MainPanelResources.TopMostOff,
+            TeachingTipSeverity.Information,
+            Emoticon.Okay);
     }
 
     private async void SettingTapped(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();
+
+    #endregion
+
+    #region 导航区按钮
+
+    private async void GoBackTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await WebView.GoBackAsync();
+    }
+
+    private async void AddressBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        await WebView.GotoAsync(sender.Text);
+    }
+
+    private void WebViewOnPageLoaded(WebView2ForVideo sender, EventArgs e)
+    {
+        if (sender.HasVideo)
+        {
+            Vm.TotalTime = sender.Duration;
+            TrySetPlaybackRate();
+        }
+    }
 
     #endregion
 
@@ -302,58 +341,133 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private void PauseResumeTapped(object sender, IWinRTObject e)
     {
-        if (_vm.IsPlaying)
+        if (Vm.IsPlaying)
             Pause();
         else
             Resume();
     }
 
-    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender, _vm.AppConfig);
+    private async void RewindTapped(object sender, IWinRTObject e)
+    {
+        if (WebView.HasVideo)
+            UpdateTime(await WebView.IncreaseCurrentTimeAsync(-Vm.AppConfig.PlayFastForward));
+        else if (Vm.Time - Vm.AppConfig.PlayFastForward < 0)
+            Vm.Time = 0;
+        else
+            Vm.Time -= Vm.AppConfig.PlayFastForward;
+    }
 
-    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)_vm.Time, _vm.AppConfig);
+    private async void FastForwardTapped(object sender, IWinRTObject e)
+    {
+        if (WebView.HasVideo)
+            UpdateTime(await WebView.IncreaseCurrentTimeAsync(Vm.AppConfig.PlayFastForward));
+        else if (Vm.Time + Vm.AppConfig.PlayFastForward > Vm.TotalTime)
+            Vm.Time = 0;
+        else
+            Vm.Time += Vm.AppConfig.PlayFastForward;
+    }
+
+    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender, Vm.AppConfig);
+
+    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time, Vm.AppConfig);
+
+    // TODO: Time Slider
 
     // private void TimePointerPressed(object sender, PointerRoutedEventArgs e) => TryPause();
 
     // private void TimePointerReleased(object sender, PointerRoutedEventArgs e) => TryResume();
 
+    // private void SliderOnManipulationCompleted(object sender, PointerRoutedEventArgs pointerRoutedEventArgs)
+    // {
+    // Debug.WriteLine("ManipulationCompleted");
+    // WebView.SetCurrentTimeAsync(Vm.ActualTime);
+    // WebView.SetPlaybackRateAsync(3);
+    // }
+
     #endregion
 
-    #region 区域显隐触发
+    #region WebView视频控制
 
-    private void ImportPointerEntered(object sender, PointerRoutedEventArgs e) => _vm.PointerInImportArea = true;
+    private void PlaybackRateOnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        Vm.AppConfig.PlaybackRate = double.Parse(sender.To<MenuFlyoutItem>().Text);
+        DispatcherTimerHelper.ResetTimerInterval();
+        ResetProvider();
+        TrySetPlaybackRate();
+        AppContext.SaveConfiguration(Vm.AppConfig);
+    }
 
-    private void ImportPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInImportArea = false;
+    private async void MuteOnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (!WebView.HasVideo)
+            return;
+        Vm.Mute = await WebView.MutedFlipAsync();
+    }
 
-    private void TitlePointerEntered(object sender, PointerRoutedEventArgs e) => _vm.PointerInTitleArea = true;
+    private double Volume
+    {
+        get => WebView.HasVideo ? WebView.VolumeAsync().GetAwaiter().GetResult() * 100 : 0;
+        set
+        {
+            // TODO: Volume
+            return;
+            if (WebView.HasVideo)
+                WebView.SetVolumeAsync(value / 100).GetAwaiter().GetResult();
+        }
+    }
 
-    private void TitlePointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInTitleArea = false;
+    private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (!WebView.HasVideo)
+            return;
+        Vm.LockWebView2 = !Vm.LockWebView2;
+    }
 
-    private void ControlPointerEntered(object sender, PointerRoutedEventArgs e) => _vm.PointerInControlArea = true;
+    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (!WebView.HasVideo)
+            return;
+        var button = sender.To<AppBarButton>();
+        if (await WebView.FullScreenAsync())
+        {
+            await WebView.ExitFullScreenAsync();
+            button.Icon.To<SymbolIcon>().Symbol = Symbol.FullScreen;
+        }
+        else
+        {
+            await WebView.RequestFullScreenAsync();
+            button.Icon.To<SymbolIcon>().Symbol = Symbol.BackToWindow;
+        }
+    }
 
-    private void ControlPointerExited(object sender, PointerRoutedEventArgs e) => _vm.PointerInControlArea = false;
+    #endregion
 
     #region 进度条时间输入
 
     private void TimeTextTapped(object sender, TappedRoutedEventArgs e)
     {
-        TimeText.Text = DoubleToTimeTextConverter.ToTime(_vm.Time);
-        _vm.EditingTime = true;
+        TimeText.Text = DoubleToTimeTextConverter.ToTime(Vm.Time);
+        Vm.EditingTime = true;
     }
 
-    private void TimeTextLostFocus(object sender, RoutedEventArgs e) => _vm.EditingTime = false;
+    private void TimeTextLostFocus(object sender, RoutedEventArgs e) => Vm.EditingTime = false;
 
-    private void TimeTextInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
+    private async void TimeTextInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
     {
         if (TimeSpan.TryParse(TimeText.Text/*.ReplaceLineEndings("")*/, out var result))
-            _vm.Time = Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
+        {
+            Vm.Time = Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
             {
                 0 => result.TotalDays,
                 1 => result.TotalMinutes,
                 2 => result.TotalSeconds,
                 _ => 1
-            }, _vm.TotalTime), 0);
+            }, Vm.TotalTime), 0);
+            if (WebView.HasVideo)
+                await WebView.SetCurrentTimeAsync(Vm.Time);
+        }
 
-        _vm.EditingTime = false;
+        Vm.EditingTime = false;
     }
 
     private void TimeTextIsEditing(object sender, DependencyPropertyChangedEventArgs e)
@@ -365,8 +479,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             tb.SelectAll();
         }
     }
-
-    #endregion
 
     #endregion
 

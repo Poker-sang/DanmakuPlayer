@@ -1,39 +1,41 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Controls;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.ViewModels;
 
 public partial class RootViewModel : ObservableObject
 {
-    public void RaiseForegroundChanged() => OnPropertyChanged(nameof(Foreground));
+    public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
 
-    public uint Foreground
+    public uint Foreground => AppConfig.Foreground;
+
+    public bool EnableWebView2 => AppConfig.EnableWebView2;
+
+    [ObservableProperty] private bool _mute;
+
+    public bool LockWebView2
     {
-        get => AppConfig.Foreground;
-        set => SetProperty(AppConfig.Foreground, value, AppConfig, (setting, value) => setting.Foreground = value);
+        get => AppConfig.LockWebView2;
+        set
+        {
+            if (value == AppConfig.LockWebView2)
+                return;
+            AppConfig.LockWebView2 = value;
+            OnPropertyChanged();
+            AppContext.SaveConfiguration(AppConfig);
+        }
     }
-
-    [ObservableProperty] private bool _startPlaying;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Time))]
-    private double _actualTime;
-
-    public double Time
-    {
-        get => ActualTime * AppConfig.PlaySpeed;
-        set => ActualTime = value / AppConfig.PlaySpeed;
-    }
-
-    [ObservableProperty] private double _totalTime;
 
     public bool TopMost
     {
         get => AppConfig.TopMost;
         set
         {
-            if (value == AppConfig.TopMost)
+            if (value == AppConfig.TopMost &&
+                value == CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
                 return;
             CurrentContext.OverlappedPresenter.IsAlwaysOnTop = AppConfig.TopMost = value;
             OnPropertyChanged();
@@ -41,11 +43,40 @@ public partial class RootViewModel : ObservableObject
         }
     }
 
-    [ObservableProperty] private bool _pointerInTitleArea;
+    public bool IsMaximized
+    {
+        get => CurrentContext.OverlappedPresenter.State is OverlappedPresenterState.Maximized;
+        set
+        {
+            if (value == IsMaximized)
+                return;
+            if (value)
+                CurrentContext.OverlappedPresenter.Maximize();
+            else
+                CurrentContext.OverlappedPresenter.Restore();
+            OnPropertyChanged();
+        }
+    }
 
-    [ObservableProperty] private bool _pointerInImportArea;
+    [ObservableProperty] private bool _startPlaying;
 
-    [ObservableProperty] private bool _pointerInControlArea;
+    /// <summary>
+    /// 现实时间
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Time))]
+    private double _actualTime;
+
+    /// <summary>
+    /// 进度条时间
+    /// </summary>
+    public double Time
+    {
+        get => ActualTime * AppConfig.PlaybackRate;
+        set => ActualTime = value / AppConfig.PlaybackRate;
+    }
+
+    [ObservableProperty] private double _totalTime;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NavigateEditingTime))]

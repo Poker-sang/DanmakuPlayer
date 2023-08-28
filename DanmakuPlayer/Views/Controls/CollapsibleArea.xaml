@@ -1,0 +1,20 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DanmakuPlayer.Views.Controls">
+
+    <Style TargetType="local:CollapsibleArea">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:CollapsibleArea">
+                    <Border
+                        x:Name="RootBorder"
+                        Background="Transparent"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Child="{TemplateBinding Content}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

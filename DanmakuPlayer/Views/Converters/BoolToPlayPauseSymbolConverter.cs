@@ -1,13 +1,10 @@
-using System;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Converters;
 
-public class BoolToPlayPauseSymbolConverter : IValueConverter
+public class BoolToPlayPauseSymbolConverter : BoolToIconConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language) => ((bool)value) ? Symbol.Pause : Symbol.Play;
+    protected override object TrueValue => Symbol.Pause;
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => ThrowHelper.InvalidCast<object>();
+    protected override object FalseValue => Symbol.Play;
 }

@@ -22,8 +22,8 @@ public partial record AppConfig
     /// <summary>
     /// 前景色
     /// </summary>
-    /// <remarks>default: 0xFFA9A9A9</remarks>
-    public uint Foreground { get; set; } = 0xFFA9A9A9;
+    /// <remarks>default: 0xFFFFFFFF</remarks>
+    public uint Foreground { get; set; } = 0xFFFFFFFF;
 
     #endregion
 
@@ -39,7 +39,7 @@ public partial record AppConfig
     /// 倍速(times)
     /// </summary>
     /// <remarks>default: 1 ∈ [0.5, 2]</remarks>
-    public double PlaySpeed { get; set; } = 1;
+    public double PlaybackRate { get; set; } = 1;
 
     /// <summary>
     /// 帧率(second)
@@ -70,7 +70,7 @@ public partial record AppConfig
     /// <inheritdoc cref="DanmakuDuration"/>
     /// 方便计算使用float
     [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
-    public float DanmakuActualDuration => (float)(DanmakuDuration * PlaySpeed);
+    public float DanmakuActualDuration => (float)(DanmakuDuration * PlaybackRate);
 
     /// <summary>
     /// 弹幕透明度
@@ -209,6 +209,22 @@ public partial record AppConfig
     public string RegexPatterns { get; set; } = "[]";
 
     #endregion
+
+    #endregion
+
+    #region 网页设置
+
+    /// <summary>
+    /// 使用WebView2
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool EnableWebView2 { get; set; } = true;
+
+    /// <summary>
+    /// 使用WebView2
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool LockWebView2 { get; set; } = true;
 
     #endregion
 

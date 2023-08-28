@@ -10,13 +10,12 @@ public partial class SettingViewModel : ObservableObject
 {
     public SettingViewModel()
     {
-        PatternsCollection = JsonSerializer.Deserialize<ObservableCollection<string>>(RegexPatterns) ?? new ObservableCollection<string>();
-        PatternsCollection.CollectionChanged += (_, _) => RegexPatterns = JsonSerializer.Serialize(PatternsCollection);
+        AppConfig = AppContext.AppConfig with { };
+        PatternsCollection = JsonSerializer.Deserialize<ObservableCollection<string>>(AppConfig.RegexPatterns) ?? new ObservableCollection<string>();
+        PatternsCollection.CollectionChanged += (_, _) => AppConfig.RegexPatterns = JsonSerializer.Serialize(PatternsCollection);
     }
 
     public ObservableCollection<string> PatternsCollection { get; }
 
-#pragma warning disable CA1822 // 将成员标记为 static
-    public AppConfig AppConfig => AppContext.AppConfig;
-#pragma warning restore CA1822 // 将成员标记为 static
+    public AppConfig AppConfig { get; set; }
 }

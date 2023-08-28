@@ -21,9 +21,7 @@ public static partial class AppContext
             ? new() : appConfigurations;
     }
 
-    public static void SetDefaultAppConfig() => AppConfig = new();
-
-    public static AppConfig AppConfig { get; private set; } = null!;
+    public static AppConfig AppConfig { get; set; } = null!;
 
     public static BackgroundPanel BackgroundPanel { get; set; } = null!;
 

@@ -29,6 +29,10 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ![m7](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/m7.png)
 
+### 与背后播放器同步
+
+![m7](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/webview2.png)
+
 ## 使用说明
 
 ⚠️：指实现比较困难的功能
@@ -65,7 +69,15 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 * [x] 输入进度条
 
-* [ ] ⚠️ 和背后播放器同步
+* [x] 和背后网页播放器同步
+
+* [x] 支持同时调整软件和网页视频的倍速、进度条、播放暂停等
+
+* [ ] ⚠️ 支持网页视频跨域
+
+* [ ] ⚠️ 支持网页视频调整音量
+
+* [ ] ⚠️ 有网页时，支持**拖动**进度条
 
 ### 弹幕
 
@@ -119,7 +131,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.40
+版本：3.50
 
 ## 联系方式
 
@@ -129,4 +141,4 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 QQ：[2639914082](http://wpa.qq.com/msgrd?v=3&uin=2639914082&site=qq&menu=yes)
 
-2023.5.13
+2023.8.28

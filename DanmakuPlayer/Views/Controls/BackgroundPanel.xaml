@@ -7,10 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:rs="using:DanmakuPlayer.Resources"
-    xmlns:utilities="using:WinUI3Utilities"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
-    DoubleTapped="RootDoubleTapped"
+    DoubleTapped="MaximizeRestoreTapped"
     SizeChanged="RootSizeChanged"
     Unloaded="RootUnloaded"
     mc:Ignorable="d">
@@ -18,122 +16,186 @@
         <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
         <converters:BoolToPlayPauseSymbolConverter x:Key="BoolToPlayPauseSymbolConverter" />
         <converters:BoolToPinUnPinSymbolConverter x:Key="BoolToPinUnPinSymbolConverter" />
+        <converters:BoolToMuteVolumeSymbolConverter x:Key="BoolToMuteVolumeSymbolConverter" />
+        <converters:BoolToLockUnLockFontIconConverter x:Key="BoolToLockUnLockFontIconConverter" />
+        <converters:BoolToChromeMaximizeRestoreFontIconConverter x:Key="BoolToChromeMaximizeRestoreFontIconConverter" />
         <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <SolidColorBrush x:Key="Foreground" Color="{x:Bind _vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />
+        <ctkConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
+        <SolidColorBrush x:Key="Foreground" Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />
     </SwapChainPanel.Resources>
     <SwapChainPanel.RowDefinitions>
         <RowDefinition Height="*" />
         <RowDefinition Height="*" />
         <RowDefinition Height="*" />
     </SwapChainPanel.RowDefinitions>
-    <SwapChainPanel.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-    </SwapChainPanel.ColumnDefinitions>
+    <local:WebView2ForVideo
+        x:Name="WebView"
+        Grid.Row="0"
+        Grid.RowSpan="3"
+        IsHitTestVisible="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
+        KeyboardAcceleratorPlacementMode="Hidden"
+        PageLoaded="WebViewOnPageLoaded"
+        Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+        <local:WebView2ForVideo.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+            <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
+            <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
+            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
+        </local:WebView2ForVideo.KeyboardAccelerators>
+    </local:WebView2ForVideo>
     <xaml:CanvasControl
         x:Name="DanmakuCanvas"
         Grid.Row="0"
         Grid.RowSpan="3"
-        Grid.Column="0"
-        Grid.ColumnSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        KeyboardAcceleratorPlacementMode="Hidden">
-        <xaml:CanvasControl.KeyboardAccelerators>
-            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
-            <KeyboardAccelerator Key="Left" Invoked="RewindInvoked" />
-            <KeyboardAccelerator Key="Right" Invoked="FastForwardInvoked" />
-            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
-        </xaml:CanvasControl.KeyboardAccelerators>
-    </xaml:CanvasControl>
-    <TextBlock
-        x:Name="BannerTextBlock"
-        Grid.Row="1"
-        Grid.Column="0"
-        Grid.ColumnSpan="3"
-        FontSize="72"
-        Foreground="{StaticResource Foreground}"
-        IsHitTestVisible="False"
-        Text="{x:Bind rs:ConstantStrings.AppTitle}"
-        TextAlignment="Center" />
-    <Border
-        Grid.Row="0"
-        Grid.Column="2"
-        Background="Transparent"
-        PointerEntered="TitlePointerEntered"
-        PointerExited="TitlePointerExited">
-        <CommandBar
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            OverflowButtonVisibility="Collapsed"
-            Visibility="{x:Bind _vm.PointerInTitleArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-            <AppBarButton Foreground="{StaticResource Foreground}" Tapped="FrontTapped">
-                <AppBarButton.Icon>
-                    <SymbolIcon Symbol="{x:Bind _vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton
-                Foreground="{StaticResource Foreground}"
-                Icon="Setting"
-                Tapped="SettingTapped" />
-            <AppBarButton
-                Foreground="{StaticResource Foreground}"
-                Icon="Cancel"
-                Tapped="CloseTapped" />
-        </CommandBar>
-    </Border>
-    <Border
-        Grid.Row="0"
-        Grid.Column="0"
-        Background="Transparent"
-        PointerEntered="ImportPointerEntered"
-        PointerExited="ImportPointerExited">
-        <CommandBar
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            OverflowButtonVisibility="Collapsed"
-            Visibility="{x:Bind _vm.PointerInImportArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-            <AppBarButton
-                Foreground="{StaticResource Foreground}"
-                Icon="Download"
-                Tapped="ImportTapped" />
-            <AppBarButton
-                Foreground="{StaticResource Foreground}"
-                Icon="OpenFile"
-                Tapped="FileTapped" />
-        </CommandBar>
-    </Border>
-    <Border
-        Grid.Row="2"
-        Grid.Column="0"
-        Grid.ColumnSpan="3"
-        Background="Transparent"
-        IsHitTestVisible="{x:Bind _vm.StartPlaying, Mode=OneWay}"
-        PointerEntered="ControlPointerEntered"
-        PointerExited="ControlPointerExited">
-        <Grid
-            Margin="3,0,30,0"
-            VerticalAlignment="Bottom"
-            Visibility="{x:Bind _vm.PointerInControlArea, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+        IsHitTestVisible="False" />
+
+    <local:CollapsibleArea Grid.Row="0" Grid.Column="2">
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <LinearGradientBrush.GradientStops>
+                        <GradientStop Offset="0" Color="{x:Bind TransparentColor}" />
+                        <GradientStop Offset="1" Color="Transparent" />
+                    </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <CommandBar
+                Grid.Row="0"
+                Grid.Column="0"
+                OverflowButtonVisibility="Collapsed">
+                <AppBarButton
+                    Foreground="{StaticResource Foreground}"
+                    Icon="Download"
+                    Tapped="ImportTapped" />
+                <AppBarButton
+                    Foreground="{StaticResource Foreground}"
+                    Icon="OpenFile"
+                    Tapped="FileTapped" />
+            </CommandBar>
+            <Grid
+                Grid.Row="0"
+                Grid.Column="1"
+                Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
+                    <AppBarButton
+                        Foreground="{StaticResource Foreground}"
+                        Icon="Back"
+                        IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
+                        Tapped="GoBackTapped" />
+                </CommandBar>
+                <AutoSuggestBox
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    QueryIcon="Send"
+                    QuerySubmitted="AddressBoxOnQuerySubmitted" />
+            </Grid>
+            <CommandBar
+                Grid.Row="0"
+                Grid.Column="2"
+                OverflowButtonVisibility="Collapsed">
+                <AppBarButton Foreground="{StaticResource Foreground}" Tapped="FrontTapped">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Foreground="{StaticResource Foreground}"
+                    Icon="Setting"
+                    Tapped="SettingTapped" />
+                <AppBarButton
+                    Foreground="{StaticResource Foreground}"
+                    Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}"
+                    Tapped="MaximizeRestoreTapped" />
+                <AppBarButton Foreground="{StaticResource Foreground}" Tapped="CloseTapped">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE8BB;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar>
+        </Grid>
+    </local:CollapsibleArea>
+    <local:CollapsibleArea Grid.Row="2">
+        <!--  IsHitTestVisible="{x:Bind _vm.StartPlaying, Mode=OneWay}"  -->
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <LinearGradientBrush.GradientStops>
+                        <GradientStop Offset="0" Color="Transparent" />
+                        <GradientStop Offset="1" Color="{x:Bind TransparentColor}" />
+                    </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+            </Grid.Background>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <AppBarButton
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Slider
+                Grid.Row="1"
                 Grid.Column="0"
-                Width="40"
-                Foreground="{StaticResource Foreground}"
+                Grid.ColumnSpan="5"
+                Margin="10,0"
+                VerticalAlignment="Center"
                 IsTabStop="False"
-                LabelPosition="Collapsed"
-                Tapped="PauseResumeTapped">
-                <AppBarButton.Icon>
-                    <SymbolIcon Symbol="{x:Bind _vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
-                </AppBarButton.Icon>
-            </AppBarButton>
+                Maximum="{x:Bind Vm.TotalTime, Mode=OneWay}"
+                Minimum="0"
+                StepFrequency="0.1"
+                ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
+                Value="{x:Bind Vm.Time, Mode=TwoWay}" />
+            <CommandBar
+                Grid.Row="2"
+                Grid.Column="0"
+                OverflowButtonVisibility="Collapsed">
+                <AppBarButton
+                    Width="40"
+                    Foreground="{StaticResource Foreground}"
+                    Tapped="RewindTapped">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xEB9E;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Width="40"
+                    Foreground="{StaticResource Foreground}"
+                    Tapped="PauseResumeTapped">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton
+                    Width="40"
+                    Foreground="{StaticResource Foreground}"
+                    Tapped="FastForwardTapped">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xEB9D;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar>
             <Grid
+                Grid.Row="2"
                 Grid.Column="1"
                 Margin="10,0"
                 Background="Transparent"
@@ -142,11 +204,11 @@
                     Margin="0"
                     Orientation="Horizontal"
                     Spacing="5"
-                    Visibility="{x:Bind _vm.NavigateEditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                    Visibility="{x:Bind Vm.NavigateEditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{StaticResource Foreground}"
-                        Text="{x:Bind _vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                        Text="{x:Bind Vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Right" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -156,7 +218,7 @@
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{StaticResource Foreground}"
-                        Text="{x:Bind _vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
+                        Text="{x:Bind Vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Left" />
                 </StackPanel>
                 <TextBox
@@ -164,33 +226,82 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     AcceptsReturn="False"
-                    IsEnabled="{x:Bind _vm.EditingTime, Mode=OneWay}"
+                    IsEnabled="{x:Bind Vm.EditingTime, Mode=OneWay}"
                     IsEnabledChanged="TimeTextIsEditing"
                     KeyboardAcceleratorPlacementMode="Hidden"
                     LostFocus="TimeTextLostFocus"
                     TextAlignment="Center"
-                    Visibility="{x:Bind _vm.EditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                    Visibility="{x:Bind Vm.EditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBox.KeyboardAccelerators>
                         <KeyboardAccelerator Key="Enter" Invoked="TimeTextInvoked" />
                     </TextBox.KeyboardAccelerators>
                 </TextBox>
             </Grid>
+
+            <CommandBar
+                Grid.Row="2"
+                Grid.Column="3"
+                OverflowButtonVisibility="Collapsed">
+                <AppBarButton>
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xEC57;" />
+                    </AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <MenuFlyout Placement="Top">
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="2.0" />
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.5" />
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.25" />
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.0" />
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="0.75" />
+                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="0.5" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar>
+            <CommandBar
+                Grid.Row="2"
+                Grid.Column="4"
+                OverflowButtonVisibility="Collapsed"
+                Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                <AppBarButton Icon="Volume">
+                    <AppBarButton.Flyout>
+                        <Flyout Placement="Top">
+                            <StackPanel>
+                                <Slider
+                                    MinHeight="100"
+                                    HorizontalAlignment="Center"
+                                    IsEnabled="{x:Bind Vm.Mute, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
+                                    Maximum="100"
+                                    Minimum="0"
+                                    Orientation="Vertical"
+                                    StepFrequency="1"
+                                    Value="{x:Bind Volume, Mode=TwoWay}" />
+                                <AppBarButton
+                                    Width="40"
+                                    HorizontalAlignment="Center"
+                                    LabelPosition="Collapsed"
+                                    Tapped="MuteOnTapped">
+                                    <AppBarButton.Icon>
+                                        <SymbolIcon Symbol="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeSymbolConverter}, Mode=OneWay}" />
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                            </StackPanel>
+                        </Flyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarButton
+                    x:Name="LockWebView2Button"
+                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}"
+                    Tapped="LockWebView2OnTapped" />
+                <AppBarButton Icon="FullScreen" Tapped="FullScreenOnTapped" />
+            </CommandBar>
             <!--
                 PointerPressed="TimePointerPressed"
                 PointerReleased="TimePointerReleased"
             -->
-            <Slider
-                Grid.Column="2"
-                VerticalAlignment="Center"
-                IsTabStop="False"
-                Maximum="{x:Bind _vm.TotalTime, Mode=OneWay}"
-                Minimum="0"
-                StepFrequency="0.1"
-                ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
-                Value="{x:Bind _vm.Time, Mode=TwoWay}" />
         </Grid>
-    </Border>
-    <local:SettingsDialog x:Name="DialogSetting" TopMost="{x:Bind _vm.TopMost, Mode=TwoWay}" />
+    </local:CollapsibleArea>
+    <local:SettingsDialog x:Name="DialogSetting" />
     <local:InputDialog x:Name="DialogInput" />
     <TeachingTip x:Name="RootTeachingTip" />
 </SwapChainPanel>
