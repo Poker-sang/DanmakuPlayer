@@ -10,6 +10,8 @@ using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
+public class VideoEventArgs(ILocator Video) : EventArgs;
+
 [DependencyProperty<double>("Duration")]
 [DependencyProperty<bool>("CanGoForward")]
 [DependencyProperty<bool>("CanGoBack")]
@@ -17,12 +19,16 @@ namespace DanmakuPlayer.Views.Controls;
 public sealed partial class WebView2ForVideo : UserControl
 {
     private WebView2 WebView2 => Content.To<WebView2>();
+
     private IPlaywright Pw { get; set; } = null!;
+
     private IBrowser Browser { get; set; } = null!;
+
     private IPage Page { get; set; } = null!;
+
     private ILocator? Video { get; set; }
 
-    public event TypedEventHandler<WebView2ForVideo, EventArgs>? PageLoaded;
+    public event TypedEventHandler<WebView2ForVideo, VideoEventArgs>? VideoLoaded;
 
     public WebView2ForVideo()
     {
@@ -56,30 +62,49 @@ public sealed partial class WebView2ForVideo : UserControl
             return;
         }
 
+        if (await TryLoadVideoAsync())
+        {
+            VideoLoaded?.Invoke(this, new(Video!));
+        }
+        else if (HasVideo)
+            try
+            {
+                await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+                Duration = await DurationAsync();
+                VideoLoaded?.Invoke(this, new(Video!));
+            }
+            catch (TimeoutException)
+            {
+                Duration = await DurationAsync();
+                VideoLoaded?.Invoke(this, new(Video!));
+            }
+            catch (ArgumentException)
+            {
+                Duration = 0;
+            }
+    }
+
+    public async Task<bool> TryLoadVideoAsync()
+    {
         Video = Page.Locator("video").First;
         HasVideo = Video is not null;
         if (HasVideo)
             try
             {
-                Duration = await DurationAsync(); 
+                Duration = await DurationAsync();
             }
             catch (ArgumentException) // 可能出现.NET不支持无穷浮点数异常
             {
-                try
-                {
-                    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-                    Duration = await DurationAsync();
-                }
-                catch (TimeoutException)
-                {
-                    Duration = await DurationAsync();
-                }
-                catch (ArgumentException)
-                {
-                    Duration = 0;
-                }
+                Duration = 0;
+                return false;
             }
-        PageLoaded?.Invoke(this, EventArgs.Empty);
+        else
+        {
+            Duration = 0;
+            return false;
+        }
+        VideoLoaded?.Invoke(this, new(Video!));
+        return true;
     }
 
     public async Task GoBackAsync() => await Page.GoBackAsync();
@@ -128,16 +153,33 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> IncreaseVolumeAsync(double volume)
     {
-        var duration = await Video!.EvaluateAsync($"video => video.volume += {volume}");
+        var duration = await Video!.EvaluateAsync($"video => video.volume += {volume / 100}");
         return duration!.Value.GetDouble();
     }
 
     public async Task SetVolumeAsync(double volume)
     {
-        _ = await Video!.EvaluateAsync($"video => video.volume = {volume}");
+        _ = await Video!.EvaluateAsync($"video => video.volume = {volume / 100}");
     }
 
     public async Task<double> VolumeAsync()
+    {
+        var duration = await Video!.EvaluateAsync("video => video.volume")!;
+        return duration!.Value.GetDouble() * 100;
+    }
+
+    public async Task<double> IncreaseVolumePercentageAsync(double volume)
+    {
+        var duration = await Video!.EvaluateAsync($"video => video.volume += {volume}");
+        return duration!.Value.GetDouble();
+    }
+
+    public async Task SetVolumePercentageAsync(double volume)
+    {
+        _ = await Video!.EvaluateAsync($"video => video.volume = {volume}");
+    }
+
+    public async Task<double> VolumePercentageAsync()
     {
         var duration = await Video!.EvaluateAsync("video => video.volume")!;
         return duration!.Value.GetDouble();
@@ -166,21 +208,47 @@ public sealed partial class WebView2ForVideo : UserControl
 
     #endregion
 
+    /// <summary>
+    /// Use <see cref="TryLoadVideoAsync"/> to update <see cref="Duration"/>
+    /// </summary>
+    /// <returns></returns>
     private async Task<double> DurationAsync()
     {
         var duration = await Video!.EvaluateAsync("video => video.duration");
         return duration!.Value.GetDouble();
     }
 
+    #region PlayPause
+
+    public async Task<bool> IsPlayingAsync()
+    {
+        var isPlaying = await Video!.EvaluateAsync("video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)");
+        return isPlaying!.Value.GetBoolean();
+    }
+
+    public async Task<bool> PlayPauseFlipTask()
+    {
+        var isPlaying = await IsPlayingAsync();
+        if (isPlaying)
+            await PauseAsync();
+        else
+            await PlayAsync();
+        return !isPlaying;
+    }
+
     public async Task PlayAsync()
     {
-        _ = await Video!.EvaluateAsync("video => video.play()");
+         _ = await Video!.EvaluateAsync("video => video.play()");
     }
 
     public async Task PauseAsync()
     {
         _ = await Video!.EvaluateAsync("video => video.pause()");
     }
+
+    #endregion
+
+    #region PlaybackRate
 
     public async Task PlaybackRateAsync()
     {
@@ -192,12 +260,24 @@ public sealed partial class WebView2ForVideo : UserControl
         _ = await Video!.EvaluateAsync($"video => video.playbackRate = {playbackRate}");
     }
 
+    #endregion
+
     #region FullScreen
 
     public async Task<bool> FullScreenAsync()
     {
         var fullScreen = await Video!.EvaluateAsync("video => window.document.fullscreenElement");
         return fullScreen.HasValue;
+    }
+
+    public async Task<bool> FullScreenFlipAsync()
+    {
+        var fullScreen = (await Video!.EvaluateAsync("video => window.document.fullscreenElement")).HasValue;
+        if (fullScreen)
+            await ExitFullScreenAsync();
+        else
+            await RequestFullScreenAsync();
+        return !fullScreen;
     }
 
     public async Task RequestFullScreenAsync()

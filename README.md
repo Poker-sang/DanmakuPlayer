@@ -10,6 +10,8 @@
 
 * 弹幕渲染使用 [vortice](https://github.com/amerkoleci/vortice) 的DirectX库
  
+* WebView2操作使用 [Playwright](https://github.com/microsoft/playwright-dotnet) 自动化
+ 
 * 龟速更新中
 
 ## 预览
@@ -23,7 +25,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ### 合并类似弹幕、同屏不重叠
 
-![conbined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/conbined.png)
+![combined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/combined.png)
 
 ### M7高级弹幕
 
@@ -31,7 +33,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ### 与背后播放器同步
 
-![m7](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/webview2.png)
+![webview2](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/webview2.png)
 
 ## 使用说明
 
@@ -71,11 +73,9 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 * [x] 和背后网页播放器同步
 
-* [x] 支持同时调整软件和网页视频的倍速、进度条、播放暂停等
+* [x] 支持同时调整软件和网页视频的倍速、进度条、音量、播放暂停等
 
-* [ ] ⚠️ 支持网页视频跨域
-
-* [ ] ⚠️ 支持网页视频调整音量
+* [ ] ⚠️ 支持网页视频跨域（iframe）
 
 * [ ] ⚠️ 有网页时，支持**拖动**进度条
 

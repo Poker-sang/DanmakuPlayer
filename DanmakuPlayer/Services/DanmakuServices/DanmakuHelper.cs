@@ -20,7 +20,7 @@ public static class DanmakuHelper
 
     public static CreatorProvider Current { get; set; } = null!;
 
-    public static RenderType RenderType { get; set; }
+    public static RenderMode RenderType { get; set; }
 
     public static bool IsRendering { get; set; }
 
@@ -28,19 +28,19 @@ public static class DanmakuHelper
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {
-        if (RenderType.IsFlagSet(RenderType.RenderInit))
+        if (RenderType.IsFlagSet(RenderMode.RenderInit))
         {
-            if (RenderType.IsFlagSet(RenderType.ReloadProvider))
+            if (RenderType.IsFlagSet(RenderMode.ReloadProvider))
             {
-                if (RenderType.IsFlagSet(RenderType.ReloadFormats))
+                if (RenderType.IsFlagSet(RenderMode.ReloadFormats))
                 {
                     CreatorProvider.DisposeFormats();
-                    RenderType = RenderType.SetFlags(RenderType.ReloadFormats, false);
+                    RenderType = RenderType.SetFlags(RenderMode.ReloadFormats, false);
                 }
 
                 Current.Dispose();
                 Current = new(sender, appConfig);
-                RenderType = RenderType.SetFlags(RenderType.ReloadProvider, false);
+                RenderType = RenderType.SetFlags(RenderMode.ReloadProvider, false);
             }
 
             var context = new DanmakuContext((float)sender.ActualHeight, appConfig);
@@ -55,10 +55,10 @@ public static class DanmakuHelper
                 Current.ClearLayouts();
 
             _renderCount = count;
-            RenderType = RenderType.SetFlags(RenderType.RenderInit, false);
+            RenderType = RenderType.SetFlags(RenderMode.RenderInit, false);
         }
 
-        if (RenderType.IsFlagSet(RenderType.RenderOnce) || RenderType.IsFlagSet(RenderType.RenderAlways))
+        if (RenderType.IsFlagSet(RenderMode.RenderOnce) || RenderType.IsFlagSet(RenderMode.RenderAlways))
         {
             e.DrawingSession.Clear(Colors.Transparent);
 
@@ -77,8 +77,8 @@ public static class DanmakuHelper
                 Current.ClearUnusedLayoutRef();
             }
 
-            if (RenderType.IsFlagSet(RenderType.RenderOnce))
-                RenderType = RenderType.SetFlags(RenderType.RenderOnce, false);
+            if (RenderType.IsFlagSet(RenderMode.RenderOnce))
+                RenderType = RenderType.SetFlags(RenderMode.RenderOnce, false);
         }
 
         IsRendering = false;
@@ -86,7 +86,7 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = Array.Empty<Danmaku>();
 
-    public static async Task<int> Render(CanvasControl canvas, RenderType renderType, CancellationToken token)
+    public static async Task<int> Render(CanvasControl canvas, RenderMode renderType, CancellationToken token)
     {
         RenderType = renderType;
         await WaitForRender(canvas, token);

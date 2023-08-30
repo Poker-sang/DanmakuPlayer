@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -16,14 +17,13 @@ using DanmakuPlayer.Views.Converters;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
-using RenderType = DanmakuPlayer.Enums.RenderType;
+using RenderMode = DanmakuPlayer.Enums.RenderMode;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -39,8 +39,13 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     public BackgroundPanel()
     {
         AppContext.BackgroundPanel = this;
+        Vm.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName is nameof(Vm.Volume))
+                VolumeChanged(sender, e);
+        };
+
         InitializeComponent();
-        LockWebView2Button.Icon = new FontIcon { Glyph = Vm.LockWebView2 ? "\uE785" : "\uE72E" };
         DragMoveAndResizeHelper.RootPanel = this;
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
@@ -89,7 +94,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), TeachingTipSeverity.Information, Emoticon.Okay);
 
-            var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderType.RenderInit, _cancellationTokenSource.Token);
+            var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             if (!WebView.HasVideo)
@@ -110,7 +115,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         Vm.StartPlaying = true;
     }
 
-    public async void ReloadDanmaku(RenderType renderType)
+    public async void ReloadDanmaku(RenderMode renderType)
     {
         if (DanmakuHelper.Pool.Length is 0)
             return;
@@ -133,9 +138,9 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         TryResume();
     }
 
-    public void ResetProvider() => ReloadDanmaku(RenderType.ReloadProvider);
+    public void ResetProvider() => ReloadDanmaku(RenderMode.ReloadProvider);
 
-    public void DanmakuFontChanged() => ReloadDanmaku(RenderType.ReloadFormats);
+    public void DanmakuFontChanged() => ReloadDanmaku(RenderMode.ReloadFormats);
 
     #region 播放及暂停
 
@@ -143,7 +148,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private int _tickCount;
 
-    private void TimerTick(object? sender, object e)
+    private async void TimerTick(object? sender, object e)
     {
         var now = DateTime.Now;
         if (Vm.Time < Vm.TotalTime)
@@ -166,7 +171,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             if (_tickCount is 10)
             {
                 _tickCount = 0;
-                UpdateTime();
+                var lastTime = Vm.Time;
+                Vm.Time = await WebView.CurrentTimeAsync();
+                if (Math.Abs(Vm.Time - lastTime) > 0.5)
+                    Sync();
             }
         }
 
@@ -191,29 +199,24 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     private async void Resume()
     {
         _lastTime = DateTime.Now;
-        DanmakuHelper.RenderType = RenderType.RenderAlways;
+        DanmakuHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
         if (WebView.HasVideo)
         {
             await WebView.PlayAsync();
-            UpdateTime();
+            Sync();
         }
     }
 
     private async void Pause()
     {
-        DanmakuHelper.RenderType = RenderType.RenderOnce;
+        DanmakuHelper.RenderType = RenderMode.RenderOnce;
         Vm.IsPlaying = false;
         if (WebView.HasVideo)
         {
             await WebView.PauseAsync();
-            UpdateTime();
+            Sync();
         }
-    }
-
-    private async void UpdateTime(double? time = null)
-    {
-        Vm.Time = time ?? await WebView.CurrentTimeAsync();
     }
 
     public async void TrySetPlaybackRate()
@@ -240,7 +243,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         if (DanmakuHelper.Pool.Length is 0)
             return;
 
-        ReloadDanmaku(RenderType.ReloadProvider);
+        ReloadDanmaku(RenderMode.ReloadProvider);
     }
 
     private void RootUnloaded(object sender, RoutedEventArgs e)
@@ -280,13 +283,10 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         await WebView.GotoAsync(sender.Text);
     }
 
-    private void WebViewOnPageLoaded(WebView2ForVideo sender, EventArgs e)
+    private void WebViewOnPageLoaded(WebView2ForVideo sender, VideoEventArgs e)
     {
-        if (sender.HasVideo)
-        {
-            Vm.TotalTime = sender.Duration;
-            TrySetPlaybackRate();
-        }
+        Vm.TotalTime = sender.Duration;
+        TrySetPlaybackRate();
     }
 
     #endregion
@@ -347,24 +347,49 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             Resume();
     }
 
-    private async void RewindTapped(object sender, IWinRTObject e)
+    private void VolumeDownTapped(object sender, IWinRTObject e)
     {
-        if (WebView.HasVideo)
-            UpdateTime(await WebView.IncreaseCurrentTimeAsync(-Vm.AppConfig.PlayFastForward));
-        else if (Vm.Time - Vm.AppConfig.PlayFastForward < 0)
-            Vm.Time = 0;
-        else
-            Vm.Time -= Vm.AppConfig.PlayFastForward;
+        VolumeUp(-5);
     }
 
-    private async void FastForwardTapped(object sender, IWinRTObject e)
+    private void VolumeUpTapped(object sender, IWinRTObject e)
     {
+        VolumeUp(5);
+    }
+
+    private void RewindTapped(object sender, IWinRTObject e)
+    {
+        FastForward(-(e is RightTappedRoutedEventArgs ? 90 : Vm.AppConfig.PlayFastForward));
+    }
+
+    private void FastForwardTapped(object sender, IWinRTObject e)
+    {
+        FastForward(e is RightTappedRoutedEventArgs ? 90 : Vm.AppConfig.PlayFastForward);
+    }
+
+    private async void FastForward(int fastForwardTime)
+    {
+        var time = Math.Clamp(Vm.Time + fastForwardTime, 0, Vm.TotalTime);
         if (WebView.HasVideo)
-            UpdateTime(await WebView.IncreaseCurrentTimeAsync(Vm.AppConfig.PlayFastForward));
-        else if (Vm.Time + Vm.AppConfig.PlayFastForward > Vm.TotalTime)
-            Vm.Time = 0;
+        {
+            await WebView.SetCurrentTimeAsync(time);
+            Vm.Time = time;
+        }
         else
-            Vm.Time += Vm.AppConfig.PlayFastForward;
+            Vm.Time = time;
+    }
+
+    private void VolumeUp(int volumeUp)
+    {
+        var volume = Math.Clamp(Vm.Volume + volumeUp, 0, 100);
+        //see VolumeChanged()
+        //if (WebView.HasVideo)
+        //{
+        //    await WebView.SetVolumeAsync(volume);
+        //    Vm.Volume = volume;
+        //}
+        //else
+        Vm.Volume = volume;
     }
 
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender, Vm.AppConfig);
@@ -388,6 +413,25 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region WebView视频控制
 
+    private async void Sync()
+    {
+        _ = await WebView.TryLoadVideoAsync();
+        if (WebView.HasVideo)
+        {
+            Vm.Time = await WebView.CurrentTimeAsync();
+            Vm.IsPlaying = await WebView.IsPlayingAsync();
+            Vm.Volume = await WebView.VolumeAsync();
+            Vm.Mute = await WebView.MutedAsync();
+            Vm.FullScreen = await WebView.FullScreenAsync();
+            TrySetPlaybackRate();
+        }
+    }
+
+    /// <summary>
+    /// 倍速是面前唯一一个存在于<see cref="AppConfig"/>，且修改后需要本类和Vm类同时更改的属性，比较麻烦，所以没有写到Vm的属性里
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void PlaybackRateOnTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.AppConfig.PlaybackRate = double.Parse(sender.To<MenuFlyoutItem>().Text);
@@ -399,45 +443,28 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private async void MuteOnTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!WebView.HasVideo)
-            return;
-        Vm.Mute = await WebView.MutedFlipAsync();
+        if (WebView.HasVideo)
+            Vm.Mute = await WebView.MutedFlipAsync();
     }
 
-    private double Volume
+    private async void VolumeChanged(object? sender, PropertyChangedEventArgs e)
     {
-        get => WebView.HasVideo ? WebView.VolumeAsync().GetAwaiter().GetResult() * 100 : 0;
-        set
-        {
-            // TODO: Volume
-            return;
-            if (WebView.HasVideo)
-                WebView.SetVolumeAsync(value / 100).GetAwaiter().GetResult();
-        }
+        if (WebView.HasVideo)
+            await WebView.SetVolumeAsync(Vm.Volume);
     }
+
+    private void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e) => Sync();
 
     private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!WebView.HasVideo)
-            return;
-        Vm.LockWebView2 = !Vm.LockWebView2;
+        if (WebView.HasVideo)
+            Vm.LockWebView2 = !Vm.LockWebView2;
     }
 
     private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!WebView.HasVideo)
-            return;
-        var button = sender.To<AppBarButton>();
-        if (await WebView.FullScreenAsync())
-        {
-            await WebView.ExitFullScreenAsync();
-            button.Icon.To<SymbolIcon>().Symbol = Symbol.FullScreen;
-        }
-        else
-        {
-            await WebView.RequestFullScreenAsync();
-            button.Icon.To<SymbolIcon>().Symbol = Symbol.BackToWindow;
-        }
+        if (WebView.HasVideo)
+            Vm.FullScreen = await WebView.FullScreenFlipAsync();
     }
 
     #endregion

@@ -24,5 +24,6 @@ public partial class App : Application
             TitleBarType = TitleBarType.AppWindow,
             BackdropType = BackdropType.None
         });
+        AppHelper.RegisterUnhandledExceptionHandler(CurrentContext.Window);
     }
 }

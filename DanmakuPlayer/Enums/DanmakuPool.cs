@@ -9,10 +9,12 @@ public enum DanmakuPool
     /// 普通池
     /// </summary>
     Normal,
+
     /// <summary>
     /// 字幕池
     /// </summary>
     Subtitle,
+
     /// <summary>
     /// 高级池
     /// </summary>

@@ -19,14 +19,15 @@
         <converters:BoolToMuteVolumeSymbolConverter x:Key="BoolToMuteVolumeSymbolConverter" />
         <converters:BoolToLockUnLockFontIconConverter x:Key="BoolToLockUnLockFontIconConverter" />
         <converters:BoolToChromeMaximizeRestoreFontIconConverter x:Key="BoolToChromeMaximizeRestoreFontIconConverter" />
-        <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
+        <converters:BoolToFullScreenBackToWindowSymbolConverter x:Key="BoolToFullScreenBackToWindowSymbolConverter" />
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <ctkConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
-        <SolidColorBrush x:Key="Foreground" Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />
+        <!--<converters:UIntToColorConverter x:Key="UIntToColorConverter" />
+        <SolidColorBrush x:Key="Foreground" Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />-->
     </SwapChainPanel.Resources>
     <SwapChainPanel.RowDefinitions>
         <RowDefinition Height="*" />
-        <RowDefinition Height="*" />
+        <RowDefinition Height="4*" />
         <RowDefinition Height="*" />
     </SwapChainPanel.RowDefinitions>
     <local:WebView2ForVideo
@@ -35,10 +36,12 @@
         Grid.RowSpan="3"
         IsHitTestVisible="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
         KeyboardAcceleratorPlacementMode="Hidden"
-        PageLoaded="WebViewOnPageLoaded"
+        VideoLoaded="WebViewOnPageLoaded"
         Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
         <local:WebView2ForVideo.KeyboardAccelerators>
             <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+            <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
+            <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
             <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
             <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
             <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
@@ -75,14 +78,8 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton
-                    Foreground="{StaticResource Foreground}"
-                    Icon="Download"
-                    Tapped="ImportTapped" />
-                <AppBarButton
-                    Foreground="{StaticResource Foreground}"
-                    Icon="OpenFile"
-                    Tapped="FileTapped" />
+                <AppBarButton Icon="Download" Tapped="ImportTapped" />
+                <AppBarButton Icon="OpenFile" Tapped="FileTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="0"
@@ -94,7 +91,6 @@
                 </Grid.ColumnDefinitions>
                 <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
                     <AppBarButton
-                        Foreground="{StaticResource Foreground}"
                         Icon="Back"
                         IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
                         Tapped="GoBackTapped" />
@@ -109,20 +105,14 @@
                 Grid.Row="0"
                 Grid.Column="2"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Foreground="{StaticResource Foreground}" Tapped="FrontTapped">
+                <AppBarButton Tapped="FrontTapped">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton
-                    Foreground="{StaticResource Foreground}"
-                    Icon="Setting"
-                    Tapped="SettingTapped" />
-                <AppBarButton
-                    Foreground="{StaticResource Foreground}"
-                    Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}"
-                    Tapped="MaximizeRestoreTapped" />
-                <AppBarButton Foreground="{StaticResource Foreground}" Tapped="CloseTapped">
+                <AppBarButton Icon="Setting" Tapped="SettingTapped" />
+                <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
+                <AppBarButton Tapped="CloseTapped">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xE8BB;" />
                     </AppBarButton.Icon>
@@ -171,23 +161,20 @@
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
                     Width="40"
-                    Foreground="{StaticResource Foreground}"
+                    RightTapped="RewindTapped"
                     Tapped="RewindTapped">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEB9E;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton
-                    Width="40"
-                    Foreground="{StaticResource Foreground}"
-                    Tapped="PauseResumeTapped">
+                <AppBarButton Width="40" Tapped="PauseResumeTapped">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
                     Width="40"
-                    Foreground="{StaticResource Foreground}"
+                    RightTapped="FastForwardTapped"
                     Tapped="FastForwardTapped">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEB9D;" />
@@ -207,17 +194,14 @@
                     Visibility="{x:Bind Vm.NavigateEditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBlock
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource Foreground}"
                         Text="{x:Bind Vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Right" />
                     <TextBlock
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource Foreground}"
                         Text="-"
                         TextAlignment="Center" />
                     <TextBlock
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource Foreground}"
                         Text="{x:Bind Vm.TotalTime, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
                         TextAlignment="Left" />
                 </StackPanel>
@@ -275,7 +259,7 @@
                                     Minimum="0"
                                     Orientation="Vertical"
                                     StepFrequency="1"
-                                    Value="{x:Bind Volume, Mode=TwoWay}" />
+                                    Value="{x:Bind Vm.Volume, Mode=TwoWay}" />
                                 <AppBarButton
                                     Width="40"
                                     HorizontalAlignment="Center"
@@ -289,11 +273,13 @@
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton
-                    x:Name="LockWebView2Button"
-                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}"
-                    Tapped="LockWebView2OnTapped" />
-                <AppBarButton Icon="FullScreen" Tapped="FullScreenOnTapped" />
+                <AppBarButton Icon="Sync" Tapped="LoadSyncOnTapped" />
+                <AppBarButton Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}" Tapped="LockWebView2OnTapped" />
+                <AppBarButton Tapped="FullScreenOnTapped">
+                    <AppBarButton.Icon>
+                        <SymbolIcon Symbol="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowSymbolConverter}, Mode=OneWay}" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
             </CommandBar>
             <!--
                 PointerPressed="TimePointerPressed"

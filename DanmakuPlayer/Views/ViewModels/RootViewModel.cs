@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml.Controls;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.ViewModels;
@@ -10,11 +9,7 @@ public partial class RootViewModel : ObservableObject
 {
     public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
 
-    public uint Foreground => AppConfig.Foreground;
-
     public bool EnableWebView2 => AppConfig.EnableWebView2;
-
-    [ObservableProperty] private bool _mute;
 
     public bool LockWebView2
     {
@@ -58,6 +53,12 @@ public partial class RootViewModel : ObservableObject
         }
     }
 
+    [ObservableProperty] private bool _mute;
+
+    [ObservableProperty] private double _volume;
+
+    [ObservableProperty] private bool _fullScreen;
+
     [ObservableProperty] private bool _startPlaying;
 
     /// <summary>
@@ -84,9 +85,6 @@ public partial class RootViewModel : ObservableObject
 
     public bool NavigateEditingTime => !EditingTime;
 
-#pragma warning disable CA1822
-    public AppConfig AppConfig => AppContext.AppConfig;
-
     public bool IsPlaying
     {
         get => DispatcherTimerHelper.IsRunning;
@@ -99,5 +97,8 @@ public partial class RootViewModel : ObservableObject
             }
         }
     }
+
+#pragma warning disable CA1822
+    public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822
 }
