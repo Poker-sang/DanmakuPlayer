@@ -20,7 +20,7 @@ public sealed partial class InputDialog : UserControl
 
     private bool _cancel;
 
-    private VideoPage[] ItemsSource { get; set; } = Array.Empty<VideoPage>();
+    private VideoPage[] ItemsSource { get; set; } = [];
 
     public async Task<int?> ShowAsync()
     {

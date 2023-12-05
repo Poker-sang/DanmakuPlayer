@@ -17,8 +17,7 @@ public static class DanmakuRegex
             ? pool
             : await Task.Run(() =>
             {
-                var regexPatterns = JsonSerializer.Deserialize<string[]>(appConfig.RegexPatterns) ??
-                                    Array.Empty<string>();
+                var regexPatterns = JsonSerializer.Deserialize<string[]>(appConfig.RegexPatterns) ?? [];
                 return regexPatterns.Aggregate(pool,
                     (current, pattern) => current.Where(d => !Regex.IsMatch(d.Text, pattern)));
             }, token);

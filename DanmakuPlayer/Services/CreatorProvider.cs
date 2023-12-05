@@ -10,47 +10,39 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 
 namespace DanmakuPlayer.Services;
 
-public class CreatorProvider : IDisposable
+public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisposable
 {
-    public CreatorProvider(CanvasControl creator, AppConfig appConfig)
-    {
-        Creator = creator;
-        AppConfig = appConfig;
-        ViewWidth = creator.ActualWidth;
-        ViewHeight = creator.ActualHeight;
-    }
+    public ICanvasResourceCreator Creator { get; } = creator;
 
-    public ICanvasResourceCreator Creator { get; }
+    public AppConfig AppConfig { get; } = appConfig;
 
-    public AppConfig AppConfig { get; }
+    public double ViewWidth { get; } = creator.ActualWidth;
 
-    public double ViewWidth { get; }
-
-    public double ViewHeight { get; }
+    public double ViewHeight { get; } = creator.ActualHeight;
 
     /// <summary>
     /// 颜色和对应笔刷
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/></remarks>
-    public Dictionary<uint, CanvasSolidColorBrush> Brushes { get; } = new();
+    public Dictionary<uint, CanvasSolidColorBrush> Brushes { get; } = [];
 
     /// <summary>
     /// 字号和对应字体格式
     /// </summary>
     /// <remarks>依赖于<see cref="DanmakuPlayer.AppConfig.DanmakuFont"/></remarks>
-    public static Dictionary<float, CanvasTextFormat> Formats { get; } = new();
+    public static Dictionary<float, CanvasTextFormat> Formats { get; } = [];
 
     /// <summary>
     /// 内容和对应渲染布局
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, CanvasTextLayout> Layouts { get; } = new();
+    public Dictionary<string, CanvasTextLayout> Layouts { get; } = [];
 
     /// <summary>
     /// 渲染布局描边
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
-    public Dictionary<string, CanvasGeometry> Geometries { get; } = new();
+    public Dictionary<string, CanvasGeometry> Geometries { get; } = [];
 
     #region 计数器
 
@@ -58,7 +50,7 @@ public class CreatorProvider : IDisposable
     /// 内容和对应渲染布局的引用计数
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, int> LayoutsCounter { get; } = new();
+    public Dictionary<string, int> LayoutsCounter { get; } = [];
 
     public void AddLayoutRef(Danmaku danmaku)
     {

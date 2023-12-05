@@ -55,7 +55,7 @@ public static class DanmakuCombiner
             else
             {
                 hashList[t] = vector.Count;
-                vector.Add(new[] { 1, 0 });
+                vector.Add([1, 0]);
             }
 
         foreach (var t in q)
@@ -64,7 +64,7 @@ public static class DanmakuCombiner
             else
             {
                 hashList[t] = vector.Count;
-                vector.Add(new[] { 0, 1 });
+                vector.Add([0, 1]);
             }
 
         var xy = 0;
@@ -167,7 +167,7 @@ public static class DanmakuCombiner
                         }
 
                         if (addNew)
-                            danmakuChunk.Enqueue((str, new() { danmaku }));
+                            danmakuChunk.Enqueue((str, [danmaku]));
                     }
                     else
                         ret.Add(danmaku);

@@ -8,24 +8,24 @@ public static class Emoticon
     private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[new Random().Next(arr.Count)];
 
     public static readonly string[] ShockedEmoticons =
-    {
+    [
         "━━Σ(ﾟДﾟ川)━"
-    };
+    ];
 
     public static readonly string[] DepressedEmoticons =
-    {
+    [
         "( ´･_･)ﾉ(._.`)"
-    };
+    ];
 
     public static readonly string[] OkayEmoticons =
-    {
+    [
         "(｀・ω・´)",
         "✧(≖ ◡ ≖✿)",
         "('ヮ')",
         "(/・ω・)/",
         "(°∀°)ﾉ",
         "(・ω< )★"
-    };
+    ];
 
     public static string Shocked => ShockedEmoticons.RandomGet();
 
