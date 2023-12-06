@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -55,14 +56,18 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     public void AddLayoutRef(Danmaku danmaku)
     {
         var danmakuString = danmaku.ToString();
-        if (!LayoutsCounter.ContainsKey(danmakuString))
+        //if (!LayoutsCounter.ContainsKey(danmakuString))
+        //{
+        //    LayoutsCounter[danmakuString] = 0;
+        //}
+        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(LayoutsCounter, danmakuString, out var exists);
+        if (!exists)
         {
-            LayoutsCounter[danmakuString] = 0;
-            Layouts[danmakuString] = GetNewLayout(danmaku);
+            var newLayout = Layouts[danmakuString] = GetNewLayout(danmaku);
             if (AppConfig.DanmakuEnableStrokes)
-                Geometries[danmakuString] = CanvasGeometry.CreateText(Layouts[danmakuString]);
+                Geometries[danmakuString] = CanvasGeometry.CreateText(newLayout);
         }
-        ++LayoutsCounter[danmakuString];
+        ++count;
     }
 
     public void ClearLayoutRefCount()
