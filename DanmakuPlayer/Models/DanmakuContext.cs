@@ -9,6 +9,21 @@ namespace DanmakuPlayer.Models;
 /// </summary>
 public class DanmakuContext
 {
+    /// <summary>
+    /// <list type="bullet">
+    /// <item>
+    /// <term>BottomPos</term>
+    /// <description>从前一个结点的BottomPos（表头前一个算作0）到本结点的BottomPos的区间，算作一个空间（连续的）</description>
+    /// </item>
+    /// <item>
+    /// <term>Time</term>
+    /// <description>等该空间空余时，进度条的时间</description>
+    /// </item>
+    /// </list>
+    /// </summary>
+    /// ReSharper disable once UnusedMember.Local
+    private const bool DocProvider = false;
+
     public DanmakuContext(float viewHeight, AppConfig appConfig)
     {
         _ = StaticRoom.AddFirst((viewHeight, 0));
@@ -25,57 +40,40 @@ public class DanmakuContext
     }
 
     /// <summary>
-    /// <list type="bullet">
-    /// <item>
-    /// <term>BottomPos</term>
-    /// <description>从前一个结点的BottomPos（表头前一个算作0）到本结点的BottomPos的区间，算作一个空间（连续的）</description>
-    /// </item>
-    /// <item>
-    /// <term>Time</term>
-    /// <description>等该空间空余时，进度条的时间</description>
-    /// </item>
-    /// </list>
-    /// </summary>
-    /// ReSharper disable once UnusedMember.Local
-#pragma warning disable IDE0052 // 删除未读的私有成员
-    private const bool DocProvider = false;
-#pragma warning restore IDE0052 // 删除未读的私有成员
-
-    /// <summary>
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomRollList RollRoom { get; } = new();
+    public DanmakuRoomRollList RollRoom { get; } = [];
 
     /// <summary>
     /// 静止弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomStaticList StaticRoom { get; } = new();
+    public DanmakuRoomStaticList StaticRoom { get; } = [];
 
     /// <summary>
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomRollList InverseRoom { get; } = new();
+    public DanmakuRoomRollList InverseRoom { get; } = [];
 
     /// <summary>
     /// 正在顶部的弹幕
     /// </summary>
-    public Queue<Danmaku> Top { get; } = null!;
+    public Queue<Danmaku>? Top { get; }
 
     /// <summary>
     /// 正在底部的弹幕
     /// </summary>
-    public Queue<Danmaku> Bottom { get; } = null!;
+    public Queue<Danmaku>? Bottom { get; }
 
     /// <summary>
     /// 正在滚动的弹幕
     /// </summary>
-    public Queue<Danmaku> Roll { get; } = null!;
+    public Queue<Danmaku>? Roll { get; }
 
     /// <summary>
     /// 正在逆向滚动的弹幕
     /// </summary>
-    public Queue<Danmaku> Inverse { get; } = null!;
+    public Queue<Danmaku>? Inverse { get; }
 }

@@ -13,6 +13,8 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuHelper
 {
+    private static int _renderCount;
+
     /// <summary>
     /// 弹幕池
     /// </summary>
@@ -23,8 +25,6 @@ public static class DanmakuHelper
     public static RenderMode RenderType { get; set; }
 
     public static bool IsRendering { get; set; }
-
-    private static int _renderCount;
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {

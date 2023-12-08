@@ -344,5 +344,4 @@ public partial record Danmaku
     }
 
     #endregion
-
 }

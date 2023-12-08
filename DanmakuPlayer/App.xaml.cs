@@ -7,9 +7,11 @@ namespace DanmakuPlayer;
 
 public partial class App : Application
 {
+    public const ushort RemoteDebuggingPort = 9222;
+
     public App()
     {
-        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--remote-debugging-port=9222");
+        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", $"--remote-debugging-port={RemoteDebuggingPort}");
         InitializeComponent();
         CurrentContext.Title = nameof(DanmakuPlayer);
         AppContext.Initialize();

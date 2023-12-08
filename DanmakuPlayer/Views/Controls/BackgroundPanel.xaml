@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
-    xmlns:ctkConverters="using:CommunityToolkit.WinUI.UI.Converters"
+    xmlns:ctkConverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -107,11 +107,14 @@
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton Tapped="FrontTapped">
                     <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
+                        <SymbolIcon
+                            Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton Icon="Setting" Tapped="SettingTapped" />
-                <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
+                <AppBarButton
+                    Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}"
+                    Tapped="MaximizeRestoreTapped" />
                 <AppBarButton Tapped="CloseTapped">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xE8BB;" />
@@ -169,7 +172,8 @@
                 </AppBarButton>
                 <AppBarButton Width="40" Tapped="PauseResumeTapped">
                     <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
+                        <SymbolIcon
+                            Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
@@ -266,7 +270,8 @@
                                     LabelPosition="Collapsed"
                                     Tapped="MuteOnTapped">
                                     <AppBarButton.Icon>
-                                        <SymbolIcon Symbol="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeSymbolConverter}, Mode=OneWay}" />
+                                        <SymbolIcon
+                                            Symbol="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeSymbolConverter}, Mode=OneWay}" />
                                     </AppBarButton.Icon>
                                 </AppBarButton>
                             </StackPanel>
@@ -274,10 +279,13 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
                 <AppBarButton Icon="Sync" Tapped="LoadSyncOnTapped" />
-                <AppBarButton Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}" Tapped="LockWebView2OnTapped" />
+                <AppBarButton
+                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}"
+                    Tapped="LockWebView2OnTapped" />
                 <AppBarButton Tapped="FullScreenOnTapped">
                     <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowSymbolConverter}, Mode=OneWay}" />
+                        <SymbolIcon
+                            Symbol="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar>

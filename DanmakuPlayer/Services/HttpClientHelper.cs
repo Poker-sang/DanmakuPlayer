@@ -11,7 +11,7 @@ namespace DanmakuPlayer.Services;
 
 public static class HttpClientHelper
 {
-    public static void Initialize() { }
+    private static bool _shouldRefreshHeader = true;
 
     public static HttpClient Client { get; } =
         new(new HttpClientHandler
@@ -24,7 +24,8 @@ public static class HttpClientHelper
             MaxResponseContentBufferSize = ((long)2 << 30) - 1
         };
 
-    private static bool _shouldRefreshHeader = true;
+    public static void Initialize() { }
+
     public static HttpClient InitializeHeader(this HttpClient client, Dictionary<string, string>? header = null)
     {
         if (!_shouldRefreshHeader && header is null)

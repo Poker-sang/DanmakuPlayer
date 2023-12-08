@@ -5,6 +5,21 @@ namespace DanmakuPlayer;
 [GenerateConstructor]
 public partial record AppConfig
 {
+    public AppConfig()
+    {
+
+    }
+
+    #region 渲染设置
+
+    /// <summary>
+    /// 提前渲染并存储，会占用更高内存
+    /// </summary>
+    /// <remarks>default: <see langword="false"/></remarks>
+    public bool RenderBefore { get; set; } = false;
+
+    #endregion
+
     #region 应用设置
 
     /// <summary>
@@ -49,16 +64,6 @@ public partial record AppConfig
 
     #endregion
 
-    #region 渲染设置
-
-    /// <summary>
-    /// 提前渲染并存储，会占用更高内存
-    /// </summary>
-    /// <remarks>default: <see langword="false"/></remarks>
-    public bool RenderBefore { get; set; } = false;
-
-    #endregion
-
     #region 弹幕设置
 
     /// <summary>
@@ -75,8 +80,8 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕透明度
     /// </summary>
-    /// <remarks>default: 0.7 ∈ [0.1, 1]</remarks>
-    public float DanmakuOpacity { get; set; } = 0.7f;
+    /// <remarks>default: 0.6 ∈ [0.2, 1]</remarks>
+    public float DanmakuOpacity { get; set; } = 0.6f;
 
     /// <summary>
     /// 弹幕字体
@@ -227,9 +232,4 @@ public partial record AppConfig
     public bool LockWebView2 { get; set; } = true;
 
     #endregion
-
-    public AppConfig()
-    {
-
-    }
 }

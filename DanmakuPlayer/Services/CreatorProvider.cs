@@ -45,6 +45,35 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
     public Dictionary<string, CanvasGeometry> Geometries { get; } = [];
 
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        foreach (var brush in Brushes)
+            brush.Value.Dispose();
+        Brushes.Clear();
+
+        ClearLayouts();
+    }
+
+    public static void DisposeFormats()
+    {
+        foreach (var format in Formats)
+            format.Value.Dispose();
+        Formats.Clear();
+    }
+
+    public void ClearLayouts()
+    {
+        foreach (var layout in Layouts)
+            layout.Value.Dispose();
+        foreach (var geometry in Geometries)
+            geometry.Value.Dispose();
+        LayoutsCounter.Clear();
+        Layouts.Clear();
+        Geometries.Clear();
+    }
+
     #region 计数器
 
     /// <summary>
@@ -56,10 +85,6 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     public void AddLayoutRef(Danmaku danmaku)
     {
         var danmakuString = danmaku.ToString();
-        //if (!LayoutsCounter.ContainsKey(danmakuString))
-        //{
-        //    LayoutsCounter[danmakuString] = 0;
-        //}
         ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(LayoutsCounter, danmakuString, out var exists);
         if (!exists)
         {
@@ -118,33 +143,4 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     }
 
     #endregion
-
-    public static void DisposeFormats()
-    {
-        foreach (var format in Formats)
-            format.Value.Dispose();
-        Formats.Clear();
-    }
-
-    public void ClearLayouts()
-    {
-        foreach (var layout in Layouts)
-            layout.Value.Dispose();
-        foreach (var geometry in Geometries)
-            geometry.Value.Dispose();
-        LayoutsCounter.Clear();
-        Layouts.Clear();
-        Geometries.Clear();
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-
-        foreach (var brush in Brushes)
-            brush.Value.Dispose();
-        Brushes.Clear();
-
-        ClearLayouts();
-    }
 }

@@ -7,7 +7,26 @@ namespace DanmakuPlayer.Views.ViewModels;
 
 public partial class RootViewModel : ObservableObject
 {
-    public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
+    /// <summary>
+    /// 现实时间
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Time))]
+    private double _actualTime;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NavigateEditingTime))]
+    private bool _editingTime;
+
+    [ObservableProperty] private bool _fullScreen;
+
+    [ObservableProperty] private bool _mute;
+
+    [ObservableProperty] private bool _startPlaying;
+
+    [ObservableProperty] private double _totalTime;
+
+    [ObservableProperty] private double _volume;
 
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
@@ -53,21 +72,6 @@ public partial class RootViewModel : ObservableObject
         }
     }
 
-    [ObservableProperty] private bool _mute;
-
-    [ObservableProperty] private double _volume;
-
-    [ObservableProperty] private bool _fullScreen;
-
-    [ObservableProperty] private bool _startPlaying;
-
-    /// <summary>
-    /// 现实时间
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Time))]
-    private double _actualTime;
-
     /// <summary>
     /// 进度条时间
     /// </summary>
@@ -76,12 +80,6 @@ public partial class RootViewModel : ObservableObject
         get => ActualTime * AppConfig.PlaybackRate;
         set => ActualTime = value / AppConfig.PlaybackRate;
     }
-
-    [ObservableProperty] private double _totalTime;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NavigateEditingTime))]
-    private bool _editingTime;
 
     public bool NavigateEditingTime => !EditingTime;
 
@@ -101,4 +99,5 @@ public partial class RootViewModel : ObservableObject
 #pragma warning disable CA1822
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822
+    public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
 }

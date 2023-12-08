@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -24,6 +25,7 @@ namespace DanmakuPlayer.Models;
 /// <param name="UnixTimeStamp">发送时间戳</param>
 /// <param name="Pool">所属弹幕池</param>
 /// <param name="UserHash">用户ID</param>
+[DebuggerDisplay($"{{{nameof(Text)}}},{{{nameof(Color)}}},{{{nameof(Size)}}}")]
 public partial record Danmaku(
     string Text,
     float Time,
@@ -34,8 +36,6 @@ public partial record Danmaku(
     DanmakuPool Pool,
     string UserHash) : IDanmakuWidth
 {
-    public double LayoutWidth { get; set; }
-
     private double _layoutHeight;
 
     /// <summary>
@@ -58,6 +58,8 @@ public partial record Danmaku(
     /// </summary>
     public AdvancedDanmaku? AdvancedInfo { get; private set; }
 
+    public double LayoutWidth { get; set; }
+
     /// <summary>
     /// 初始化渲染
     /// </summary>
@@ -69,10 +71,10 @@ public partial record Danmaku(
         // 是否超过弹幕数量限制
         if (Mode switch
         {
-            DanmakuMode.Roll => provider.AppConfig.DanmakuCountRollEnableLimit && CountReachLimit(context.Roll, provider.AppConfig.DanmakuCountRollLimit),
-            DanmakuMode.Bottom => provider.AppConfig.DanmakuCountBottomEnableLimit && CountReachLimit(context.Bottom, provider.AppConfig.DanmakuCountBottomLimit),
-            DanmakuMode.Top => provider.AppConfig.DanmakuCountTopEnableLimit && CountReachLimit(context.Top, provider.AppConfig.DanmakuCountTopLimit),
-            DanmakuMode.Inverse => provider.AppConfig.DanmakuCountInverseEnableLimit && CountReachLimit(context.Inverse, provider.AppConfig.DanmakuCountInverseLimit),
+            DanmakuMode.Roll => provider.AppConfig.DanmakuCountRollEnableLimit && CountReachLimit(context.Roll!, provider.AppConfig.DanmakuCountRollLimit),
+            DanmakuMode.Bottom => provider.AppConfig.DanmakuCountBottomEnableLimit && CountReachLimit(context.Bottom!, provider.AppConfig.DanmakuCountBottomLimit),
+            DanmakuMode.Top => provider.AppConfig.DanmakuCountTopEnableLimit && CountReachLimit(context.Top!, provider.AppConfig.DanmakuCountTopLimit),
+            DanmakuMode.Inverse => provider.AppConfig.DanmakuCountInverseEnableLimit && CountReachLimit(context.Inverse!, provider.AppConfig.DanmakuCountInverseLimit),
             DanmakuMode.Advanced => !provider.AppConfig.DanmakuCountM7Enable,
             _ => true
         })
@@ -188,11 +190,9 @@ public partial record Danmaku(
             var aPos = AdvancedInfo.GetPosition(t, (float)provider.ViewWidth, (float)provider.ViewHeight);
             var aOpacity = AdvancedInfo.GetOpacity(t);
             using var aBrush = new CanvasSolidColorBrush(renderTarget, Color.GetColor((byte)(aOpacity * 0xFF)));
-            using var aFormat = new CanvasTextFormat
-            {
-                FontFamily = AdvancedInfo.Font,
-                FontSize = Size
-            };
+            using var aFormat = new CanvasTextFormat();
+            aFormat.FontFamily = AdvancedInfo.Font;
+            aFormat.FontSize = Size;
             using var aLayout = new CanvasTextLayout(renderTarget, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
 
             var lastTransform = renderTarget.Transform;

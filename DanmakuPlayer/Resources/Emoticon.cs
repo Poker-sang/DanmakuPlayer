@@ -5,8 +5,6 @@ namespace DanmakuPlayer.Resources;
 
 public static class Emoticon
 {
-    private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[new Random().Next(arr.Count)];
-
     public static readonly string[] ShockedEmoticons =
     [
         "━━Σ(ﾟДﾟ川)━"
@@ -32,4 +30,5 @@ public static class Emoticon
     public static string Depressed => DepressedEmoticons.RandomGet();
 
     public static string Okay => OkayEmoticons.RandomGet();
+    private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[new Random().Next(arr.Count)];
 }

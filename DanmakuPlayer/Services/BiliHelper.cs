@@ -14,6 +14,11 @@ namespace DanmakuPlayer.Services;
 
 public static partial class BiliHelper
 {
+    public enum CodeType
+    {
+        Error, AvId, BvId, CId, MediaId, SeasonId, EpisodeId
+    }
+
     private const int Xor = 177451812;
 
     private const long Add = 8728348608;
@@ -111,11 +116,6 @@ public static partial class BiliHelper
 
     [GeneratedRegex(@"(?:BV)1\w\w4\w1\w7\w\w")]
     private static partial Regex BvRegex();
-
-    public enum CodeType
-    {
-        Error, AvId, BvId, CId, MediaId, SeasonId, EpisodeId
-    }
 
     public static CodeType Match(this string url, out string result)
     {
