@@ -46,16 +46,16 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         };
 
         InitializeComponent();
-        DragMoveAndResizeHelper.RootPanel = this;
+        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
         DispatcherTimerHelper.Tick += TimerTick;
 
-        _filter = new()
-        {
+        _filter =
+        [
             DanmakuCombiner.Combine,
             DanmakuRegex.Match
-        };
+        ];
     }
 
     #region 操作
@@ -256,11 +256,11 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region Title区按钮
 
-    private void CloseTapped(object sender, TappedRoutedEventArgs e) => CurrentContext.App.Exit();
+    private void CloseTapped(object sender, TappedRoutedEventArgs e) => Application.Current.Exit();
 
     private void FrontTapped(object sender, TappedRoutedEventArgs e)
     {
-        Vm.TopMost = !CurrentContext.OverlappedPresenter.IsAlwaysOnTop;
+        Vm.TopMost = !App.OverlappedPresenter.IsAlwaysOnTop;
         RootTeachingTip.ShowAndHide(
             Vm.TopMost ? MainPanelResources.TopMostOn : MainPanelResources.TopMostOff,
             TeachingTipSeverity.Information,
@@ -326,7 +326,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     private async void FileTapped(object sender, TappedRoutedEventArgs e)
     {
-        var file = await PickerHelper.PickSingleFileAsync();
+        var file = await App.Window.PickSingleFileAsync();
         if (file is not null)
             await LoadDanmaku(async token =>
             {

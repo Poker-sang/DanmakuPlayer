@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using Microsoft.UI.Windowing;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.ViewModels;
 
@@ -30,9 +29,9 @@ public partial class RootViewModel : ObservableObject
         set
         {
             if (value == AppConfig.TopMost &&
-                value == CurrentContext.OverlappedPresenter.IsAlwaysOnTop)
+                value == App.OverlappedPresenter.IsAlwaysOnTop)
                 return;
-            CurrentContext.OverlappedPresenter.IsAlwaysOnTop = AppConfig.TopMost = value;
+            App.OverlappedPresenter.IsAlwaysOnTop = AppConfig.TopMost = value;
             OnPropertyChanged();
             AppContext.SaveConfiguration(AppConfig);
         }
@@ -40,15 +39,15 @@ public partial class RootViewModel : ObservableObject
 
     public bool IsMaximized
     {
-        get => CurrentContext.OverlappedPresenter.State is OverlappedPresenterState.Maximized;
+        get => App.OverlappedPresenter.State is OverlappedPresenterState.Maximized;
         set
         {
             if (value == IsMaximized)
                 return;
             if (value)
-                CurrentContext.OverlappedPresenter.Maximize();
+                App.OverlappedPresenter.Maximize();
             else
-                CurrentContext.OverlappedPresenter.Restore();
+                App.OverlappedPresenter.Restore();
             OnPropertyChanged();
         }
     }

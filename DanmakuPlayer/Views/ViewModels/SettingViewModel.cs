@@ -11,7 +11,7 @@ public partial class SettingViewModel : ObservableObject
     public SettingViewModel()
     {
         AppConfig = AppContext.AppConfig with { };
-        PatternsCollection = JsonSerializer.Deserialize<ObservableCollection<string>>(AppConfig.RegexPatterns) ?? new ObservableCollection<string>();
+        PatternsCollection = JsonSerializer.Deserialize<ObservableCollection<string>>(AppConfig.RegexPatterns) ?? [];
         PatternsCollection.CollectionChanged += (_, _) => AppConfig.RegexPatterns = JsonSerializer.Serialize(PatternsCollection);
     }
 

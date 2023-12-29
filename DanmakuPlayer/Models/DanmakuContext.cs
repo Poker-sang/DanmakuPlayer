@@ -45,19 +45,19 @@ public class DanmakuContext
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomRollList RollRoom { get; } = new();
+    public DanmakuRoomRollList RollRoom { get; } = [];
 
     /// <summary>
     /// 静止弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomStaticList StaticRoom { get; } = new();
+    public DanmakuRoomStaticList StaticRoom { get; } = [];
 
     /// <summary>
     /// 滚动弹幕空间
     /// <inheritdoc cref="DocProvider"/>
     /// </summary>
-    public DanmakuRoomRollList InverseRoom { get; } = new();
+    public DanmakuRoomRollList InverseRoom { get; } = [];
 
     /// <summary>
     /// 正在顶部的弹幕

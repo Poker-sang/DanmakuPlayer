@@ -335,4 +335,10 @@
   <data name="WebView2Header.Text" xml:space="preserve">
     <value>WebView2设置</value>
   </data>
+  <data name="DuplicatesWithExistingRegex" xml:space="preserve">
+    <value>与已有正则表达式重复</value>
+  </data>
+  <data name="RegexCannotBeEmpty" xml:space="preserve">
+    <value>正则表达式不能为空</value>
+  </data>
 </root>

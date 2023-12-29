@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
@@ -14,7 +15,6 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using WinUI3Utilities;
-using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -33,15 +33,9 @@ public sealed partial class SettingsDialog : UserControl
 
     #region 事件处理
 
-    private void NavigateUriTapped(object sender, TappedRoutedEventArgs e)
+    private async void NavigateUriTapped(object sender, TappedRoutedEventArgs e)
     {
-        using var process = new Process();
-        process.StartInfo = new()
-        {
-            FileName = sender.GetTag<string>(),
-            UseShellExecute = true
-        };
-        _ = process.Start();
+        _ = await Launcher.LaunchUriAsync(new(sender.GetTag<string>()));
     }
 
     private void ThemeChanged(object sender, SelectionChangedEventArgs e)
@@ -55,15 +49,8 @@ public sealed partial class SettingsDialog : UserControl
             _ => ElementTheme.Default
         };
 
-        if (CurrentContext.Window.Content is FrameworkElement rootElement)
+        if (App.Window.Content is FrameworkElement rootElement)
             rootElement.RequestedTheme = selectedTheme;
-
-        CurrentContext.App.Resources["WindowCaptionForeground"] = selectedTheme switch
-        {
-            ElementTheme.Dark => Colors.White,
-            ElementTheme.Light => Colors.Black,
-            _ => CurrentContext.App.RequestedTheme is ApplicationTheme.Dark ? Colors.White : Colors.Black
-        };
     }
 
     private void SetDefaultAppConfigClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
@@ -75,11 +62,10 @@ public sealed partial class SettingsDialog : UserControl
 
     private void AddRegexPattern(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e)
     {
-        // TODO: Localization
         if (string.IsNullOrEmpty(sender.Text))
         {
             RegexErrorInfoBar.Severity = InfoBarSeverity.Warning;
-            RegexErrorInfoBar.Message = "正则表达式不能为空";
+            RegexErrorInfoBar.Message = SettingsDialogResources.RegexCannotBeEmpty;
             RegexErrorInfoBar.IsOpen = true;
             return;
         }
@@ -87,7 +73,7 @@ public sealed partial class SettingsDialog : UserControl
         if (Vm.PatternsCollection.Contains(sender.Text))
         {
             RegexErrorInfoBar.Severity = InfoBarSeverity.Warning;
-            RegexErrorInfoBar.Message = "与已有正则表达式重复";
+            RegexErrorInfoBar.Message = SettingsDialogResources.DuplicatesWithExistingRegex;
             RegexErrorInfoBar.IsOpen = true;
             return;
         }

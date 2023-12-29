@@ -5,7 +5,7 @@ using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
 
-[AppContext<AppConfig>]
+[AppContext<AppConfig>(ConfigKey = "Configuration", MethodName = "Configuration")]
 public static partial class AppContext
 {
     public static string AppLocalFolder { get; private set; } = null!;
@@ -13,7 +13,7 @@ public static partial class AppContext
     public static void Initialize()
     {
         AppLocalFolder = ApplicationData.Current.LocalFolder.Path;
-        InitializeConfigurationContainer();
+        InitializeConfiguration();
         AppConfig = LoadConfiguration() is not { } appConfigurations
 #if FIRST_TIME
         || true
