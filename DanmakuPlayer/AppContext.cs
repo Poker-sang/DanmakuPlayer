@@ -1,6 +1,6 @@
+using Windows.Storage;
 using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using Windows.Storage;
 using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
@@ -9,6 +9,12 @@ namespace DanmakuPlayer;
 public static partial class AppContext
 {
     public static string AppLocalFolder { get; private set; } = null!;
+
+    public static AppConfig AppConfig { get; set; } = null!;
+
+    public static BackgroundPanel BackgroundPanel { get; set; } = null!;
+
+    public static CanvasControl DanmakuCanvas { get; set; } = null!;
 
     public static void Initialize()
     {
@@ -20,10 +26,4 @@ public static partial class AppContext
 #endif
             ? new() : appConfigurations;
     }
-
-    public static AppConfig AppConfig { get; set; } = null!;
-
-    public static BackgroundPanel BackgroundPanel { get; set; } = null!;
-
-    public static CanvasControl DanmakuCanvas { get; set; } = null!;
 }

@@ -1,4 +1,4 @@
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -22,7 +22,6 @@ public sealed class CollapsibleArea : ContentControl
             }
         };
     }
-
 
     public void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {

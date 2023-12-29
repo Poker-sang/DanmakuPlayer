@@ -29,13 +29,6 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class BackgroundPanel : SwapChainPanel
 {
-#pragma warning disable CA1822, IDE0079 // 将成员标记为 static
-    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
-    private Color TransparentColor => Color.FromArgb(0xff / 2, 0, 0, 0);
-#pragma warning restore CA1822, IDE0079
-
-    public RootViewModel Vm { get; } = new();
-
     public BackgroundPanel()
     {
         AppContext.BackgroundPanel = this;
@@ -57,6 +50,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
             DanmakuRegex.Match
         ];
     }
+#pragma warning disable CA1822, IDE0079 // 将成员标记为 static
+    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
+    private Color TransparentColor => Color.FromArgb(0xff / 2, 0, 0, 0);
+#pragma warning restore CA1822, IDE0079
+
+    public RootViewModel Vm { get; } = new();
 
     #region 操作
 
@@ -72,7 +71,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
     {
         Pause();
 
-        _cancellationTokenSource.Cancel();
+        await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 
@@ -122,7 +121,7 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
         TryPause();
 
-        _cancellationTokenSource.Cancel();
+        await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 

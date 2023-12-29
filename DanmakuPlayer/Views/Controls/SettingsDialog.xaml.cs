@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
@@ -29,6 +27,52 @@ public sealed partial class SettingsDialog : UserControl
     {
         Vm = new();
         _ = await Content.To<ContentDialog>().ShowAsync();
+    }
+
+    /// <summary>
+    /// <see cref="Selector.SelectionChanged" />、<see cref="ToggleSwitch.Toggled" />等事件在属性变化前触发，
+    /// 所以不能使用这些事件， 而是在保证属性变化后再去操作。此方法在<see cref="SettingsDialog" />关闭时调用
+    /// </summary>
+    /// <param name="before"></param>
+    /// <param name="after"></param>
+#pragma warning disable IDE0079 // 请删除不必要的忽略
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+#pragma warning restore IDE0079 // 请删除不必要的忽略
+    private void CompareChanges(AppConfig before, AppConfig after)
+    {
+        var backgroundPanel = Parent.To<BackgroundPanel>();
+        if (before.PlaybackRate != after.PlaybackRate)
+        {
+            DispatcherTimerHelper.ResetTimerInterval();
+            backgroundPanel.ResetProvider();
+            backgroundPanel.TrySetPlaybackRate();
+        }
+        else
+        {
+            if (before.RenderBefore != after.RenderBefore
+                || before.DanmakuDuration != after.DanmakuDuration
+                || before.DanmakuOpacity != after.DanmakuOpacity
+                || before.DanmakuScale != after.DanmakuScale
+                || before.DanmakuEnableOverlap != after.DanmakuEnableOverlap
+                || before.DanmakuCountRollLimit != after.DanmakuCountRollLimit
+                || before.DanmakuCountBottomLimit != after.DanmakuCountBottomLimit
+                || before.DanmakuCountTopLimit != after.DanmakuCountTopLimit
+                || before.DanmakuCountInverseLimit != after.DanmakuCountInverseLimit
+                || before.DanmakuCountM7Enable != after.DanmakuCountM7Enable)
+                backgroundPanel.ResetProvider();
+            if (before.PlayFramePerSecond != after.PlayFramePerSecond)
+                DispatcherTimerHelper.ResetTimerInterval();
+        }
+        if (before.DanmakuFont != after.DanmakuFont)
+            backgroundPanel.DanmakuFontChanged();
+        if (before.Foreground != after.Foreground)
+            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.Foreground));
+        if (before.EnableWebView2 != after.EnableWebView2)
+            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.EnableWebView2));
+        if (before.LockWebView2 != after.LockWebView2)
+            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.LockWebView2));
+        if (before.TopMost != after.TopMost)
+            backgroundPanel.Vm.TopMost = after.TopMost; // 需要setter中设置OverlappedPresenter.IsAlwaysOnTop，所以不能直接用RaisePropertyChanged
     }
 
     #region 事件处理
@@ -121,50 +165,4 @@ public sealed partial class SettingsDialog : UserControl
     }
 
     #endregion
-
-    /// <summary>
-    /// <see cref="Selector.SelectionChanged" />、<see cref="ToggleSwitch.Toggled" />等事件在属性变化前触发，
-    /// 所以不能使用这些事件， 而是在保证属性变化后再去操作。此方法在<see cref="SettingsDialog" />关闭时调用
-    /// </summary>
-    /// <param name="before"></param>
-    /// <param name="after"></param>
-#pragma warning disable IDE0079 // 请删除不必要的忽略
-    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-#pragma warning restore IDE0079 // 请删除不必要的忽略
-    private void CompareChanges(AppConfig before, AppConfig after)
-    {
-        var backgroundPanel = Parent.To<BackgroundPanel>();
-        if (before.PlaybackRate != after.PlaybackRate)
-        {
-            DispatcherTimerHelper.ResetTimerInterval();
-            backgroundPanel.ResetProvider();
-            backgroundPanel.TrySetPlaybackRate();
-        }
-        else
-        {
-            if (before.RenderBefore != after.RenderBefore
-                || before.DanmakuDuration != after.DanmakuDuration
-                || before.DanmakuOpacity != after.DanmakuOpacity
-                || before.DanmakuScale != after.DanmakuScale
-                || before.DanmakuEnableOverlap != after.DanmakuEnableOverlap
-                || before.DanmakuCountRollLimit != after.DanmakuCountRollLimit
-                || before.DanmakuCountBottomLimit != after.DanmakuCountBottomLimit
-                || before.DanmakuCountTopLimit != after.DanmakuCountTopLimit
-                || before.DanmakuCountInverseLimit != after.DanmakuCountInverseLimit
-                || before.DanmakuCountM7Enable != after.DanmakuCountM7Enable)
-                backgroundPanel.ResetProvider();
-            if (before.PlayFramePerSecond != after.PlayFramePerSecond)
-                DispatcherTimerHelper.ResetTimerInterval();
-        }
-        if (before.DanmakuFont != after.DanmakuFont)
-            backgroundPanel.DanmakuFontChanged();
-        if (before.Foreground != after.Foreground)
-            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.Foreground));
-        if (before.EnableWebView2 != after.EnableWebView2)
-            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.EnableWebView2));
-        if (before.LockWebView2 != after.LockWebView2)
-            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.LockWebView2));
-        if (before.TopMost != after.TopMost)
-            backgroundPanel.Vm.TopMost = after.TopMost; // 需要setter中设置OverlappedPresenter.IsAlwaysOnTop，所以不能直接用RaisePropertyChanged
-    }
 }

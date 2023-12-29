@@ -75,7 +75,7 @@ public partial record Danmaku
         }
         return true;
 
-        bool TopDownRollCanBePlaced(RollNode? node, float startPos, [NotNullWhen(true)] out (double MostDistance, RollNode? LastNode, bool Overlapped)? outNode)
+        bool TopDownRollCanBePlaced(RollNode? node, float startPos, [NotNullWhen(true)] out (double MostDistance, RollNode LastNode, bool Overlapped)? outNode)
         {
             // 覆盖区间的时间都大于最长的距离，并且不超出屏幕高度。如果返回true，则一定是目前的最优位置
             // 如果不允许重叠，则就放在第一个可以不重叠放的区间
@@ -158,7 +158,7 @@ public partial record Danmaku
         list.Remove(lastNode);
         return true;
 
-        bool BottomUpRollCanBePlaced(RollNode? node, float startPos, [NotNullWhen(true)] out (double MostDistance, RollNode? LastNode, bool Overlapped)? outNode)
+        bool BottomUpRollCanBePlaced(RollNode? node, float startPos, [NotNullWhen(true)] out (double MostDistance, RollNode LastNode, bool Overlapped)? outNode)
         {
             var intervalLeastDistance = double.PositiveInfinity;
             outNode = null;
@@ -239,7 +239,7 @@ public partial record Danmaku
         }
         return true;
 
-        bool TopDownStaticCanBePlaced(StaticNode? node, float startPos, [NotNullWhen(true)] out (double LeastTime, StaticNode? LastNode, bool Overlapped)? outNode)
+        bool TopDownStaticCanBePlaced(StaticNode? node, float startPos, [NotNullWhen(true)] out (double LeastTime, StaticNode LastNode, bool Overlapped)? outNode)
         {
             // 覆盖区间的时间都低于最小的时间，并且不超出屏幕高度。如果返回true，则一定是目前的最优位置
             var intervalMostTime = 0d;
@@ -316,7 +316,7 @@ public partial record Danmaku
         list.Remove(lastNode);
         return true;
 
-        bool BottomUpStaticCanBePlaced(StaticNode? node, float startPos, [NotNullWhen(true)] out (double LeastTime, StaticNode? LastNode, bool Overlapped)? outNode)
+        bool BottomUpStaticCanBePlaced(StaticNode? node, float startPos, [NotNullWhen(true)] out (double LeastTime, StaticNode LastNode, bool Overlapped)? outNode)
         {
             var intervalMostTime = 0d;
             outNode = null;
@@ -344,5 +344,4 @@ public partial record Danmaku
     }
 
     #endregion
-
 }

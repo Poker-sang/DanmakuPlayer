@@ -12,15 +12,14 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class InputDialog : UserControl
 {
-    public InputDialog() => InitializeComponent();
-
-    private BiliHelper.CodeType _codeType;
+    private bool _cancel;
 
     private int? _cId;
 
-    private bool _cancel;
+    private BiliHelper.CodeType _codeType;
+    public InputDialog() => InitializeComponent();
 
-    private VideoPage[] ItemsSource { get; set; } = Array.Empty<VideoPage>();
+    private VideoPage[] ItemsSource { get; set; } = [];
 
     public async Task<int?> ShowAsync()
     {
@@ -64,7 +63,7 @@ public sealed partial class InputDialog : UserControl
         _cId = null;
         HideSecondButton(sender);
         e.Cancel = true;
-        _cancellationTokenSource.Cancel();
+        await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
         _codeType = InputBox.Text.Match(out var match);

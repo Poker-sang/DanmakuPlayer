@@ -8,7 +8,7 @@
 
 * 获取弹幕依赖 [protobuf-net](https://github.com/protobuf-net/protobuf-net) 库
 
-* 弹幕渲染使用 [vortice](https://github.com/amerkoleci/vortice) 的DirectX库
+* 弹幕渲染使用 [vortice](https://github.com/amerkoleci/Vortice.Windows) 的DirectX库
  
 * WebView2操作使用 [Playwright](https://github.com/microsoft/playwright-dotnet) 自动化
  

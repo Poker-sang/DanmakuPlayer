@@ -46,8 +46,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.230907" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.230907" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.1.1" />
         <PackageReference Include="Microsoft.Playwright" Version="1.40.0" />
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231115000" />

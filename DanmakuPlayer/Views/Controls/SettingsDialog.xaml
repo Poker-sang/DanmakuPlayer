@@ -2,23 +2,16 @@
     x:Class="DanmakuPlayer.Views.Controls.SettingsDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
     xmlns:system="using:System"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <Style
-            x:Key="FirstSettingHeaderStyle"
-            BasedOn="{StaticResource BodyStrongTextBlockStyle}"
-            TargetType="TextBlock">
-            <Style.Setters>
-                <Setter Property="Margin" Value="1,0,0,4" />
-            </Style.Setters>
-        </Style>
+        <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
         <Style
             x:Key="SettingHeaderStyle"
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
@@ -26,6 +19,17 @@
             <Style.Setters>
                 <Setter Property="Margin" Value="1,28,0,4" />
             </Style.Setters>
+        </Style>
+        <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
+        <Style
+            x:Key="SliderStyle"
+            BasedOn="{StaticResource DefaultSliderStyle}"
+            TargetType="Slider">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Minimum" Value="0" />
+            <Setter Property="SnapsTo" Value="Ticks" />
+            <Setter Property="TickFrequency" Value="1" />
+            <Setter Property="TickPlacement" Value="Outside" />
         </Style>
         <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <converters:CountLimitConverter x:Key="CountLimitConverter" />
@@ -36,16 +40,19 @@
         CloseButtonClick="CloseClick"
         DefaultButton="Close"
         PrimaryButtonClick="SetDefaultAppConfigClick">
-        <ScrollViewer>
+        <ScrollView>
             <StackPanel MinWidth="550">
                 <!--  应用设置  -->
-                <TextBlock x:Uid="/SettingsDialog/AppHeader" Style="{StaticResource FirstSettingHeaderStyle}" />
-                <labs:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander">
-                    <labs:SettingsExpander.HeaderIcon>
+                <TextBlock
+                    x:Uid="/SettingsDialog/AppHeader"
+                    Margin="1,0,0,4"
+                    Style="{StaticResource SettingHeaderStyle}" />
+                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander">
+                    <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE771;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard ContentAlignment="Left">
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard ContentAlignment="Left">
                             <RadioButtons SelectedIndex="{x:Bind Vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
                                 <RadioButton x:Uid="/SettingsDialog/RadioButtonSystemTheme">
                                     <RadioButton.Tag>
@@ -63,16 +70,16 @@
                                     </RadioButton.Tag>
                                 </RadioButton>
                             </RadioButtons>
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                <labs:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="Pin">
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="Pin">
                     <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
-                    <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <local:ColorPickerButton>
                         <local:ColorPickerButton.ColorPicker>
                             <ColorPicker
@@ -81,101 +88,93 @@
                                 Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
                         </local:ColorPickerButton.ColorPicker>
                     </local:ColorPickerButton>
-                </labs:SettingsCard>
+                </controls:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard">
-                    <labs:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE81C;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" />
-                </labs:SettingsCard>
+                </controls:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard">
-                    <labs:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEB9D;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <Slider
                         Maximum="20"
                         Minimum="1"
-                        StepFrequency="1"
-                        TickFrequency="5"
-                        TickPlacement="Outside"
+                        Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard">
-                    <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC57;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
                         StepFrequency="0.25"
-                        TickFrequency="0.5"
-                        TickPlacement="Outside"
+                        Style="{StaticResource SliderStyle}"
+                        TickFrequency="0.25"
                         Value="{x:Bind Vm.PlaybackRate, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard">
-                    <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE916;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <Slider
                         Maximum="100"
                         Minimum="5"
-                        StepFrequency="1"
-                        TickFrequency="20"
-                        TickPlacement="Outside"
+                        Style="{StaticResource SliderStyle}"
+                        TickFrequency="5"
                         Value="{x:Bind Vm.PlayFramePerSecond, Mode=TwoWay}" />
-                </labs:SettingsCard>
+                </controls:SettingsCard>
                 <!--  弹幕设置  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="Clock">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="Clock">
                     <Slider
                         Maximum="20"
                         Minimum="5"
-                        StepFrequency="1"
-                        TickFrequency="1"
-                        TickPlacement="Outside"
+                        Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard">
-                    <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEF3C;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <Slider
                         Maximum="1"
-                        Minimum="0.1"
-                        StepFrequency="0.1"
+                        Minimum="0.2"
+                        StepFrequency="0.2"
+                        Style="{StaticResource SliderStyle}"
                         TickFrequency="0.2"
-                        TickPlacement="Outside"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="Font">
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="Font">
                     <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="FontSize">
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="FontSize">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
-                        StepFrequency="0.1"
-                        TickFrequency="0.5"
-                        TickPlacement="Outside"
+                        StepFrequency="0.25"
+                        Style="{StaticResource SliderStyle}"
+                        TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander">
-                    <labs:SettingsExpander.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander">
+                    <controls:SettingsExpander.HeaderIcon>
                         <SymbolIcon Symbol="FontColor" />
-                    </labs:SettingsExpander.HeaderIcon>
+                    </controls:SettingsExpander.HeaderIcon>
                     <Slider
                         Maximum="5"
-                        Minimum="0"
-                        StepFrequency="1"
-                        TickFrequency="1"
-                        TickPlacement="Outside"
+                        Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuStrokeWidth, Mode=TwoWay}" />
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuStrokeColorCard" IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuStrokeColorCard" IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
                             <local:ColorPickerButton>
                                 <local:ColorPickerButton.ColorPicker>
                                     <ColorPicker
@@ -184,53 +183,45 @@
                                         Color="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
                                 </local:ColorPickerButton.ColorPicker>
                             </local:ColorPickerButton>
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
                 <!--  弹幕滤过  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander">
-                    <labs:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander">
+                    <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEA3C;" />
-                    </labs:SettingsExpander.HeaderIcon>
+                    </controls:SettingsExpander.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
-                                Minimum="0"
-                                StepFrequency="1"
-                                TickFrequency="2"
-                                TickPlacement="Outside"
+                                Style="{StaticResource SliderStyle}"
                                 Value="{x:Bind Vm.DanmakuMergeMaxDistance, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
-                                Minimum="0"
-                                StepFrequency="1"
-                                TickFrequency="2"
-                                TickPlacement="Outside"
+                                Style="{StaticResource SliderStyle}"
                                 Value="{x:Bind Vm.DanmakuMergeMaxCosine, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="60"
-                                Minimum="0"
-                                StepFrequency="5"
-                                TickFrequency="10"
-                                TickPlacement="Outside"
+                                Style="{StaticResource SliderStyle}"
+                                TickFrequency="5"
                                 Value="{x:Bind Vm.DanmakuMergeTimeSpan, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuMergeCrossMode, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="Filter">
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="Filter">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard
                             HorizontalContentAlignment="Stretch"
                             ContentAlignment="Vertical"
                             IsEnabled="{x:Bind Vm.DanmakuEnableRegex, Mode=OneWay}">
@@ -269,151 +260,134 @@
                                     </ListView.ItemTemplate>
                                 </ListView>
                             </StackPanel>
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard">
-                    <labs:SettingsCard.HeaderIcon>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF156;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander">
-                    <labs:SettingsExpander.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander">
+                    <controls:SettingsExpander.Resources>
+                        <Style
+                            x:Key="DanmakuCountLimitSliderStyle"
+                            BasedOn="{StaticResource SliderStyle}"
+                            TargetType="Slider">
+                            <Setter Property="Maximum" Value="100" />
+                            <Setter Property="Minimum" Value="-1" />
+                            <Setter Property="TickFrequency" Value="5" />
+                            <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource CountLimitConverter}" />
+                        </Style>
+                    </controls:SettingsExpander.Resources>
+                    <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xECA5;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard">
-                            <Slider
-                                Maximum="100"
-                                Minimum="-1"
-                                StepFrequency="1"
-                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
-                                TickFrequency="20"
-                                TickPlacement="Outside"
-                                Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
-                            <Slider
-                                Maximum="100"
-                                Minimum="-1"
-                                StepFrequency="1"
-                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
-                                TickFrequency="20"
-                                TickPlacement="Outside"
-                                Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard">
-                            <Slider
-                                Maximum="100"
-                                Minimum="-1"
-                                StepFrequency="1"
-                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
-                                TickFrequency="20"
-                                TickPlacement="Outside"
-                                Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard">
-                            <Slider
-                                Maximum="100"
-                                Minimum="-1"
-                                StepFrequency="1"
-                                ThumbToolTipValueConverter="{StaticResource CountLimitConverter}"
-                                TickFrequency="20"
-                                TickPlacement="Outside"
-                                Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard">
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard">
+                            <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
+                            <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard">
+                            <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard">
+                            <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
+                        </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
 
                 <!--  WebView2设置  -->
                 <TextBlock x:Uid="/SettingsDialog/WebView2Header" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="Globe">
+                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="Globe">
                     <ToggleSwitch IsOn="{x:Bind Vm.EnableWebView2, Mode=TwoWay}" />
-                </labs:SettingsCard>
-                <labs:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card">
-                    <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card">
+                    <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE72E;" />
-                    </labs:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
-                </labs:SettingsCard>
+                </controls:SettingsCard>
 
                 <!--  关于  -->
                 <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <labs:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}">
-                    <labs:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}">
+                    <controls:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE946;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
+                    </controls:SettingsExpander.HeaderIcon>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard
                             x:Uid="/SettingsDialog/MailCard"
                             Description="{x:Bind rs:ConstantStrings.Mail}"
                             HeaderIcon="Mail"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.MailToUri}"
                             Tapped="NavigateUriTapped">
-                            <labs:SettingsCard.ActionIcon>
+                            <controls:SettingsCard.ActionIcon>
                                 <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
-                        <labs:SettingsCard
+                            </controls:SettingsCard.ActionIcon>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard
                             x:Uid="/SettingsDialog/AuthorCard"
                             Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.AuthorUri}"
                             Tapped="NavigateUriTapped">
-                            <labs:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.GitHubSvgPath}" />
-                            </labs:SettingsCard.HeaderIcon>
-                            <labs:SettingsCard.ActionIcon>
+                            </controls:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
-                        <labs:SettingsCard
+                            </controls:SettingsCard.ActionIcon>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard
                             x:Uid="/SettingsDialog/QqCard"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.QqUri}"
                             Tapped="NavigateUriTapped">
-                            <labs:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.QqSvgPath}" />
-                            </labs:SettingsCard.HeaderIcon>
-                            <labs:SettingsCard.ActionIcon>
+                            </controls:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
-                        <labs:SettingsCard
+                            </controls:SettingsCard.ActionIcon>
+                        </controls:SettingsCard>
+                        <controls:SettingsCard
                             x:Uid="/SettingsDialog/RepositoryCard"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}"
                             Tapped="NavigateUriTapped">
-                            <labs:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE7B8;" />
-                            </labs:SettingsCard.HeaderIcon>
-                            <labs:SettingsCard.ActionIcon>
+                            </controls:SettingsCard.HeaderIcon>
+                            <controls:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                <labs:SettingsCard
+                            </controls:SettingsCard.ActionIcon>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+                <controls:SettingsCard
                     x:Uid="/SettingsDialog/LicenseCard"
                     IsClickEnabled="True"
                     Tag="{x:Bind rs:ConstantStrings.LicenseUri}"
                     Tapped="NavigateUriTapped">
-                    <labs:SettingsCard.HeaderIcon>
+                    <controls:SettingsCard.HeaderIcon>
                         <PathIcon Data="{x:Bind rs:ConstantStrings.GnuSvgPath}" />
-                    </labs:SettingsCard.HeaderIcon>
-                    <labs:SettingsCard.ActionIcon>
+                    </controls:SettingsCard.HeaderIcon>
+                    <controls:SettingsCard.ActionIcon>
                         <FontIcon Glyph="&#xE8A7;" />
-                    </labs:SettingsCard.ActionIcon>
-                </labs:SettingsCard>
+                    </controls:SettingsCard.ActionIcon>
+                </controls:SettingsCard>
             </StackPanel>
-        </ScrollViewer>
+        </ScrollView>
     </ContentDialog>
 </UserControl>

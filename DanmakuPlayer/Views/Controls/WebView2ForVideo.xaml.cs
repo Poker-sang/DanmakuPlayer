@@ -18,6 +18,13 @@ public class VideoEventArgs(ILocator Video) : EventArgs;
 [DependencyProperty<bool>("HasVideo")]
 public sealed partial class WebView2ForVideo : UserControl
 {
+    public WebView2ForVideo()
+    {
+        InitializeComponent();
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
+    }
+
     private WebView2 WebView2 => Content.To<WebView2>();
 
     private IPlaywright Pw { get; set; } = null!;
@@ -30,18 +37,11 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public event TypedEventHandler<WebView2ForVideo, VideoEventArgs>? VideoLoaded;
 
-    public WebView2ForVideo()
-    {
-        InitializeComponent();
-        Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
-    }
-
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await WebView2.EnsureCoreWebView2Async();
         Pw = await Playwright.CreateAsync();
-        Browser = await Pw.Chromium.ConnectOverCDPAsync("http://localhost:9222");
+        Browser = await Pw.Chromium.ConnectOverCDPAsync($"http://localhost:{App.RemoteDebuggingPort}");
         Page = Browser.Contexts[0].Pages[0];
     }
 
@@ -132,8 +132,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> IncreaseCurrentTimeAsync(double second)
     {
-        var duration = await Video!.EvaluateAsync($"video => video.currentTime += {second}");
-        return duration!.Value.GetDouble();
+        var currentTime = await Video!.EvaluateAsync($"video => video.currentTime += {second}");
+        return currentTime!.Value.GetDouble();
     }
 
     public async Task SetCurrentTimeAsync(double second)
@@ -143,8 +143,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> CurrentTimeAsync()
     {
-        var duration = await Video!.EvaluateAsync("video => video.currentTime")!;
-        return duration!.Value.GetDouble();
+        var currentTime = await Video!.EvaluateAsync("video => video.currentTime")!;
+        return currentTime!.Value.GetDouble();
     }
 
     #endregion
@@ -153,8 +153,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> IncreaseVolumeAsync(double volume)
     {
-        var duration = await Video!.EvaluateAsync($"video => video.volume += {volume / 100}");
-        return duration!.Value.GetDouble();
+        var v = await Video!.EvaluateAsync($"video => video.volume += {volume / 100}");
+        return v!.Value.GetDouble();
     }
 
     public async Task SetVolumeAsync(double volume)
@@ -164,14 +164,14 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> VolumeAsync()
     {
-        var duration = await Video!.EvaluateAsync("video => video.volume")!;
-        return duration!.Value.GetDouble() * 100;
+        var v = await Video!.EvaluateAsync("video => video.volume")!;
+        return v!.Value.GetDouble() * 100;
     }
 
     public async Task<double> IncreaseVolumePercentageAsync(double volume)
     {
-        var duration = await Video!.EvaluateAsync($"video => video.volume += {volume}");
-        return duration!.Value.GetDouble();
+        var v = await Video!.EvaluateAsync($"video => video.volume += {volume}");
+        return v!.Value.GetDouble();
     }
 
     public async Task SetVolumePercentageAsync(double volume)
@@ -181,8 +181,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<double> VolumePercentageAsync()
     {
-        var duration = await Video!.EvaluateAsync("video => video.volume")!;
-        return duration!.Value.GetDouble();
+        var v = await Video!.EvaluateAsync("video => video.volume")!;
+        return v!.Value.GetDouble();
     }
 
     #endregion
@@ -191,8 +191,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<bool> MutedFlipAsync()
     {
-        var duration = await Video!.EvaluateAsync("video => video.muted = !video.muted");
-        return duration!.Value.GetBoolean();
+        var muted = await Video!.EvaluateAsync("video => video.muted = !video.muted");
+        return muted!.Value.GetBoolean();
     }
 
     public async Task SetMutedAsync(bool muted)
@@ -202,8 +202,8 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task<bool> MutedAsync()
     {
-        var duration = await Video!.EvaluateAsync("video => video.muted");
-        return duration!.Value.GetBoolean();
+        var muted = await Video!.EvaluateAsync("video => video.muted");
+        return muted!.Value.GetBoolean();
     }
 
     #endregion
@@ -250,9 +250,10 @@ public sealed partial class WebView2ForVideo : UserControl
 
     #region PlaybackRate
 
-    public async Task PlaybackRateAsync()
+    public async Task<double> PlaybackRateAsync()
     {
-        _ = await Video!.EvaluateAsync("video => video.playbackRate");
+        var playbackRate = await Video!.EvaluateAsync("video => video.playbackRate");
+        return playbackRate!.Value.GetDouble();
     }
 
     public async Task SetPlaybackRateAsync(double playbackRate)

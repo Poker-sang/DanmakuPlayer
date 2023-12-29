@@ -13,18 +13,18 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuHelper
 {
+    private static int _renderCount;
+
     /// <summary>
     /// 弹幕池
     /// </summary>
-    public static Danmaku[] Pool { get; set; } = Array.Empty<Danmaku>();
+    public static Danmaku[] Pool { get; set; } = [];
 
     public static CreatorProvider Current { get; set; } = null!;
 
     public static RenderMode RenderType { get; set; }
 
     public static bool IsRendering { get; set; }
-
-    private static int _renderCount;
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {
@@ -84,7 +84,7 @@ public static class DanmakuHelper
         IsRendering = false;
     }
 
-    public static void ClearPool() => Pool = Array.Empty<Danmaku>();
+    public static void ClearPool() => Pool = [];
 
     public static async Task<int> Render(CanvasControl canvas, RenderMode renderType, CancellationToken token)
     {
@@ -107,12 +107,12 @@ public static class DanmakuHelper
 
         var firstIndex = Array.FindIndex(Pool, t => t.Time > time - actualDuration);
         if (firstIndex is -1)
-            return Array.Empty<Danmaku>();
+            return [];
         var lastIndex = Array.FindLastIndex(Pool, t => t.Time <= time);
 #pragma warning disable IDE0046 // 转换为条件表达式
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (lastIndex < firstIndex)
-            return Array.Empty<Danmaku>();
+            return [];
         return Pool[firstIndex..(lastIndex + 1)];
 #pragma warning restore IDE0046 // 转换为条件表达式
     }

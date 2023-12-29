@@ -21,6 +21,8 @@ public static class DanmakuCombiner
     /// </summary>
     private const string HalfAngleChars = @" 0123456789！@#$%^&*（）-=_+[]{}；'：""，./<>？\|`~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+    public const int MinDanmakuSize = 10;
+
     private static List<int> Gen2GramArray(string p)
     {
         p += p[0];
@@ -81,8 +83,6 @@ public static class DanmakuCombiner
         return (double)xy * xy / (x * y);
     }
 
-    public const int MinDanmakuSize = 10;
-
     private static bool Similarity(DanmakuString p, DanmakuString q, AppConfig appConfig)
     {
         // 全等
@@ -120,8 +120,6 @@ public static class DanmakuCombiner
 
         return false;
     }
-
-    private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
 
     public static async Task<IEnumerable<Danmaku>> Combine(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
     {
@@ -210,4 +208,6 @@ public static class DanmakuCombiner
                 return ret;
             }, token);
     }
+
+    private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
 }

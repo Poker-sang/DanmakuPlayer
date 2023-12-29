@@ -6,6 +6,7 @@ using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using WinUI3Utilities;
+using ISwapChainPanelNative = Vortice.WinUI.ISwapChainPanelNative;
 
 namespace DanmakuPlayer.Services;
 
@@ -21,7 +22,7 @@ public static class SwapChainPanelHelper
         _d3D12Device = CreateDevice(out _dxgiFactory5, out _dxgiAdapter1);
         _dxgiSwapChain1 = CreateSwapChain(0, _d3D12Device, _dxgiFactory5);
 
-        var panelNative = ComObject.As<Vortice.WinUI.ISwapChainPanelNative>(swapChainPanel);
+        var panelNative = ComObject.As<ISwapChainPanelNative>(swapChainPanel);
         _ = panelNative.SetSwapChain(_dxgiSwapChain1);
 
         var exStyle = (User32.WindowStylesEx)User32.GetWindowLong(hWnd, User32.WindowLongFlags.GWL_EXSTYLE);

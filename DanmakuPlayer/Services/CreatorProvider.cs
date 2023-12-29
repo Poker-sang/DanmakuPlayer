@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -10,47 +11,68 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 
 namespace DanmakuPlayer.Services;
 
-public class CreatorProvider : IDisposable
+public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisposable
 {
-    public CreatorProvider(CanvasControl creator, AppConfig appConfig)
-    {
-        Creator = creator;
-        AppConfig = appConfig;
-        ViewWidth = creator.ActualWidth;
-        ViewHeight = creator.ActualHeight;
-    }
+    public ICanvasResourceCreator Creator { get; } = creator;
 
-    public ICanvasResourceCreator Creator { get; }
+    public AppConfig AppConfig { get; } = appConfig;
 
-    public AppConfig AppConfig { get; }
+    public double ViewWidth { get; } = creator.ActualWidth;
 
-    public double ViewWidth { get; }
-
-    public double ViewHeight { get; }
+    public double ViewHeight { get; } = creator.ActualHeight;
 
     /// <summary>
     /// 颜色和对应笔刷
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/></remarks>
-    public Dictionary<uint, CanvasSolidColorBrush> Brushes { get; } = new();
+    public Dictionary<uint, CanvasSolidColorBrush> Brushes { get; } = [];
 
     /// <summary>
     /// 字号和对应字体格式
     /// </summary>
     /// <remarks>依赖于<see cref="DanmakuPlayer.AppConfig.DanmakuFont"/></remarks>
-    public static Dictionary<float, CanvasTextFormat> Formats { get; } = new();
+    public static Dictionary<float, CanvasTextFormat> Formats { get; } = [];
 
     /// <summary>
     /// 内容和对应渲染布局
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, CanvasTextLayout> Layouts { get; } = new();
+    public Dictionary<string, CanvasTextLayout> Layouts { get; } = [];
 
     /// <summary>
     /// 渲染布局描边
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
-    public Dictionary<string, CanvasGeometry> Geometries { get; } = new();
+    public Dictionary<string, CanvasGeometry> Geometries { get; } = [];
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        foreach (var brush in Brushes)
+            brush.Value.Dispose();
+        Brushes.Clear();
+
+        ClearLayouts();
+    }
+
+    public static void DisposeFormats()
+    {
+        foreach (var format in Formats)
+            format.Value.Dispose();
+        Formats.Clear();
+    }
+
+    public void ClearLayouts()
+    {
+        foreach (var layout in Layouts)
+            layout.Value.Dispose();
+        foreach (var geometry in Geometries)
+            geometry.Value.Dispose();
+        LayoutsCounter.Clear();
+        Layouts.Clear();
+        Geometries.Clear();
+    }
 
     #region 计数器
 
@@ -58,19 +80,19 @@ public class CreatorProvider : IDisposable
     /// 内容和对应渲染布局的引用计数
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, int> LayoutsCounter { get; } = new();
+    public Dictionary<string, int> LayoutsCounter { get; } = [];
 
     public void AddLayoutRef(Danmaku danmaku)
     {
         var danmakuString = danmaku.ToString();
-        if (!LayoutsCounter.ContainsKey(danmakuString))
+        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(LayoutsCounter, danmakuString, out var exists);
+        if (!exists)
         {
-            LayoutsCounter[danmakuString] = 0;
-            Layouts[danmakuString] = GetNewLayout(danmaku);
+            var newLayout = Layouts[danmakuString] = GetNewLayout(danmaku);
             if (AppConfig.DanmakuEnableStrokes)
-                Geometries[danmakuString] = CanvasGeometry.CreateText(Layouts[danmakuString]);
+                Geometries[danmakuString] = CanvasGeometry.CreateText(newLayout);
         }
-        ++LayoutsCounter[danmakuString];
+        ++count;
     }
 
     public void ClearLayoutRefCount()
@@ -121,33 +143,4 @@ public class CreatorProvider : IDisposable
     }
 
     #endregion
-
-    public static void DisposeFormats()
-    {
-        foreach (var format in Formats)
-            format.Value.Dispose();
-        Formats.Clear();
-    }
-
-    public void ClearLayouts()
-    {
-        foreach (var layout in Layouts)
-            layout.Value.Dispose();
-        foreach (var geometry in Geometries)
-            geometry.Value.Dispose();
-        LayoutsCounter.Clear();
-        Layouts.Clear();
-        Geometries.Clear();
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-
-        foreach (var brush in Brushes)
-            brush.Value.Dispose();
-        Brushes.Clear();
-
-        ClearLayouts();
-    }
 }
