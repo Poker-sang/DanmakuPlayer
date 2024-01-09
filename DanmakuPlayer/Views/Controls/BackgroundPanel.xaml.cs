@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.UI;
+using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
@@ -23,11 +24,10 @@ using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
-using RenderMode = DanmakuPlayer.Enums.RenderMode;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class BackgroundPanel : SwapChainPanel
+public sealed partial class BackgroundPanel : Grid
 {
     public BackgroundPanel()
     {
@@ -39,7 +39,6 @@ public sealed partial class BackgroundPanel : SwapChainPanel
         };
 
         InitializeComponent();
-        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
         AppContext.DanmakuCanvas = DanmakuCanvas;
 
         DispatcherTimerHelper.Tick += TimerTick;
@@ -230,7 +229,12 @@ public sealed partial class BackgroundPanel : SwapChainPanel
 
     #region 事件处理
 
-    #region SwapChainPanel事件
+    #region Grid事件
+
+    private void RootLoaded(object sender, RoutedEventArgs e)
+    {
+        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
+    }
 
     private void MaximizeRestoreTapped(object sender, RoutedEventArgs e)
     {

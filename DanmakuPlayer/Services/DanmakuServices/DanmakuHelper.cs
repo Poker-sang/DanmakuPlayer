@@ -7,7 +7,6 @@ using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
-using Vanara.Extensions;
 
 namespace DanmakuPlayer.Services.DanmakuServices;
 
@@ -28,19 +27,19 @@ public static class DanmakuHelper
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {
-        if (RenderType.IsFlagSet(RenderMode.RenderInit))
+        if ((RenderType & RenderMode.RenderInit) > 0)
         {
-            if (RenderType.IsFlagSet(RenderMode.ReloadProvider))
+            if ((RenderType & RenderMode.ReloadProvider) > 0)
             {
-                if (RenderType.IsFlagSet(RenderMode.ReloadFormats))
+                if ((RenderType & RenderMode.ReloadFormats) > 0)
                 {
                     CreatorProvider.DisposeFormats();
-                    RenderType = RenderType.SetFlags(RenderMode.ReloadFormats, false);
+                    RenderType &= ~RenderMode.ReloadFormats;
                 }
 
                 Current.Dispose();
                 Current = new(sender, appConfig);
-                RenderType = RenderType.SetFlags(RenderMode.ReloadProvider, false);
+                RenderType &= ~RenderMode.ReloadProvider;
             }
 
             var context = new DanmakuContext((float)sender.ActualHeight, appConfig);
@@ -55,10 +54,10 @@ public static class DanmakuHelper
                 Current.ClearLayouts();
 
             _renderCount = count;
-            RenderType = RenderType.SetFlags(RenderMode.RenderInit, false);
+            RenderType &= ~RenderMode.RenderInit;
         }
 
-        if (RenderType.IsFlagSet(RenderMode.RenderOnce) || RenderType.IsFlagSet(RenderMode.RenderAlways))
+        if ((RenderType & RenderMode.RenderOnce) > 0 || (RenderType & RenderMode.RenderAlways) > 0)
         {
             e.DrawingSession.Clear(Colors.Transparent);
 
@@ -77,8 +76,8 @@ public static class DanmakuHelper
                 Current.ClearUnusedLayoutRef();
             }
 
-            if (RenderType.IsFlagSet(RenderMode.RenderOnce))
-                RenderType = RenderType.SetFlags(RenderMode.RenderOnce, false);
+            if ((RenderType & RenderMode.RenderOnce) > 0)
+                RenderType &= ~RenderMode.RenderOnce;
         }
 
         IsRendering = false;

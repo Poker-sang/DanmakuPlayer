@@ -8,7 +8,7 @@
 
 * 获取弹幕依赖 [protobuf-net](https://github.com/protobuf-net/protobuf-net) 库
 
-* 弹幕渲染使用 [vortice](https://github.com/amerkoleci/Vortice.Windows) 的DirectX库
+* 弹幕渲染使用 [Win2D](https://github.com/Microsoft/Win2D) 库
  
 * WebView2操作使用 [Playwright](https://github.com/microsoft/playwright-dotnet) 自动化
  
@@ -131,7 +131,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.50
+版本：3.51
 
 ## 联系方式
 

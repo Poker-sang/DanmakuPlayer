@@ -3,6 +3,7 @@ using DanmakuPlayer.Services;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using WinUI3Utilities;
+using WinUIEx;
 
 namespace DanmakuPlayer;
 
@@ -12,7 +13,7 @@ public partial class App : Application
 
     public static MainWindow Window { get; set; } = null!;
 
-    public static OverlappedPresenter OverlappedPresenter => Window.AppWindow.Presenter.To<OverlappedPresenter>();
+    public static OverlappedPresenter OverlappedPresenter => Window.OverlappedPresenter;
 
     public App()
     {
@@ -24,13 +25,15 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        new MainWindow().Initialize(new()
+        Window = new() { SystemBackdrop = new TransparentTintBackdrop() };
+        Window.Initialize(new()
         {
             Size = WindowHelper.EstimatedWindowSize(),
             ExtendTitleBar = true,
-            BackdropType = BackdropType.None,
+            BackdropType = BackdropType.Maintain,
             Title = nameof(DanmakuPlayer)
         });
         Window.RegisterUnhandledExceptionHandler();
+        Window.Activate();
     }
 }
