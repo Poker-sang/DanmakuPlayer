@@ -47,8 +47,9 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private async void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        await Browser.DisposeAsync();
-        Pw.Dispose();
+        if (Browser is { } browser)
+            await browser.DisposeAsync();
+        Pw?.Dispose();
     }
 
     public async Task GotoAsync(string url)
@@ -238,7 +239,7 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task PlayAsync()
     {
-         _ = await Video!.EvaluateAsync("video => video.play()");
+        _ = await Video!.EvaluateAsync("video => video.play()");
     }
 
     public async Task PauseAsync()

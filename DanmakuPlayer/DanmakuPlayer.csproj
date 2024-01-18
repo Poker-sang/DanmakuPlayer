@@ -83,14 +83,10 @@
     </Target>
     <ItemGroup>
         <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemGroup" />
-        <None Remove="Resources\zh-Hans\AppInfo.resw" />
-        <None Remove="Resources\zh-Hans\MainPanel.resw" />
-        <None Remove="Resources\zh-Hans\SettingsDialog.resw" />
-        <None Remove="Resources\zh-Hans\InputDialog.resw" />
-        <PRIResource Include="Resources\zh-Hans\AppInfo.resw" />
-        <PRIResource Include="Resources\zh-Hans\InputDialog.resw" />
-        <PRIResource Include="Resources\zh-Hans\MainPanel.resw" />
-        <PRIResource Include="Resources\zh-Hans\SettingsDialog.resw" />
+        <PRIResource Include="Strings\zh-Hans\AppInfo.resw" />
+        <PRIResource Include="Strings\zh-Hans\InputDialog.resw" />
+        <PRIResource Include="Strings\zh-Hans\MainPanel.resw" />
+        <PRIResource Include="Strings\zh-Hans\SettingsDialog.resw" />
     </ItemGroup>
 
     <!-- 
