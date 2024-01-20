@@ -47,15 +47,15 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.230907" />
-        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.230907" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.1.1" />
-        <PackageReference Include="Microsoft.Playwright" Version="1.40.0" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231115000" />
+        <PackageReference Include="Microsoft.Playwright" Version="1.41.1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231219000" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
-        <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+        <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
-        <PackageReference Include="WinUI3Utilities" Version="1.1.5.3" />
+        <PackageReference Include="WinUI3Utilities" Version="1.1.5.6" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
         <PackageReference Include="protobuf-net" Version="3.2.30" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />
@@ -83,10 +83,10 @@
     </Target>
     <ItemGroup>
         <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemGroup" />
-        <PRIResource Include="Strings\zh-Hans\AppInfo.resw" />
-        <PRIResource Include="Strings\zh-Hans\InputDialog.resw" />
-        <PRIResource Include="Strings\zh-Hans\MainPanel.resw" />
-        <PRIResource Include="Strings\zh-Hans\SettingsDialog.resw" />
+        <PRIResource Include="Strings\zh-Hans\AppInfo.resjson" />
+        <PRIResource Include="Strings\zh-Hans\InputDialog.resjson" />
+        <PRIResource Include="Strings\zh-Hans\MainPanel.resjson" />
+        <PRIResource Include="Strings\zh-Hans\SettingsDialog.resjson" />
     </ItemGroup>
 
     <!-- 
