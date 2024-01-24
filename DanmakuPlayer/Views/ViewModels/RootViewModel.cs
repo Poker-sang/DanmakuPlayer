@@ -27,6 +27,8 @@ public partial class RootViewModel : ObservableObject
 
     [ObservableProperty] private double _volume;
 
+    [ObservableProperty] private bool _loadingDanmaku;
+
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
     public bool LockWebView2

@@ -104,21 +104,21 @@ public partial record Danmaku(
         switch (Mode)
         {
             case DanmakuMode.Roll:
-                if (!TopDownRollDanmaku(provider, context.RollRoom, OverlapPredicate))
+                if (!TopDownRollDanmaku(provider, context.RollRoom, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 break;
             case DanmakuMode.Bottom:
-                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
+                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 _showPositionX = (float)(provider.ViewWidth - LayoutWidth) / 2;
                 break;
             case DanmakuMode.Top:
-                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, OverlapPredicate))
+                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 _showPositionX = (float)(provider.ViewWidth - LayoutWidth) / 2;
                 break;
             case DanmakuMode.Inverse:
-                if (!TopDownRollDanmaku(provider, context.InverseRoom, OverlapPredicate))
+                if (!TopDownRollDanmaku(provider, context.InverseRoom, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 break;
             default:

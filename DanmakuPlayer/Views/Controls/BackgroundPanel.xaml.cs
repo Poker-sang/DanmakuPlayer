@@ -298,13 +298,15 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void ImportTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (await DialogInput.ShowAsync() is not { } cId)
-            return;
-
-        RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
-
         try
         {
+            Vm.LoadingDanmaku = true;
+
+            if (await DialogInput.ShowAsync() is not { } cId)
+                return;
+
+            RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
+
             await LoadDanmaku(async token =>
             {
                 var tempPool = new List<Danmaku>();
@@ -325,17 +327,30 @@ public sealed partial class BackgroundPanel : Grid
             Debug.WriteLine(ex);
             RootTeachingTip.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, TeachingTipSeverity.Error, ex.Message);
         }
+        finally
+        {
+            Vm.LoadingDanmaku = false;
+        }
     }
 
     private async void FileTapped(object sender, TappedRoutedEventArgs e)
     {
-        var file = await App.Window.PickSingleFileAsync();
-        if (file is not null)
-            await LoadDanmaku(async token =>
-            {
-                await using var stream = File.OpenRead(file.Path);
-                return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
-            });
+        try
+        {
+            Vm.LoadingDanmaku = true;
+
+            var file = await App.Window.PickSingleFileAsync();
+            if (file is not null)
+                await LoadDanmaku(async token =>
+                {
+                    await using var stream = File.OpenRead(file.Path);
+                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
+                });
+        }
+        finally
+        {
+            Vm.LoadingDanmaku = false;
+        }
     }
 
     #endregion

@@ -12,14 +12,13 @@ public partial record Danmaku
 {
     private double GetDistance(CreatorProvider provider, IDanmakuWidth previous)
     {
-        var endTime = previous.Time + provider.AppConfig.DanmakuActualDuration;
+        var time = LayoutWidth <= previous.LayoutWidth
+            ? Time
+            : previous.Time + provider.AppConfig.DanmakuActualDuration;
 
-        return (LayoutWidth <= previous.LayoutWidth
-                   ? GetPosition(previous, Time) - GetPosition(this, Time)
-                   : GetPosition(previous, endTime) - GetPosition(this, endTime))
-               - previous.LayoutWidth;
+        return GetPosition(previous, time) - GetPosition(this, time) - previous.LayoutWidth;
 
-        // 末端位置
+        // 弹幕左边缘距离屏幕右边缘的距离
         double GetPosition(IDanmakuWidth danmaku, float t) => (t - danmaku.Time) * (provider.ViewWidth + danmaku.LayoutWidth) / provider.AppConfig.DanmakuActualDuration;
     }
 
@@ -30,12 +29,13 @@ public partial record Danmaku
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="list"></param>
+    /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool TopDownRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, Func<bool, bool> overlapPredicate)
+    private bool TopDownRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
-        // 所有区间中，最大距离
-        var mostDistance = double.NegativeInfinity;
+        // 目前可用区间中，距离上条弹幕的最大距离
+        var mostDistance = allowOverlap ? double.NegativeInfinity : 0;
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
@@ -48,7 +48,7 @@ public partial record Danmaku
         var overlap = true;
         for (var current = list.First; current is not null; current = current.Next)
         {
-            // 循环中一定会进一次该if分支
+            // 如果允许重叠，循环中一定会进一次该if分支
             if (TopDownRollCanBePlaced(current, lastPos, out var outNode))
             {
                 firstNode = current;
@@ -63,6 +63,7 @@ public partial record Danmaku
         }
 
         // 如果重叠了，去判断是否可以重叠
+        // 如果firstNode为null则overlap也是默认值true，并且此时一定不允许重叠，故此处一定会为true并且返回
         if (overlapPredicate(overlap))
             return false;
 
@@ -86,11 +87,11 @@ public partial record Danmaku
             {
                 var distance = GetDistance(provider, node.Value.Danmaku);
                 // 小于目前最小距离
-                if (distance < mostDistance)
+                if (distance <= mostDistance)
                     return false;
                 // 在连续区间取最短距离作为距离
                 intervalLeastDistance = Math.Min(intervalLeastDistance, distance);
-                if (_layoutHeight < node.Value.BottomPos - startPos)
+                if (_layoutHeight <= node.Value.BottomPos - startPos)
                 {
                     outNode = new()
                     {
@@ -113,12 +114,13 @@ public partial record Danmaku
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="list"></param>
+    /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool BottomUpRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, Func<bool, bool> overlapPredicate)
+    private bool BottomUpRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
-        // 所有区间中，最大距离
-        var mostDistance = double.NegativeInfinity;
+        // 目前可用区间中，距离上条弹幕的最大距离
+        var mostDistance = allowOverlap ? double.NegativeInfinity : 0;
         // 插入的第一个区间（靠下）
         var firstNode = (RollNode?)null;
         // 插入的最后一个区间（靠上）
@@ -131,7 +133,7 @@ public partial record Danmaku
         {
             // 本区间开始位置
             var lastPos = current.Value.BottomPos;
-            // 循环中一定会进一次该if分支
+            // 如果允许重叠，循环中一定会进一次该if分支
             if (BottomUpRollCanBePlaced(current, lastPos, out var outNode))
             {
                 firstNode = current;
@@ -144,6 +146,8 @@ public partial record Danmaku
             }
         }
 
+        // 如果重叠了，去判断是否可以重叠
+        // 如果firstNode为null则overlap也是默认值true，并且此时一定不允许重叠，故此处一定会为true并且返回
         if (overlapPredicate(overlap))
             return false;
 
@@ -166,11 +170,11 @@ public partial record Danmaku
             {
                 var distance = GetDistance(provider, node.Value.Danmaku);
                 // 小于目前最小距离
-                if (distance < mostDistance)
+                if (distance <= mostDistance)
                     return false;
                 // 在连续区间取最短距离作为距离
                 intervalLeastDistance = Math.Min(intervalLeastDistance, distance);
-                if (_layoutHeight < startPos - (node.Previous?.Value.BottomPos ?? 0))
+                if (_layoutHeight <= startPos - (node.Previous?.Value.BottomPos ?? 0))
                 {
                     outNode = new()
                     {
@@ -196,12 +200,13 @@ public partial record Danmaku
     /// </summary>
     /// <param name="list"></param>
     /// <param name="occupyTime"></param>
+    /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool TopDownStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, Func<bool, bool> overlapPredicate)
+    private bool TopDownStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
-        // 所有区间中，最短的显示时间
-        var leastTime = double.PositiveInfinity;
+        // 目前可用区间中，上条弹幕最短的显示时间
+        var leastTime = allowOverlap ? double.PositiveInfinity : Time;
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
@@ -214,7 +219,7 @@ public partial record Danmaku
         var overlap = true;
         for (var current = list.First; current is not null; current = current.Next)
         {
-            // 循环中一定会进一次该if分支
+            // 如果允许重叠，循环中一定会进一次该if分支
             if (TopDownStaticCanBePlaced(current, lastPos, out var outNode))
             {
                 firstNode = current;
@@ -227,6 +232,8 @@ public partial record Danmaku
             lastPos = current.Value.BottomPos;
         }
 
+        // 如果重叠了，去判断是否可以重叠
+        // 如果firstNode为null则overlap也是默认值true，并且此时一定不允许重叠，故此处一定会为true并且返回
         if (overlapPredicate(overlap))
             return false;
 
@@ -247,10 +254,10 @@ public partial record Danmaku
             for (; node is not null; node = node.Next)
             {
                 // 高于目前最小时间
-                if (node.Value.Time > leastTime)
+                if (node.Value.Time >= leastTime)
                     return false;
                 intervalMostTime = Math.Max(intervalMostTime, node.Value.Time);
-                if (_layoutHeight < node.Value.BottomPos - startPos)
+                if (_layoutHeight <= node.Value.BottomPos - startPos)
                 {
                     outNode = new()
                     {
@@ -273,11 +280,12 @@ public partial record Danmaku
     /// <param name="list"></param>
     /// <param name="occupyTime"></param>
     /// <param name="overlapPredicate"></param>
+    /// <param name="allowOverlap"></param>
     /// <returns></returns>
-    private bool BottomUpStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, Func<bool, bool> overlapPredicate)
+    private bool BottomUpStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
-        // 所有区间中，最短的显示时间
-        var leastTime = double.PositiveInfinity;
+        // 目前可用区间中，上条弹幕最短的显示时间
+        var leastTime = allowOverlap ? double.PositiveInfinity : Time;
         // 插入的第一个区间（靠下）
         var firstNode = (StaticNode?)null;
         // 插入的最后一个区间（靠上）
@@ -290,7 +298,7 @@ public partial record Danmaku
         {
             // 本区间开始位置
             var lastPos = current.Value.BottomPos;
-            // 循环中一定会进一次该if分支
+            // 如果允许重叠，循环中一定会进一次该if分支
             if (BottomUpStaticCanBePlaced(current, lastPos, out var outNode))
             {
                 firstNode = current;
@@ -302,6 +310,8 @@ public partial record Danmaku
             }
         }
 
+        // 如果重叠了，去判断是否可以重叠
+        // 如果firstNode为null则overlap也是默认值true，并且此时一定不允许重叠，故此处一定会为true并且返回
         if (overlapPredicate(overlap))
             return false;
 
@@ -323,10 +333,10 @@ public partial record Danmaku
             for (; node is not null; node = node.Previous)
             {
                 // 高于目前最小时间
-                if (node.Value.Time > leastTime)
+                if (node.Value.Time >= leastTime)
                     return false;
                 intervalMostTime = Math.Max(intervalMostTime, node.Value.Time);
-                if (_layoutHeight < startPos - (node.Previous?.Value.BottomPos ?? 0))
+                if (_layoutHeight <= startPos - (node.Previous?.Value.BottomPos ?? 0))
                 {
                     outNode = new()
                     {
