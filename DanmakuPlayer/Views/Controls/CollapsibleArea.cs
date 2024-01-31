@@ -25,13 +25,13 @@ public sealed class CollapsibleArea : ContentControl
 
     public void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        base.OnPointerEntered(e);
+        OnPointerEntered(e);
         sender.To<Border>().Child.To<UIElement>().Visibility = Visibility.Visible;
     }
 
     public void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
-        base.OnPointerExited(e);
+        OnPointerExited(e);
         sender.To<Border>().Child.To<UIElement>().Visibility = Visibility.Collapsed;
     }
 }

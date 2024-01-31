@@ -433,7 +433,6 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void Sync()
     {
-        _ = await WebView.TryLoadVideoAsync();
         if (WebView.HasVideo)
         {
             Vm.Time = await WebView.CurrentTimeAsync();
@@ -471,7 +470,11 @@ public sealed partial class BackgroundPanel : Grid
             await WebView.SetVolumeAsync(Vm.Volume);
     }
 
-    private void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e) => Sync();
+    private async void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await WebView.LoadVideoAsync();
+        Sync();
+    }
 
     private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e)
     {

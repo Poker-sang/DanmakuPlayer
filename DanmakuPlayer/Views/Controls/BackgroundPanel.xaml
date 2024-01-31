@@ -101,7 +101,8 @@
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     QueryIcon="Send"
-                    QuerySubmitted="AddressBoxOnQuerySubmitted" />
+                    QuerySubmitted="AddressBoxOnQuerySubmitted"
+                    Text="{x:Bind WebView.Url, Mode=OneWay}" />
             </Grid>
             <CommandBar
                 Grid.Row="0"
@@ -136,6 +137,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -148,7 +150,7 @@
             <Slider
                 Grid.Row="1"
                 Grid.Column="0"
-                Grid.ColumnSpan="5"
+                Grid.ColumnSpan="6"
                 Margin="10,0"
                 VerticalAlignment="Center"
                 IsTabStop="False"
@@ -223,10 +225,14 @@
                     </TextBox.KeyboardAccelerators>
                 </TextBox>
             </Grid>
+            <ProgressRing
+                Grid.Row="2"
+                Grid.Column="2"
+                IsActive="{x:Bind WebView.IsLoading, Mode=OneWay}" />
 
             <CommandBar
                 Grid.Row="2"
-                Grid.Column="3"
+                Grid.Column="4"
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton>
                     <AppBarButton.Icon>
@@ -246,7 +252,7 @@
             </CommandBar>
             <CommandBar
                 Grid.Row="2"
-                Grid.Column="4"
+                Grid.Column="5"
                 OverflowButtonVisibility="Collapsed"
                 Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                 <AppBarButton Icon="Volume">
