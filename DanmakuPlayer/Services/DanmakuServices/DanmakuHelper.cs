@@ -27,11 +27,11 @@ public static class DanmakuHelper
 
     public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
     {
-        if ((RenderType & RenderMode.RenderInit) > 0)
+        if ((RenderType & RenderMode.RenderInit) is not 0)
         {
-            if ((RenderType & RenderMode.ReloadProvider) > 0)
+            if ((RenderType & RenderMode.ReloadProvider) is not 0)
             {
-                if ((RenderType & RenderMode.ReloadFormats) > 0)
+                if ((RenderType & RenderMode.ReloadFormats) is not 0)
                 {
                     CreatorProvider.DisposeFormats();
                     RenderType &= ~RenderMode.ReloadFormats;
@@ -57,7 +57,7 @@ public static class DanmakuHelper
             RenderType &= ~RenderMode.RenderInit;
         }
 
-        if ((RenderType & RenderMode.RenderOnce) > 0 || (RenderType & RenderMode.RenderAlways) > 0)
+        if ((RenderType & RenderMode.RenderOnce) is not 0 || (RenderType & RenderMode.RenderAlways) is not 0)
         {
             e.DrawingSession.Clear(Colors.Transparent);
 
@@ -76,7 +76,7 @@ public static class DanmakuHelper
                 Current.ClearUnusedLayoutRef();
             }
 
-            if ((RenderType & RenderMode.RenderOnce) > 0)
+            if ((RenderType & RenderMode.RenderOnce) is not 0)
                 RenderType &= ~RenderMode.RenderOnce;
         }
 

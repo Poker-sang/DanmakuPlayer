@@ -22,7 +22,10 @@ public static class DispatcherTimerHelper
         }
     }
 
-    public static void ResetTimerInterval() => Timer.Interval = TimeSpan.FromSeconds(1d / AppContext.AppConfig.PlayFramePerSecond);
+    public static void ResetTimerInterval()
+    {
+        Timer.Interval = TimeSpan.FromSeconds(1d / AppContext.AppConfig.PlayFramePerSecond);
+    }
 
     public static event EventHandler<object> Tick
     {

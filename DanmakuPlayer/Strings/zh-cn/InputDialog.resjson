@@ -1,9 +1,9 @@
 {
-  "InputDialog/Title": "在线获取弹幕",
-  "InputDialog/PrimaryButtonText": "获取视频弹幕",
-  "InputDialog/CloseButtonText": "取消",
-  "InputBox/PlaceholderText": "输入视频的网址",
-  "PleaseSelectAVideo": "请选择一个视频：",
-  "SelectThisVideo": "选择此视频",
-  "VideoUnmatched": "未匹配到相应的视频！"
+    "InputDialog/Title": "在线获取弹幕",
+    "InputDialog/PrimaryButtonText": "获取视频弹幕",
+    "InputDialog/CloseButtonText": "取消",
+    "InputBox/PlaceholderText": "输入视频的网址",
+    "PleaseSelectAVideo": "请选择一个视频：",
+    "SelectThisVideo": "选择此视频",
+    "VideoUnmatched": "未匹配到相应的视频！"
 }

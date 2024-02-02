@@ -38,23 +38,23 @@
         IsHitTestVisible="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
         KeyboardAcceleratorPlacementMode="Hidden"
         VideoLoaded="WebViewOnPageLoaded"
-        Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-        <local:WebView2ForVideo.KeyboardAccelerators>
-            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
-            <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
-            <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
-            <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
-            <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
-            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
-        </local:WebView2ForVideo.KeyboardAccelerators>
-    </local:WebView2ForVideo>
+        Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
     <xaml:CanvasControl
         x:Name="DanmakuCanvas"
         Grid.Row="0"
         Grid.RowSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        IsHitTestVisible="False" />
+        IsHitTestVisible="False">
+        <xaml:CanvasControl.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+            <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
+            <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
+            <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
+            <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
+            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
+        </xaml:CanvasControl.KeyboardAccelerators>
+    </xaml:CanvasControl>
 
     <local:CollapsibleArea Grid.Row="0" Grid.Column="2">
         <Grid>
@@ -147,7 +147,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Slider
+            <local:VideoSlider
                 Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="6"
@@ -158,7 +158,8 @@
                 Minimum="0"
                 StepFrequency="0.1"
                 ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
-                Value="{x:Bind Vm.Time, Mode=TwoWay}" />
+                UserValue="{x:Bind Vm.Time, Mode=TwoWay}"
+                UserValueChangedByManipulation="VideoSliderOnUserValueChangedByManipulation" />
             <CommandBar
                 Grid.Row="2"
                 Grid.Column="0"
@@ -195,7 +196,7 @@
                     Margin="0"
                     Orientation="Horizontal"
                     Spacing="5"
-                    Visibility="{x:Bind Vm.NavigateEditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                    Visibility="{x:Bind Vm.NegativeEditingTime, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                     <TextBlock
                         VerticalAlignment="Center"
                         Text="{x:Bind Vm.Time, Converter={StaticResource DoubleToTimeTextConverter}, Mode=OneWay}"
@@ -233,19 +234,20 @@
             <CommandBar
                 Grid.Row="2"
                 Grid.Column="4"
+                DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton>
+                <AppBarButton Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEC57;" />
                     </AppBarButton.Icon>
                     <AppBarButton.Flyout>
                         <MenuFlyout Placement="Top">
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="2.0" />
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.5" />
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.25" />
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="1.0" />
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="0.75" />
-                            <MenuFlyoutItem Tapped="PlaybackRateOnTapped" Text="0.5" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="2.0" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.5" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.25" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.0" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="0.75" />
+                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="0.5" />
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
