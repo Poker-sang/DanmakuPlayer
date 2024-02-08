@@ -34,6 +34,7 @@
         <converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <converters:CountLimitConverter x:Key="CountLimitConverter" />
         <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
+        <converters:StringToFontFamilyConverter x:Key="StringToFontFamilyConverter" />
     </UserControl.Resources>
     <ContentDialog
         x:Uid="/SettingsDialog/SettingsDialog"
@@ -163,7 +164,13 @@
                     <controls:SettingsCard.HeaderIcon>
                         <SymbolIcon Symbol="Font" />
                     </controls:SettingsCard.HeaderIcon>
-                    <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}" />
+                    <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock FontFamily="{x:Bind Converter={StaticResource StringToFontFamilyConverter}}" Text="{x:Bind}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </controls:SettingsCard>
                 <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard">
                     <controls:SettingsCard.HeaderIcon>
@@ -244,16 +251,11 @@
                             ContentAlignment="Vertical"
                             IsEnabled="{x:Bind Vm.DanmakuEnableRegex, Mode=OneWay}">
                             <StackPanel Orientation="Vertical">
-                                <Border
-                                    x:Name="ErrorBorder"
-                                    BorderThickness="1"
-                                    CornerRadius="4">
-                                    <AutoSuggestBox
-                                        x:Uid="/SettingsDialog/AddRegexPatternAutoSuggestBox"
-                                        QueryIcon="Add"
-                                        QuerySubmitted="AddRegexPattern"
-                                        TextChanged="RegexPatternChanged" />
-                                </Border>
+                                <AutoSuggestBox
+                                    x:Uid="/SettingsDialog/AddRegexPatternAutoSuggestBox"
+                                    QueryIcon="Add"
+                                    QuerySubmitted="AddRegexPattern"
+                                    TextChanged="RegexPatternChanged" />
                                 <InfoBar x:Name="RegexErrorInfoBar" IsClosable="True" />
                                 <ListView
                                     AllowDrop="True"

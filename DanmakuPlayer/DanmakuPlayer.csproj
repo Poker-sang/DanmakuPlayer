@@ -55,7 +55,7 @@
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
         <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
-        <PackageReference Include="WinUI3Utilities" Version="1.1.5.8" />
+        <PackageReference Include="WinUI3Utilities" Version="1.1.5.9" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
         <PackageReference Include="protobuf-net" Version="3.2.30" />
         <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />

@@ -102,6 +102,7 @@ public sealed partial class SettingsDialog : UserControl
     {
         e.Cancel = true;
         Vm.AppConfig = new();
+        // 不知道为什么弹幕字体无法重置
         OnPropertyChanged(nameof(Vm));
     }
 
@@ -139,19 +140,18 @@ public sealed partial class SettingsDialog : UserControl
         Vm.PatternsCollection.Add(sender.Text);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     private void RegexPatternChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
     {
         try
         {
             _ = new Regex(sender.Text);
+            sender.BorderBrush = new SolidColorBrush(Colors.Transparent);
         }
         catch (RegexParseException)
         {
-            ErrorBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-            return;
+            sender.BorderBrush = new SolidColorBrush(Colors.Red);
         }
-
-        ErrorBorder.BorderBrush = new SolidColorBrush(Colors.Transparent);
     }
 
     private void RemoveTapped(object sender, TappedRoutedEventArgs e) =>

@@ -1,3 +1,4 @@
+using DanmakuPlayer.Resources;
 using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
@@ -86,8 +87,8 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕字体
     /// </summary>
-    /// <remarks>default: "微软雅黑"</remarks>
-    public string DanmakuFont { get; set; } = "微软雅黑";
+    /// <remarks>default: <see cref="ConstantStrings.DefaultFont"/></remarks>
+    public string DanmakuFont { get; set; } = ConstantStrings.DefaultFont;
 
     /// <summary>
     /// 弹幕大小缩放
