@@ -8,5 +8,6 @@
     <WebView2
         CanGoBack="{x:Bind CanGoBack, Mode=TwoWay}"
         CanGoForward="{x:Bind CanGoForward, Mode=TwoWay}"
-        PointerReleased="WebView2Tapped" />
+        PointerReleased="WebView2Tapped"
+        Source="{x:Bind SourceUri, Mode=TwoWay}" />
 </UserControl>

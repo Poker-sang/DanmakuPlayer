@@ -209,10 +209,11 @@ public partial record AppConfig
     public bool DanmakuEnableRegex { get; set; } = true;
 
     /// <summary>
-    /// 正则表达式集合，用json序列化
+    /// 正则表达式集合
     /// </summary>
-    /// <remarks>default: <see langword="true"/></remarks>
-    public string RegexPatterns { get; set; } = "[]";
+    /// <remarks>default: []</remarks>
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>))]
+    public string[] RegexPatterns { get; set; } = [];
 
     #endregion
 

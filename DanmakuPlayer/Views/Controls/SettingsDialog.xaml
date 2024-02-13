@@ -8,7 +8,6 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
-    xmlns:system="using:System"
     mc:Ignorable="d">
     <UserControl.Resources>
         <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
@@ -261,9 +260,9 @@
                                     AllowDrop="True"
                                     CanDragItems="True"
                                     CanReorderItems="True"
-                                    ItemsSource="{x:Bind Vm.PatternsCollection}">
+                                    ItemsSource="{x:Bind Vm.RegexPatterns, Mode=OneWay}">
                                     <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="system:String">
+                                        <DataTemplate x:DataType="x:String">
                                             <Grid Tag="{x:Bind}" Tapped="RemoveTapped">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />

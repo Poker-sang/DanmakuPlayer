@@ -101,8 +101,7 @@ public sealed partial class SettingsDialog : UserControl
     private void SetDefaultAppConfigClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
         e.Cancel = true;
-        Vm.AppConfig = new();
-        // 不知道为什么弹幕字体无法重置
+        Vm.ResetDefault();
         OnPropertyChanged(nameof(Vm));
     }
 
@@ -116,7 +115,7 @@ public sealed partial class SettingsDialog : UserControl
             return;
         }
 
-        if (Vm.PatternsCollection.Contains(sender.Text))
+        if (Vm.RegexPatterns.Contains(sender.Text))
         {
             RegexErrorInfoBar.Severity = InfoBarSeverity.Warning;
             RegexErrorInfoBar.Message = SettingsDialogResources.DuplicatesWithExistingRegex;
@@ -137,7 +136,7 @@ public sealed partial class SettingsDialog : UserControl
         }
 
         RegexErrorInfoBar.IsOpen = false;
-        Vm.PatternsCollection.Add(sender.Text);
+        Vm.RegexPatterns.Add(sender.Text);
     }
 
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
@@ -155,10 +154,11 @@ public sealed partial class SettingsDialog : UserControl
     }
 
     private void RemoveTapped(object sender, TappedRoutedEventArgs e) =>
-        Vm.PatternsCollection.Remove(sender.GetTag<string>());
+        Vm.RegexPatterns.Remove(sender.GetTag<string>());
 
     private void CloseClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
+        Vm.SaveCollections();
         var copy = AppContext.AppConfig;
         AppContext.AppConfig = Vm.AppConfig;
         CompareChanges(copy, Vm.AppConfig);

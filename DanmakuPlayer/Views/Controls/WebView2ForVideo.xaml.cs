@@ -34,6 +34,16 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private IPage Page { get; set; } = null!;
 
+    private Uri? SourceUri
+    {
+        get => null;
+        set
+        {
+            if (value is not null)
+                Url = value.OriginalString;
+        }
+    }
+
     [MemberNotNullWhen(true, nameof(Operations))]
     public bool HasVideo => Operations is not null && !Page.IsClosed;
 

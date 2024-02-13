@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,11 +13,6 @@ public static class DanmakuRegex
     {
         return !appConfig.DanmakuEnableRegex
             ? pool
-            : await Task.Run(() =>
-            {
-                var regexPatterns = JsonSerializer.Deserialize<string[]>(appConfig.RegexPatterns) ?? [];
-                return regexPatterns.Aggregate(pool,
-                    (current, pattern) => current.Where(d => !Regex.IsMatch(d.Text, pattern)));
-            }, token);
+            : await Task.Run(() => appConfig.RegexPatterns.Aggregate(pool, (current, pattern) => current.Where(d => !Regex.IsMatch(d.Text, pattern))), token);
     }
 }
