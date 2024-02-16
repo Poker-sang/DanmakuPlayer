@@ -51,7 +51,7 @@ public static partial class BiliHelper
 
     private static bool CheckSuccess(JsonDocument jd) => jd.RootElement.GetProperty("code").GetInt32() is 0;
 
-    private static async Task<IEnumerable<VideoPage>> GetCIds(Task<JsonDocument> jd)
+    private static async Task<IEnumerable<VideoPage>> GetCIdsAsync(Task<JsonDocument> jd)
     {
         var response = await jd;
         return CheckSuccess(response)
@@ -61,16 +61,16 @@ public static partial class BiliHelper
                     episode.GetProperty("cid").GetInt32(),
                     episode.GetProperty("page").GetInt32().ToString(),
                     episode.GetProperty("part").GetString()!))
-            : Array.Empty<VideoPage>();
+            : [];
     }
 
-    public static Task<IEnumerable<VideoPage>> Av2CIds(int av, CancellationToken token) => GetCIds(BiliApis.GetVideoPageList(av, token));
+    public static Task<IEnumerable<VideoPage>> Av2CIdsAsync(int av, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(av, token));
 
-    public static Task<IEnumerable<VideoPage>> Bv2CIds(string bv, CancellationToken token) => GetCIds(BiliApis.GetVideoPageList(bv, token));
+    public static Task<IEnumerable<VideoPage>> Bv2CIdsAsync(string bv, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(bv, token));
 
-    public static async Task<int> Ep2CId(int episodeId, CancellationToken token)
+    public static async Task<int> Ep2CIdAsync(int episodeId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiEpisodeInfo(episodeId, token);
+        var response = await BiliApis.GetBangumiEpisodeInfoAsync(episodeId, token);
         if (CheckSuccess(response))
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
             // Linq会多循环几遍
@@ -84,9 +84,9 @@ public static partial class BiliHelper
         return -1;
     }
 
-    public static async Task<IEnumerable<VideoPage>> Ss2CIds(int seasonId, CancellationToken token)
+    public static async Task<IEnumerable<VideoPage>> Ss2CIdsAsync(int seasonId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiEpisode(seasonId, token);
+        var response = await BiliApis.GetBangumiEpisodeAsync(seasonId, token);
         return CheckSuccess(response)
             ? response.RootElement
                 .GetProperty("result")
@@ -97,12 +97,12 @@ public static partial class BiliHelper
                     episode.GetProperty("cid").GetInt32(),
                     episode.GetProperty("title").GetString()!,
                     episode.GetProperty("long_title").GetString()!))
-            : Array.Empty<VideoPage>();
+            : [];
     }
 
-    public static async Task<int> Md2Ss(int mediaId, CancellationToken token)
+    public static async Task<int> Md2SsAsync(int mediaId, CancellationToken token)
     {
-        var response = await BiliApis.GetBangumiInfo(mediaId, token);
+        var response = await BiliApis.GetBangumiInfoAsync(mediaId, token);
         return CheckSuccess(response)
             ? response.RootElement
                 .GetProperty("result")
@@ -111,7 +111,7 @@ public static partial class BiliHelper
             : -1;
     }
 
-    [GeneratedRegex(@"(av|md|ss|ep)[0-9]+")]
+    [GeneratedRegex("(av|md|ss|ep)[0-9]+")]
     private static partial Regex DigitalRegex();
 
     [GeneratedRegex(@"(?:BV)1\w\w4\w1\w7\w\w")]

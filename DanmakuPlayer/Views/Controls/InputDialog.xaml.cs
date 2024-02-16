@@ -78,11 +78,11 @@ public sealed partial class InputDialog : UserControl
                     ShowInfoBar(InputDialogResources.VideoUnmatched, true);
                     break;
                 case BiliHelper.CodeType.AvId:
-                    ItemsSource = (await BiliHelper.Av2CIds(code, _cancellationTokenSource.Token)).ToArray();
+                    ItemsSource = (await BiliHelper.Av2CIdsAsync(code, _cancellationTokenSource.Token)).ToArray();
                     CheckItemsSource(sender);
                     break;
                 case BiliHelper.CodeType.BvId:
-                    ItemsSource = (await BiliHelper.Bv2CIds(match, _cancellationTokenSource.Token)).ToArray();
+                    ItemsSource = (await BiliHelper.Bv2CIdsAsync(match, _cancellationTokenSource.Token)).ToArray();
                     CheckItemsSource(sender);
                     break;
                 case BiliHelper.CodeType.CId:
@@ -90,14 +90,14 @@ public sealed partial class InputDialog : UserControl
                     sender.Hide();
                     break;
                 case BiliHelper.CodeType.MediaId:
-                    code = await BiliHelper.Md2Ss(code, _cancellationTokenSource.Token);
+                    code = await BiliHelper.Md2SsAsync(code, _cancellationTokenSource.Token);
                     goto case BiliHelper.CodeType.SeasonId;
                 case BiliHelper.CodeType.SeasonId:
-                    ItemsSource = (await BiliHelper.Ss2CIds(code, _cancellationTokenSource.Token)).ToArray();
+                    ItemsSource = (await BiliHelper.Ss2CIdsAsync(code, _cancellationTokenSource.Token)).ToArray();
                     CheckItemsSource(sender);
                     break;
                 case BiliHelper.CodeType.EpisodeId:
-                    _cId = await BiliHelper.Ep2CId(code, _cancellationTokenSource.Token);
+                    _cId = await BiliHelper.Ep2CIdAsync(code, _cancellationTokenSource.Token);
                     sender.Hide();
                     break;
                 default:

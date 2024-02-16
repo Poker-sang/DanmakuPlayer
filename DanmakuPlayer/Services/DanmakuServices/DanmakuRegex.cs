@@ -9,7 +9,7 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuRegex
 {
-    public static async Task<IEnumerable<Danmaku>> Match(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    public static async Task<IEnumerable<Danmaku>> MatchAsync(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
     {
         return !appConfig.DanmakuEnableRegex
             ? pool

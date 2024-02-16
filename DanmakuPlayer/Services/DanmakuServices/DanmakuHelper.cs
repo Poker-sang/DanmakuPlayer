@@ -85,14 +85,14 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = [];
 
-    public static async Task<int> Render(CanvasControl canvas, RenderMode renderType, CancellationToken token)
+    public static async Task<int> RenderAsync(CanvasControl canvas, RenderMode renderType, CancellationToken token)
     {
         RenderType = renderType;
-        await WaitForRender(canvas, token);
+        await WaitForRenderAsync(canvas, token);
         return _renderCount;
     }
 
-    private static async Task WaitForRender(CanvasControl canvas, CancellationToken token)
+    private static async Task WaitForRenderAsync(CanvasControl canvas, CancellationToken token)
     {
         IsRendering = true;
         canvas.Invalidate();

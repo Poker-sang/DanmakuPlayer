@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing.Text;
 using System.Linq;
-using Microsoft.UI.Xaml.Media;
 
 namespace DanmakuPlayer.Resources;
 

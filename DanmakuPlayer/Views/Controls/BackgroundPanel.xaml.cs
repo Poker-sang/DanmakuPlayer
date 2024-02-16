@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.UI;
 using DanmakuPlayer.Enums;
@@ -79,6 +81,11 @@ public sealed partial class BackgroundPanel : Grid
         _cancellationTokenSource.Dispose();
     }
 
+    /// <summary>
+    /// 阻止按钮把双击事件传递给背景
+    /// </summary>
+    private void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e) => e.Handled = true;
+
     #endregion
 
     #region Title区按钮
@@ -131,16 +138,30 @@ public sealed partial class BackgroundPanel : Grid
 
             RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
 
-            await LoadDanmaku(async token =>
+            await LoadDanmakuAsync(async token =>
             {
                 var tempPool = new List<Danmaku>();
+                var danmakuCount = 0;
+                var testCount = 0;
                 for (var i = 0; ; ++i)
                 {
-                    await using var danmaku = await BiliApis.GetDanmaku(cId, i + 1, token);
-                    if (danmaku is null)
+                    try
+                    {
+                        if (await GetDanmakuAsync(tempPool, cId, i, token, BiliApis.GetWebDanmakuAsync))
+                            break;
+                    }
+                    catch
+                    {
+                        if (await GetDanmakuAsync(tempPool, cId, i, token, BiliApis.GetMobileDanmaku))
+                            break;
+                    }
+
+                    // 连续5次获取不到新弹幕（30min）也结束
+                    if (tempPool.Count == danmakuCount)
+                        testCount += 1;
+                    if (testCount >= 5)
                         break;
-                    var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
-                    tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
+                    danmakuCount = tempPool.Count;
                 }
 
                 return tempPool;
@@ -155,6 +176,18 @@ public sealed partial class BackgroundPanel : Grid
         {
             Vm.LoadingDanmaku = false;
         }
+
+        return;
+
+        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, int cId, int i, CancellationToken token, Func<int, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
+        {
+            await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
+            if (danmaku is null)
+                return true;
+            var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
+            tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
+            return false;
+        }
     }
 
     private async void FileTapped(object sender, TappedRoutedEventArgs e)
@@ -165,7 +198,7 @@ public sealed partial class BackgroundPanel : Grid
 
             var file = await App.Window.PickSingleFileAsync();
             if (file is not null)
-                await LoadDanmaku(async token =>
+                await LoadDanmakuAsync(async token =>
                 {
                     await using var stream = File.OpenRead(file.Path);
                     return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();

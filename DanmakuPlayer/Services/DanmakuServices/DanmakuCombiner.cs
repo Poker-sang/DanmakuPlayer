@@ -121,7 +121,7 @@ public static class DanmakuCombiner
         return false;
     }
 
-    public static async Task<IEnumerable<Danmaku>> Combine(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    public static async Task<IEnumerable<Danmaku>> CombineAsync(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
     {
         return !appConfig.DanmakuEnableMerge
             ? pool

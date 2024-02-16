@@ -16,7 +16,7 @@ namespace DanmakuPlayer.Views.Controls;
 
 public partial class BackgroundPanel
 {
-    private readonly DanmakuFilter _filter = [DanmakuCombiner.Combine, DanmakuRegex.Match];
+    private readonly DanmakuFilter _filter = [DanmakuCombiner.CombineAsync, DanmakuRegex.MatchAsync];
     private CancellationTokenSource _cancellationTokenSource = new();
     private DateTime _lastTime;
     private int _tickCount;
@@ -28,7 +28,7 @@ public partial class BackgroundPanel
     /// 加载弹幕操作
     /// </summary>
     /// <param name="action"></param>
-    private async Task LoadDanmaku(Func<CancellationToken, Task<List<Danmaku>>> action)
+    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<List<Danmaku>>> action)
     {
         Pause();
 
@@ -49,12 +49,12 @@ public partial class BackgroundPanel
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), TeachingTipSeverity.Information, Emoticon.Okay);
 
-            DanmakuHelper.Pool = await _filter.Filtrate(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
+            DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), TeachingTipSeverity.Information, Emoticon.Okay);
 
-            var renderedCount = await DanmakuHelper.Render(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
+            var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             if (!WebView.HasVideo)
@@ -88,7 +88,7 @@ public partial class BackgroundPanel
 
         try
         {
-            _ = await DanmakuHelper.Render(DanmakuCanvas, renderType, _cancellationTokenSource.Token);
+            _ = await DanmakuHelper.RenderAsync(DanmakuCanvas, renderType, _cancellationTokenSource.Token);
         }
         catch (TaskCanceledException)
         {

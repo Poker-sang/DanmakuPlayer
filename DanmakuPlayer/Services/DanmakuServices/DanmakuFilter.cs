@@ -10,7 +10,7 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public class DanmakuFilter : List<Func<IEnumerable<Danmaku>, AppConfig, CancellationToken, Task<IEnumerable<Danmaku>>>>
 {
-    public async Task<Danmaku[]> Filtrate(List<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    public async Task<Danmaku[]> FiltrateAsync(List<Danmaku> pool, AppConfig appConfig, CancellationToken token)
     {
         var result = pool.To<IEnumerable<Danmaku>>();
         foreach (var func in this)

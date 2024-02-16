@@ -93,6 +93,7 @@
                 </Grid.ColumnDefinitions>
                 <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
                     <AppBarButton
+                        DoubleTapped="UIElement_OnDoubleTapped"
                         Icon="Back"
                         IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
                         Tapped="GoBackTapped" />
@@ -108,7 +109,7 @@
                 Grid.Row="0"
                 Grid.Column="2"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Tapped="FrontTapped">
+                <AppBarButton DoubleTapped="UIElement_OnDoubleTapped" Tapped="FrontTapped">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
@@ -124,7 +125,6 @@
         </Grid>
     </local:CollapsibleArea>
     <local:CollapsibleArea Grid.Row="2">
-        <!--  IsHitTestVisible="{x:Bind _vm.StartPlaying, Mode=OneWay}"  -->
         <Grid>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -153,6 +153,7 @@
                 Grid.ColumnSpan="6"
                 Margin="10,0"
                 VerticalAlignment="Center"
+                DoubleTapped="UIElement_OnDoubleTapped"
                 IsTabStop="False"
                 Maximum="{x:Bind Vm.TotalTime, Mode=OneWay}"
                 Minimum="0"
@@ -166,19 +167,24 @@
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
                     Width="40"
+                    DoubleTapped="UIElement_OnDoubleTapped"
                     RightTapped="RewindTapped"
                     Tapped="RewindTapped">
                     <AppBarButton.Icon>
                         <FontIcon Glyph="&#xEB9E;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton Width="40" Tapped="PauseResumeTapped">
+                <AppBarButton
+                    Width="40"
+                    DoubleTapped="UIElement_OnDoubleTapped"
+                    Tapped="PauseResumeTapped">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
                     Width="40"
+                    DoubleTapped="UIElement_OnDoubleTapped"
                     RightTapped="FastForwardTapped"
                     Tapped="FastForwardTapped">
                     <AppBarButton.Icon>
@@ -283,18 +289,20 @@
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton Icon="Sync" Tapped="LoadSyncOnTapped" />
-                <AppBarButton Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}" Tapped="LockWebView2OnTapped" />
-                <AppBarButton Tapped="FullScreenOnTapped">
+                <AppBarButton
+                    DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="Sync"
+                    Tapped="LoadSyncOnTapped" />
+                <AppBarButton
+                    DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}"
+                    Tapped="LockWebView2OnTapped" />
+                <AppBarButton DoubleTapped="UIElement_OnDoubleTapped" Tapped="FullScreenOnTapped">
                     <AppBarButton.Icon>
                         <SymbolIcon Symbol="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowSymbolConverter}, Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar>
-            <!--
-                PointerPressed="TimePointerPressed"
-                PointerReleased="TimePointerReleased"
-            -->
         </Grid>
     </local:CollapsibleArea>
     <local:SettingsDialog x:Name="DialogSetting" Grid.Row="0" />
