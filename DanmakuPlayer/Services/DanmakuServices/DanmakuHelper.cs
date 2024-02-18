@@ -47,7 +47,7 @@ public static class DanmakuHelper
             if (appConfig.RenderBefore)
             {
                 foreach (var (danmaku, layout) in Current.Layouts)
-                    Current.AddRenderTargetRef(danmaku, layout);
+                    Current.AddFillRef(danmaku, layout);
             }
             Current.ClearLayouts();
 
@@ -67,7 +67,7 @@ public static class DanmakuHelper
                 Current.ClearLayoutRefCount();
                 foreach (var t in DisplayingDanmaku(time, appConfig))
                 {
-                    Current.AddRenderTargetRef(t);
+                    Current.AddFillRef(t);
                     t.OnRender(e.DrawingSession, Current, time);
                 }
 

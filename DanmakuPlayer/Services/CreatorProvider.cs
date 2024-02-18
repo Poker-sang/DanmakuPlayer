@@ -42,7 +42,13 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     /// 内容和对应渲染布局
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, CanvasRenderTarget[]> RenderTargets { get; } = [];
+    public Dictionary<string, CanvasCachedGeometry> Strokes { get; } = [];
+
+    /// <summary>
+    /// 内容和对应渲染布局
+    /// </summary>
+    /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
+    public Dictionary<string, CanvasCachedGeometry> Fills { get; } = [];
 
     /// <summary>
     /// 内容和对应渲染布局
@@ -77,11 +83,13 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
 
     public void ClearRenderTargets()
     {
-        foreach (var renderTargets in RenderTargets)
-            foreach (var renderTarget in renderTargets.Value)
-                renderTarget.Dispose();
-        RenderTargetsCounter.Clear();
-        RenderTargets.Clear();
+        foreach (var fill in Fills)
+            fill.Value.Dispose();
+        foreach (var stroke in Strokes)
+            stroke.Value.Dispose();
+        FillsCounter.Clear();
+        Fills.Clear();
+        Strokes.Clear();
     }
 
     #region 计数器
@@ -90,75 +98,40 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     /// 内容和对应渲染布局的引用计数
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, int> RenderTargetsCounter { get; } = [];
+    public Dictionary<string, int> FillsCounter { get; } = [];
 
-    public void AddRenderTargetRef(Danmaku danmaku, CanvasTextLayout? textLayout = null)
+    public void AddFillRef(Danmaku danmaku, CanvasTextLayout? textLayout = null)
     {
         var danmakuString = danmaku.ToString();
-        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(RenderTargetsCounter, danmakuString, out var exists);
+        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(FillsCounter, danmakuString, out var exists);
         if (!exists)
         {
             using var newLayout = textLayout ?? GetNewLayout(danmaku);
-            var newBrush = GetBrush(danmaku.Color, AppConfig.DanmakuOpacity);
-            var newGeometry = null as CanvasGeometry;
-            var outlineBrush = null as CanvasSolidColorBrush;
+            using var newGeometry = CanvasGeometry.CreateText(newLayout);
+            Fills.Add(danmakuString, CanvasCachedGeometry.CreateFill(newGeometry));
             if (AppConfig.DanmakuEnableStrokes)
-            {
-                newGeometry = CanvasGeometry.CreateText(newLayout);
-
-                outlineBrush = GetBrush(AppConfig.DanmakuStrokeColor, AppConfig.DanmakuOpacity / 2);
-            }
-
-            var context = new Context(newLayout, newBrush, newGeometry, outlineBrush);
-            RenderTargets.Add(danmakuString, [.. GetRenderTargets(context, [])]);
-            newGeometry?.Dispose();
+                Strokes.Add(danmakuString, CanvasCachedGeometry.CreateStroke(newGeometry, AppConfig.DanmakuStrokeWidth));
         }
         ++count;
     }
 
-    private List<CanvasRenderTarget> GetRenderTargets(Context context, List<CanvasRenderTarget> list)
-    {
-        var maxWidth = Creator.Device.MaximumBitmapSizeInPixels;
-        var layoutBoundsWidth = context.Layout.LayoutBounds.Width;
-        // Math.Floor
-        var total = (int)(layoutBoundsWidth / maxWidth);
-        CanvasRenderTarget canvasRenderTarget;
-        if (total > list.Count)
-            canvasRenderTarget = new(Creator, maxWidth, (float)context.Layout.LayoutBounds.Height);
-        else if (total == list.Count)
-            canvasRenderTarget = new(Creator, (float)layoutBoundsWidth % maxWidth, (float)context.Layout.LayoutBounds.Height);
-        else
-            return list;
-        using var canvasDrawingSession = canvasRenderTarget.CreateDrawingSession();
-        canvasDrawingSession.DrawTextLayout(context.Layout, -maxWidth * list.Count, 0, context.Brush);
-        if (context is { Geometry: { } geometry, GeometryBrush: { } geometryBrush })
-            canvasDrawingSession.DrawGeometry(geometry, -maxWidth * list.Count, 0, geometryBrush, AppConfig.DanmakuStrokeWidth);
-        list.Add(canvasRenderTarget);
-        return GetRenderTargets(context, list);
-    }
-
-    private record Context(
-        CanvasTextLayout Layout,
-        CanvasSolidColorBrush Brush,
-        CanvasGeometry? Geometry,
-        CanvasSolidColorBrush? GeometryBrush);
-
     public void ClearLayoutRefCount()
     {
-        foreach (var counter in RenderTargetsCounter)
-            RenderTargetsCounter[counter.Key] = 0;
+        foreach (var counter in FillsCounter)
+            FillsCounter[counter.Key] = 0;
     }
 
     public void ClearUnusedLayoutRef()
     {
-        var list = RenderTargetsCounter.Where(pair => pair.Value < 1).Select(pair => pair.Key);
+        var list = FillsCounter.Where(pair => pair.Value < 1).Select(pair => pair.Key);
 
         foreach (var danmakuString in list)
         {
-            foreach (var renderTarget in RenderTargets[danmakuString])
-                renderTarget.Dispose();
-            _ = RenderTargets.Remove(danmakuString);
-            _ = RenderTargetsCounter.Remove(danmakuString);
+            Fills[danmakuString].Dispose();
+            Strokes[danmakuString].Dispose();
+            _ = Fills.Remove(danmakuString);
+            _ = Strokes.Remove(danmakuString);
+            _ = FillsCounter.Remove(danmakuString);
         }
     }
 
@@ -179,7 +152,7 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
 
     public CanvasTextLayout GetNewLayout(Danmaku danmaku) => new(Creator, danmaku.Text, GetTextFormat(danmaku.Size * AppConfig.DanmakuScale), int.MaxValue, int.MaxValue);
 
-    public CanvasSolidColorBrush GetBrush(uint color, float alpha)
+    public CanvasSolidColorBrush GetBrush(uint color, float alpha = 1)
     {
         if (!Brushes.TryGetValue(color, out var value))
             Brushes[color] = value = new(Creator, color.GetColor((byte)(0xFF * alpha)));

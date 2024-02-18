@@ -221,20 +221,17 @@ public partial record Danmaku(
         if (!(0 <= t) || !(t < provider.AppConfig.DanmakuActualDuration))
             return;
 
-        var renderTargets = provider.RenderTargets[ToString()];
-        var width = renderTargets.Sum(renderTarget => renderTarget.Size.Width);
-
-        var posX = Mode switch
+        var pos = Mode switch
         {
-            DanmakuMode.Roll => (float)(provider.ViewWidth - ((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration)),
-            DanmakuMode.Bottom or DanmakuMode.Top => _showPositionX,
-            DanmakuMode.Inverse => (float)(((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration) - width),
-            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, float>(Mode)
+            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + LayoutWidth) * t / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
+            DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
+            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + LayoutWidth) * t / provider.AppConfig.DanmakuActualDuration) - LayoutWidth), _showPositionY),
+            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
         };
-        for (var i = 0; i < renderTargets.Length; ++i)
+        using (resourceCreator.CreateLayer(provider.AppConfig.DanmakuOpacity))
         {
-            var x = posX + i * resourceCreator.Device.MaximumBitmapSizeInPixels;
-            resourceCreator.DrawImage(renderTargets[i], x, _showPositionY);
+            resourceCreator.DrawCachedGeometry(provider.Strokes[ToString()], pos, provider.GetBrush(Color));
+            resourceCreator.DrawCachedGeometry(provider.Fills[ToString()], pos, provider.GetBrush(Color));
         }
     }
 
