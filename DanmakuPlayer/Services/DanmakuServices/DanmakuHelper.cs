@@ -46,12 +46,10 @@ public static class DanmakuHelper
             var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
             if (appConfig.RenderBefore)
             {
-                if (appConfig.DanmakuEnableStrokes)
-                    foreach (var (danmakuString, layout) in Current.Layouts)
-                        Current.Geometries[danmakuString] = CanvasGeometry.CreateText(layout);
+                foreach (var (danmaku, layout) in Current.Layouts)
+                    Current.AddRenderTargetRef(danmaku, layout);
             }
-            else
-                Current.ClearLayouts();
+            Current.ClearLayouts();
 
             _renderCount = count;
             RenderType &= ~RenderMode.RenderInit;
@@ -69,7 +67,7 @@ public static class DanmakuHelper
                 Current.ClearLayoutRefCount();
                 foreach (var t in DisplayingDanmaku(time, appConfig))
                 {
-                    Current.AddLayoutRef(t);
+                    Current.AddRenderTargetRef(t);
                     t.OnRender(e.DrawingSession, Current, time);
                 }
 

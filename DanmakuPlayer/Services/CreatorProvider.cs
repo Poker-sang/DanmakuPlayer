@@ -1,19 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
+using CommunityToolkit.WinUI;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services;
 
 public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisposable
 {
-    public ICanvasResourceCreator Creator { get; } = creator;
+    public ICanvasResourceCreatorWithDpi Creator { get; } = creator;
 
     public AppConfig AppConfig { get; } = appConfig;
 
@@ -37,13 +42,13 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     /// 内容和对应渲染布局
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, CanvasTextLayout> Layouts { get; } = [];
+    public Dictionary<string, CanvasRenderTarget[]> RenderTargets { get; } = [];
 
     /// <summary>
-    /// 渲染布局描边
+    /// 内容和对应渲染布局
     /// </summary>
-    /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
-    public Dictionary<string, CanvasGeometry> Geometries { get; } = [];
+    /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
+    public Dictionary<Danmaku, CanvasTextLayout> Layouts { get; } = [];
 
     public void Dispose()
     {
@@ -52,8 +57,8 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
         foreach (var brush in Brushes)
             brush.Value.Dispose();
         Brushes.Clear();
-
         ClearLayouts();
+        ClearRenderTargets();
     }
 
     public static void DisposeFormats()
@@ -67,11 +72,16 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     {
         foreach (var layout in Layouts)
             layout.Value.Dispose();
-        foreach (var geometry in Geometries)
-            geometry.Value.Dispose();
-        LayoutsCounter.Clear();
         Layouts.Clear();
-        Geometries.Clear();
+    }
+
+    public void ClearRenderTargets()
+    {
+        foreach (var renderTargets in RenderTargets)
+            foreach (var renderTarget in renderTargets.Value)
+                renderTarget.Dispose();
+        RenderTargetsCounter.Clear();
+        RenderTargets.Clear();
     }
 
     #region 计数器
@@ -80,41 +90,75 @@ public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisp
     /// 内容和对应渲染布局的引用计数
     /// </summary>
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/></remarks>
-    public Dictionary<string, int> LayoutsCounter { get; } = [];
+    public Dictionary<string, int> RenderTargetsCounter { get; } = [];
 
-    public void AddLayoutRef(Danmaku danmaku)
+    public void AddRenderTargetRef(Danmaku danmaku, CanvasTextLayout? textLayout = null)
     {
         var danmakuString = danmaku.ToString();
-        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(LayoutsCounter, danmakuString, out var exists);
+        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(RenderTargetsCounter, danmakuString, out var exists);
         if (!exists)
         {
-            var newLayout = Layouts[danmakuString] = GetNewLayout(danmaku);
+            using var newLayout = textLayout ?? GetNewLayout(danmaku);
+            var newBrush = GetBrush(danmaku.Color, AppConfig.DanmakuOpacity);
+            var newGeometry = null as CanvasGeometry;
+            var outlineBrush = null as CanvasSolidColorBrush;
             if (AppConfig.DanmakuEnableStrokes)
-                Geometries[danmakuString] = CanvasGeometry.CreateText(newLayout);
+            {
+                newGeometry = CanvasGeometry.CreateText(newLayout);
+
+                outlineBrush = GetBrush(AppConfig.DanmakuStrokeColor, AppConfig.DanmakuOpacity / 2);
+            }
+
+            var context = new Context(newLayout, newBrush, newGeometry, outlineBrush);
+            RenderTargets.Add(danmakuString, [.. GetRenderTargets(context, [])]);
+            newGeometry?.Dispose();
         }
         ++count;
     }
 
+    private List<CanvasRenderTarget> GetRenderTargets(Context context, List<CanvasRenderTarget> list)
+    {
+        var maxWidth = Creator.Device.MaximumBitmapSizeInPixels;
+        var layoutBoundsWidth = context.Layout.LayoutBounds.Width;
+        // Math.Floor
+        var total = (int)(layoutBoundsWidth / maxWidth);
+        CanvasRenderTarget canvasRenderTarget;
+        if (total > list.Count)
+            canvasRenderTarget = new(Creator, maxWidth, (float)context.Layout.LayoutBounds.Height);
+        else if (total == list.Count)
+            canvasRenderTarget = new(Creator, (float)layoutBoundsWidth % maxWidth, (float)context.Layout.LayoutBounds.Height);
+        else
+            return list;
+        using var canvasDrawingSession = canvasRenderTarget.CreateDrawingSession();
+        canvasDrawingSession.DrawTextLayout(context.Layout, -maxWidth * list.Count, 0, context.Brush);
+        if (context is { Geometry: { } geometry, GeometryBrush: { } geometryBrush })
+            canvasDrawingSession.DrawGeometry(geometry, -maxWidth * list.Count, 0, geometryBrush, AppConfig.DanmakuStrokeWidth);
+        list.Add(canvasRenderTarget);
+        return GetRenderTargets(context, list);
+    }
+
+    private record Context(
+        CanvasTextLayout Layout,
+        CanvasSolidColorBrush Brush,
+        CanvasGeometry? Geometry,
+        CanvasSolidColorBrush? GeometryBrush);
+
     public void ClearLayoutRefCount()
     {
-        foreach (var counter in LayoutsCounter)
-            LayoutsCounter[counter.Key] = 0;
+        foreach (var counter in RenderTargetsCounter)
+            RenderTargetsCounter[counter.Key] = 0;
     }
 
     public void ClearUnusedLayoutRef()
     {
-        var list = LayoutsCounter.Where(pair => pair.Value < 1).Select(pair => pair.Key);
+        var list = RenderTargetsCounter.Where(pair => pair.Value < 1).Select(pair => pair.Key);
 
         foreach (var danmakuString in list)
         {
-            Layouts[danmakuString].Dispose();
-            if (Geometries.TryGetValue(danmakuString, out var geometry))
-            {
-                geometry.Dispose();
-                _ = Layouts.Remove(danmakuString);
-            }
-            _ = Geometries.Remove(danmakuString);
-            _ = LayoutsCounter.Remove(danmakuString);
+            foreach (var renderTarget in RenderTargets[danmakuString])
+                renderTarget.Dispose();
+            _ = RenderTargets.Remove(danmakuString);
+            _ = RenderTargetsCounter.Remove(danmakuString);
         }
     }
 

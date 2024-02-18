@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using System.Xml.Linq;
+using CommunityToolkit.WinUI;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
@@ -95,7 +97,7 @@ public partial record Danmaku(
             return true;
         }
 
-        var layoutExists = provider.Layouts.TryGetValue(ToString(), out var layout);
+        var layoutExists = provider.Layouts.TryGetValue(this, out var layout);
         if (!layoutExists)
             layout = provider.GetNewLayout(this);
         LayoutWidth = layout!.LayoutBounds.Width;
@@ -127,7 +129,7 @@ public partial record Danmaku(
         }
 
         if (!layoutExists)
-            provider.Layouts.Add(ToString(), layout);
+            provider.Layouts.Add(this, layout);
 
         switch (Mode)
         {
@@ -175,7 +177,7 @@ public partial record Danmaku(
         }
     }
 
-    public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, float time)
+    public void OnRender(CanvasDrawingSession resourceCreator, CreatorProvider provider, float time)
     {
         if (!NeedRender)
             return;
@@ -189,29 +191,29 @@ public partial record Danmaku(
 
             var aPos = AdvancedInfo.GetPosition(t, (float)provider.ViewWidth, (float)provider.ViewHeight);
             var aOpacity = AdvancedInfo.GetOpacity(t);
-            using var aBrush = new CanvasSolidColorBrush(renderTarget, Color.GetColor((byte)(aOpacity * 0xFF)));
+            using var aBrush = new CanvasSolidColorBrush(resourceCreator, Color.GetColor((byte)(aOpacity * 0xFF)));
             using var aFormat = new CanvasTextFormat();
             aFormat.FontFamily = AdvancedInfo.Font;
             aFormat.FontSize = Size;
-            using var aLayout = new CanvasTextLayout(renderTarget, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
+            using var aLayout = new CanvasTextLayout(resourceCreator, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
 
-            var lastTransform = renderTarget.Transform;
+            var lastTransform = resourceCreator.Transform;
 
             if (AdvancedInfo.ZFlip is not 0)
-                renderTarget.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
+                resourceCreator.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
             // Y轴翻转没有完全实现，Win2D无法实现三维变换效果
             if (AdvancedInfo.YFlip is not 0)
-                renderTarget.Transform *= Matrix3x2.CreateSkew(0, AdvancedInfo.YFlip, aPos);
+                resourceCreator.Transform *= Matrix3x2.CreateSkew(0, AdvancedInfo.YFlip, aPos);
 
-            renderTarget.DrawTextLayout(aLayout, aPos, aBrush);
+            resourceCreator.DrawTextLayout(aLayout, aPos, aBrush);
 
             if (AdvancedInfo.Outline)
             {
                 using var aGeometry = CanvasGeometry.CreateText(aLayout);
-                using var aOutlineBrush = new CanvasSolidColorBrush(renderTarget, provider.AppConfig.DanmakuStrokeColor.GetColor((byte)(aOpacity * 0xFF / 2)));
-                renderTarget.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+                using var aOutlineBrush = new CanvasSolidColorBrush(resourceCreator, provider.AppConfig.DanmakuStrokeColor.GetColor((byte)(aOpacity * 0xFF / 2)));
+                resourceCreator.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
             }
-            renderTarget.Transform = lastTransform;
+            resourceCreator.Transform = lastTransform;
 
             return;
         }
@@ -219,27 +221,21 @@ public partial record Danmaku(
         if (!(0 <= t) || !(t < provider.AppConfig.DanmakuActualDuration))
             return;
 
-        var layout = provider.Layouts[ToString()];
-        var width = layout.LayoutBounds.Width;
-        var brush = provider.GetBrush(Color, provider.AppConfig.DanmakuOpacity);
-        var outlineBrush = (CanvasSolidColorBrush)null!;
-        var geometry = (CanvasGeometry)null!;
-        if (provider.AppConfig.DanmakuEnableStrokes)
-        {
-            outlineBrush = provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, provider.AppConfig.DanmakuOpacity / 2);
-            geometry = provider.Geometries[ToString()];
-        }
+        var renderTargets = provider.RenderTargets[ToString()];
+        var width = renderTargets.Sum(renderTarget => renderTarget.Size.Width);
 
-        var pos = Mode switch
+        var posX = Mode switch
         {
-            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
-            DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
-            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY),
-            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
+            DanmakuMode.Roll => (float)(provider.ViewWidth - ((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration)),
+            DanmakuMode.Bottom or DanmakuMode.Top => _showPositionX,
+            DanmakuMode.Inverse => (float)(((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration) - width),
+            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, float>(Mode)
         };
-        renderTarget.DrawTextLayout(layout, pos, brush);
-        if (provider.AppConfig.DanmakuEnableStrokes)
-            renderTarget.DrawGeometry(geometry, pos, outlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+        for (var i = 0; i < renderTargets.Length; ++i)
+        {
+            var x = posX + i * resourceCreator.Device.MaximumBitmapSizeInPixels;
+            resourceCreator.DrawImage(renderTargets[i], x, _showPositionY);
+        }
     }
 
     public override string ToString() => $"{Text},{Color},{Size}";
