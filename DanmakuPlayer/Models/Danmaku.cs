@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
@@ -25,7 +24,6 @@ namespace DanmakuPlayer.Models;
 /// <param name="UnixTimeStamp">发送时间戳</param>
 /// <param name="Pool">所属弹幕池</param>
 /// <param name="UserHash">用户ID</param>
-[DebuggerDisplay($"{{{nameof(Text)}}},{{{nameof(Color)}}},{{{nameof(Size)}}}")]
 public partial record Danmaku(
     string Text,
     float Time,

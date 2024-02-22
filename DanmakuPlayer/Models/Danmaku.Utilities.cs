@@ -263,7 +263,7 @@ public partial record Danmaku
                     {
                         LeastTime = intervalMostTime,
                         LastNode = node,
-                        Overlapped = Time < leastTime
+                        Overlapped = Time < intervalMostTime
                     };
                     // 既没有高于最小时间，也没有超过屏幕高度
                     return true;

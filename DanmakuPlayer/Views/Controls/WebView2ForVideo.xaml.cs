@@ -80,6 +80,7 @@ public sealed partial class WebView2ForVideo : UserControl
         if (Browser is { } browser)
             await browser.DisposeAsync();
         Pw?.Dispose();
+        WebView2.Close();
     }
 
     public async Task GotoAsync(string url)
