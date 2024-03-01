@@ -21,7 +21,6 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
@@ -119,6 +118,8 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void AddressBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
+        if (string.IsNullOrEmpty(sender.Text))
+            return;
         await WebView.GotoAsync(sender.Text);
     }
 
@@ -260,6 +261,7 @@ public sealed partial class BackgroundPanel : Grid
         if (WebView.HasVideo)
         {
             Vm.Time = await WebView.Operations.CurrentTimeAsync();
+            Vm.TotalTime = await WebView.Operations.DurationAsync();
             Vm.IsPlaying = await WebView.Operations.IsPlayingAsync();
             Vm.Volume = await WebView.Operations.VolumeAsync();
             Vm.Mute = await WebView.Operations.MutedAsync();
