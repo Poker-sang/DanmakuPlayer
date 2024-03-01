@@ -8,6 +8,7 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
+    xmlns:winUi="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
     <UserControl.Resources>
         <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
@@ -47,10 +48,7 @@
                     x:Uid="/SettingsDialog/AppHeader"
                     Margin="1,0,0,4"
                     Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE771;" />
-                    </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE771;}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard ContentAlignment="Left">
                             <RadioButtons SelectedIndex="{x:Bind Vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
@@ -73,16 +71,10 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <SymbolIcon Symbol="Pin" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE718;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE790;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE790;}">
                     <local:ColorPickerButton>
                         <local:ColorPickerButton.ColorPicker>
                             <ColorPicker
@@ -94,28 +86,19 @@
                 </controls:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE81C;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE81C;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xEB9D;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEB9D;}">
                     <Slider
                         Maximum="20"
                         Minimum="1"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xEC57;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEC57;}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -124,10 +107,7 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.PlaybackRate, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE916;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE916;}">
                     <Slider
                         Maximum="100"
                         Minimum="5"
@@ -137,20 +117,14 @@
                 </controls:SettingsCard>
                 <!--  弹幕设置  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <SymbolIcon Symbol="Clock" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE121;}">
                     <Slider
                         Maximum="20"
                         Minimum="5"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xEB42;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEB42;}">
                     <Slider
                         Maximum="1"
                         Minimum="0.2"
@@ -159,10 +133,7 @@
                         TickFrequency="0.2"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <SymbolIcon Symbol="Font" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE185;}">
                     <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
@@ -171,10 +142,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <SymbolIcon Symbol="FontSize" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE1C8;}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -183,19 +151,16 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <SymbolIcon Symbol="FontColor" />
-                    </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE186;}">
                     <Slider
                         Maximum="5"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuStrokeWidth, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuStrokeColorCard" IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
-                            <controls:SettingsCard.HeaderIcon>
-                                <FontIcon Glyph="&#xEF3C;" />
-                            </controls:SettingsCard.HeaderIcon>
+                        <controls:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
+                            HeaderIcon="{winUi:FontIcon Glyph=&#xEF3C;}"
+                            IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
                             <local:ColorPickerButton>
                                 <local:ColorPickerButton.ColorPicker>
                                     <ColorPicker
@@ -209,10 +174,7 @@
                 </controls:SettingsExpander>
                 <!--  弹幕滤过  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xEA3C;" />
-                    </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xEA3C;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
@@ -239,10 +201,7 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <SymbolIcon Symbol="Filter" />
-                    </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE16E;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
@@ -282,13 +241,10 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xF156;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{winUi:FontIcon Glyph=&#xF156;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xECA5;}">
                     <controls:SettingsExpander.Resources>
                         <Style
                             x:Key="DanmakuCountLimitSliderStyle"
@@ -300,9 +256,6 @@
                             <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource CountLimitConverter}" />
                         </Style>
                     </controls:SettingsExpander.Resources>
-                    <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xECA5;" />
-                    </controls:SettingsExpander.HeaderIcon>
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
@@ -324,42 +277,30 @@
 
                 <!--  WebView2设置  -->
                 <TextBlock x:Uid="/SettingsDialog/WebView2Header" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card">
-                    <controls:SettingsCard.HeaderIcon>
-                        <SymbolIcon Symbol="Globe" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="{winUi:FontIcon Glyph=&#xE12B;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.EnableWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card">
-                    <controls:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE72E;" />
-                    </controls:SettingsCard.HeaderIcon>
+                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{winUi:FontIcon Glyph=&#xE72E;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
 
                 <!--  关于  -->
                 <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}">
-                    <controls:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xE946;" />
-                    </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}" HeaderIcon="{winUi:FontIcon Glyph=&#xE946;}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/MailCard"
+                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
                             Description="{x:Bind rs:ConstantStrings.Mail}"
+                            HeaderIcon="{winUi:FontIcon Glyph=&#xE119;}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.MailToUri}"
                             Tapped="NavigateUriTapped">
-                            <controls:SettingsCard.HeaderIcon>
-                                <SymbolIcon Symbol="Mail" />
-                            </controls:SettingsCard.HeaderIcon>
-                            <controls:SettingsCard.ActionIcon>
-                                <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
-                                <FontIcon Glyph="&#xE8A7;" />
-                            </controls:SettingsCard.ActionIcon>
+                            <!--<PathIcon Data="{x:Bind rs:ConstantStrings.OutlookSvgPath}" />显示不正确不知道为什么-->
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/AuthorCard"
+                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
                             Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.AuthorUri}"
@@ -367,12 +308,10 @@
                             <controls:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.GitHubSvgPath}" />
                             </controls:SettingsCard.HeaderIcon>
-                            <controls:SettingsCard.ActionIcon>
-                                <FontIcon Glyph="&#xE8A7;" />
-                            </controls:SettingsCard.ActionIcon>
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/QqCard"
+                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.QqUri}"
@@ -380,36 +319,26 @@
                             <controls:SettingsCard.HeaderIcon>
                                 <PathIcon Data="{x:Bind rs:ConstantStrings.QqSvgPath}" />
                             </controls:SettingsCard.HeaderIcon>
-                            <controls:SettingsCard.ActionIcon>
-                                <FontIcon Glyph="&#xE8A7;" />
-                            </controls:SettingsCard.ActionIcon>
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/RepositoryCard"
+                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
+                            HeaderIcon="{winUi:FontIcon Glyph=&#xE7B8;}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}"
-                            Tapped="NavigateUriTapped">
-                            <controls:SettingsCard.HeaderIcon>
-                                <FontIcon Glyph="&#xE7B8;" />
-                            </controls:SettingsCard.HeaderIcon>
-                            <controls:SettingsCard.ActionIcon>
-                                <FontIcon Glyph="&#xE8A7;" />
-                            </controls:SettingsCard.ActionIcon>
-                        </controls:SettingsCard>
+                            Tapped="NavigateUriTapped" />
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
                 <controls:SettingsCard
                     x:Uid="/SettingsDialog/LicenseCard"
+                    ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
                     IsClickEnabled="True"
                     Tag="{x:Bind rs:ConstantStrings.LicenseUri}"
                     Tapped="NavigateUriTapped">
                     <controls:SettingsCard.HeaderIcon>
                         <PathIcon Data="{x:Bind rs:ConstantStrings.GnuSvgPath}" />
                     </controls:SettingsCard.HeaderIcon>
-                    <controls:SettingsCard.ActionIcon>
-                        <FontIcon Glyph="&#xE8A7;" />
-                    </controls:SettingsCard.ActionIcon>
                 </controls:SettingsCard>
             </StackPanel>
         </ScrollView>

@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winUi="using:CommunityToolkit.WinUI"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="MaximizeRestoreTapped"
     Loaded="RootLoaded"
@@ -15,14 +16,37 @@
     mc:Ignorable="d">
     <Grid.Resources>
         <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
-        <converters:BoolToPlayPauseSymbolConverter x:Key="BoolToPlayPauseSymbolConverter" />
-        <converters:BoolToPinUnPinSymbolConverter x:Key="BoolToPinUnPinSymbolConverter" />
-        <converters:BoolToMuteVolumeSymbolConverter x:Key="BoolToMuteVolumeSymbolConverter" />
-        <converters:BoolToLockUnLockFontIconConverter x:Key="BoolToLockUnLockFontIconConverter" />
-        <converters:BoolToChromeMaximizeRestoreFontIconConverter x:Key="BoolToChromeMaximizeRestoreFontIconConverter" />
-        <converters:BoolToFullScreenBackToWindowSymbolConverter x:Key="BoolToFullScreenBackToWindowSymbolConverter" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToPlayPauseConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE102;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE103;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToPinUnPinConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE196;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE141;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToMuteVolumeConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE15D;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE198;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToMuteVolumeConverter2"
+            FalseValue="{winUi:FontIcon Glyph=&#xE15D;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE198;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToLockUnLockConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE785;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE72E;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToChromeMaximizeRestoreConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE922;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE923;}" />
+        <ctkConverters:BoolToObjectConverter
+            x:Key="BoolToFullScreenBackToWindowConverter"
+            FalseValue="{winUi:FontIcon Glyph=&#xE1D9;}"
+            TrueValue="{winUi:FontIcon Glyph=&#xE1D8;}" />
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <ctkConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
+        <ctkConverters:StringFormatConverter x:Key="StringFormatConverter" />
         <!--<converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <SolidColorBrush x:Key="Foreground" Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />-->
     </Grid.Resources>
@@ -109,18 +133,13 @@
                 Grid.Row="0"
                 Grid.Column="2"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton DoubleTapped="UIElement_OnDoubleTapped" Tapped="FrontTapped">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinSymbolConverter}, Mode=OneWay}" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                <AppBarButton
+                    DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinConverter}, Mode=OneWay}"
+                    Tapped="FrontTapped" />
                 <AppBarButton Icon="Setting" Tapped="SettingTapped" />
-                <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreFontIconConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
-                <AppBarButton Tapped="CloseTapped">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE8BB;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
+                <AppBarButton Icon="{winUi:FontIcon Glyph=&#xE8BB;}" Tapped="CloseTapped" />
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>
@@ -168,29 +187,20 @@
                 <AppBarButton
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="{winUi:FontIcon Glyph=&#xEB9E;}"
                     RightTapped="RewindTapped"
-                    Tapped="RewindTapped">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xEB9E;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                    Tapped="RewindTapped" />
                 <AppBarButton
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Tapped="PauseResumeTapped">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseSymbolConverter}, Mode=OneWay}" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                    Icon="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}, Mode=OneWay}"
+                    Tapped="PauseResumeTapped" />
                 <AppBarButton
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="{winUi:FontIcon Glyph=&#xEB9D;}"
                     RightTapped="FastForwardTapped"
-                    Tapped="FastForwardTapped">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xEB9D;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                    Tapped="FastForwardTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="2"
@@ -242,18 +252,15 @@
                 Grid.Column="4"
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xEC57;" />
-                    </AppBarButton.Icon>
+                <AppBarButton Icon="{winUi:FontIcon Glyph=&#xEC57;}" Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
                     <AppBarButton.Flyout>
-                        <MenuFlyout Placement="Top">
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="2.0" />
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.5" />
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.25" />
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="1.0" />
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="0.75" />
-                            <MenuFlyoutItem Click="PlaybackRateOnClick" Text="0.5" />
+                        <MenuFlyout x:Name="MenuFlyout" Placement="Top">
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="2.0" />
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.5" />
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.25" />
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.0" />
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="0.75" />
+                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="0.5" />
                         </MenuFlyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
@@ -261,9 +268,10 @@
             <CommandBar
                 Grid.Row="2"
                 Grid.Column="5"
+                DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed"
                 Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-                <AppBarButton Icon="Volume">
+                <AppBarButton Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}" Label="{x:Bind Vm.Volume, Converter={StaticResource StringFormatConverter}, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <Flyout Placement="Top">
                             <StackPanel>
@@ -279,12 +287,9 @@
                                 <AppBarButton
                                     Width="40"
                                     HorizontalAlignment="Center"
+                                    Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter2}, Mode=OneWay}"
                                     LabelPosition="Collapsed"
-                                    Tapped="MuteOnTapped">
-                                    <AppBarButton.Icon>
-                                        <SymbolIcon Symbol="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeSymbolConverter}, Mode=OneWay}" />
-                                    </AppBarButton.Icon>
-                                </AppBarButton>
+                                    Tapped="MuteOnTapped" />
                             </StackPanel>
                         </Flyout>
                     </AppBarButton.Flyout>
@@ -292,16 +297,18 @@
                 <AppBarButton
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="Sync"
+                    LabelPosition="Collapsed"
                     Tapped="LoadSyncOnTapped" />
                 <AppBarButton
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockFontIconConverter}, Mode=OneWay}"
+                    Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockConverter}, Mode=OneWay}"
+                    LabelPosition="Collapsed"
                     Tapped="LockWebView2OnTapped" />
-                <AppBarButton DoubleTapped="UIElement_OnDoubleTapped" Tapped="FullScreenOnTapped">
-                    <AppBarButton.Icon>
-                        <SymbolIcon Symbol="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowSymbolConverter}, Mode=OneWay}" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
+                <AppBarButton
+                    DoubleTapped="UIElement_OnDoubleTapped"
+                    Icon="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowConverter}, Mode=OneWay}"
+                    LabelPosition="Collapsed"
+                    Tapped="FullScreenOnTapped" />
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>

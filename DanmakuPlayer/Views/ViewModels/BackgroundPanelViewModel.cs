@@ -5,7 +5,7 @@ using Microsoft.UI.Windowing;
 
 namespace DanmakuPlayer.Views.ViewModels;
 
-public partial class RootViewModel : ObservableObject
+public partial class BackgroundPanelViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NegativeEditingTime))]
@@ -121,7 +121,7 @@ public partial class RootViewModel : ObservableObject
         }
     }
 
-    public string PlaybackRateString => AppConfig.PlaybackRate.ToString("F2");
+    public string PlaybackRateString => AppConfig.PlaybackRate.ToString(AppConfig.PlaybackRate % 0.5 is 0 ? "F1" : "F2");
 
     /// <summary>
     /// 现实时间

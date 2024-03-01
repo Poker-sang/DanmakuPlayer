@@ -21,6 +21,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
@@ -52,6 +53,10 @@ public sealed partial class BackgroundPanel : Grid
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
         DispatcherTimerHelper.Tick += TimerTick;
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (MenuFlyout.Items.OfType<RadioMenuFlyoutItem>()
+                .FirstOrDefault(t => Vm.PlaybackRateString == t.Text) is { } item)
+            item.IsChecked = true;
     }
 
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local", Justification = "For {x:Bind}")]
@@ -59,7 +64,7 @@ public sealed partial class BackgroundPanel : Grid
     [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "For ReSharper")]
     private Color TransparentColor => Color.FromArgb(0xff / 2, 0, 0, 0);
 
-    public RootViewModel Vm { get; } = new();
+    public BackgroundPanelViewModel Vm { get; } = new();
 
     #region Grid事件
 
