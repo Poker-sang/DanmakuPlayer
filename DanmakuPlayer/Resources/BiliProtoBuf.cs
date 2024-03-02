@@ -11,7 +11,7 @@ namespace DanmakuPlayer.Resources;
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Avatar : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -31,7 +31,7 @@ public partial class Avatar : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Bubble : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -48,7 +48,7 @@ public partial class Bubble : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class BubbleV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -74,7 +74,7 @@ public partial class BubbleV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Button : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -90,7 +90,7 @@ public partial class Button : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class BuzzwordConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -102,7 +102,7 @@ public partial class BuzzwordConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class BuzzwordShowConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -131,7 +131,7 @@ public partial class BuzzwordShowConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class CheckBox : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -153,7 +153,7 @@ public partial class CheckBox : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class CheckBoxV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -172,7 +172,7 @@ public partial class CheckBoxV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class ClickButton : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -202,7 +202,7 @@ public partial class ClickButton : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class ClickButtonV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -235,7 +235,7 @@ public partial class ClickButtonV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class CommandDm : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -281,7 +281,7 @@ public partial class CommandDm : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmakuAIFlag : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -293,7 +293,7 @@ public partial class DanmakuAIFlag : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmakuElem : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -347,9 +347,12 @@ public partial class DanmakuElem : global::ProtoBuf.IExtensible
     [global::System.ComponentModel.DefaultValue("")]
     public string Animation { get; set; } = "";
 
+    [global::ProtoBuf.ProtoMember(24, Name = @"colorful")]
+    public DmColorfulType Colorful { get; set; }
+
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmakuFlag : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -364,7 +367,7 @@ public partial class DanmakuFlag : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmakuFlagConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -383,7 +386,7 @@ public partial class DanmakuFlagConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuDefaultPlayerConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -444,7 +447,7 @@ public partial class DanmuDefaultPlayerConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuPlayerConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -520,7 +523,7 @@ public partial class DanmuPlayerConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuPlayerConfigPanel : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -533,7 +536,7 @@ public partial class DanmuPlayerConfigPanel : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuPlayerDynamicConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -548,7 +551,7 @@ public partial class DanmuPlayerDynamicConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuPlayerViewConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -569,7 +572,7 @@ public partial class DanmuPlayerViewConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DanmuWebPlayerConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -650,7 +653,23 @@ public partial class DanmuWebPlayerConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
+public partial class DmColorful : global::ProtoBuf.IExtensible
+{
+    private global::ProtoBuf.IExtension __pbn__extensionData;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+        => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+    [global::ProtoBuf.ProtoMember(1, Name = @"type")]
+    public DmColorfulType Type { get; set; }
+
+    [global::ProtoBuf.ProtoMember(2, Name = @"src")]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string Src { get; set; } = "";
+
+}
+
+[global::ProtoBuf.ProtoContract()]
 public partial class DmExpoReportReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -670,7 +689,7 @@ public partial class DmExpoReportReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmExpoReportRes : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -679,7 +698,7 @@ public partial class DmExpoReportRes : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmPlayerConfigReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -748,7 +767,7 @@ public partial class DmPlayerConfigReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -763,7 +782,7 @@ public partial class DmSegConfig : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegMobileReply : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -779,9 +798,12 @@ public partial class DmSegMobileReply : global::ProtoBuf.IExtensible
     [global::ProtoBuf.ProtoMember(3, Name = @"ai_flag")]
     public DanmakuAIFlag AiFlag { get; set; }
 
+    [global::ProtoBuf.ProtoMember(5, Name = @"colorfulSrc")]
+    public global::System.Collections.Generic.List<DmColorful> colorfulSrcs { get; } = new global::System.Collections.Generic.List<DmColorful>();
+
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegMobileReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -817,7 +839,7 @@ public partial class DmSegMobileReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegOttReply : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -832,7 +854,7 @@ public partial class DmSegOttReply : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegOttReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -853,7 +875,7 @@ public partial class DmSegOttReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegSDKReply : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -868,7 +890,7 @@ public partial class DmSegSDKReply : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmSegSDKReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -889,7 +911,7 @@ public partial class DmSegSDKReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmViewReply : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -959,7 +981,7 @@ public partial class DmViewReply : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmViewReq : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -984,7 +1006,7 @@ public partial class DmViewReq : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class DmWebViewReply : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1037,7 +1059,7 @@ public partial class DmWebViewReply : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class ExpoReport : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1049,7 +1071,7 @@ public partial class ExpoReport : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Expression : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1068,7 +1090,7 @@ public partial class Expression : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Expressions : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1080,7 +1102,7 @@ public partial class Expressions : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class InlinePlayerDanmakuSwitch : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1092,7 +1114,7 @@ public partial class InlinePlayerDanmakuSwitch : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Label : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1108,7 +1130,7 @@ public partial class Label : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class LabelV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1130,7 +1152,7 @@ public partial class LabelV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Period : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1145,7 +1167,7 @@ public partial class Period : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuAiRecommendedLevel : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1157,7 +1179,7 @@ public partial class PlayerDanmakuAiRecommendedLevel : global::ProtoBuf.IExtensi
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuAiRecommendedLevelV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1169,7 +1191,7 @@ public partial class PlayerDanmakuAiRecommendedLevelV2 : global::ProtoBuf.IExten
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuAiRecommendedSwitch : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1181,7 +1203,7 @@ public partial class PlayerDanmakuAiRecommendedSwitch : global::ProtoBuf.IExtens
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlockbottom : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1193,7 +1215,7 @@ public partial class PlayerDanmakuBlockbottom : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlockcolorful : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1205,7 +1227,7 @@ public partial class PlayerDanmakuBlockcolorful : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlockrepeat : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1217,7 +1239,7 @@ public partial class PlayerDanmakuBlockrepeat : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlockscroll : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1229,7 +1251,7 @@ public partial class PlayerDanmakuBlockscroll : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlockspecial : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1241,7 +1263,7 @@ public partial class PlayerDanmakuBlockspecial : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuBlocktop : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1253,7 +1275,7 @@ public partial class PlayerDanmakuBlocktop : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuDomain : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1265,7 +1287,7 @@ public partial class PlayerDanmakuDomain : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuEnableblocklist : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1277,7 +1299,7 @@ public partial class PlayerDanmakuEnableblocklist : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuOpacity : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1289,7 +1311,7 @@ public partial class PlayerDanmakuOpacity : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuScalingfactor : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1301,7 +1323,7 @@ public partial class PlayerDanmakuScalingfactor : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuSeniorModeSwitch : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1313,7 +1335,7 @@ public partial class PlayerDanmakuSeniorModeSwitch : global::ProtoBuf.IExtensibl
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuSpeed : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1325,7 +1347,7 @@ public partial class PlayerDanmakuSpeed : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuSwitch : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1340,7 +1362,7 @@ public partial class PlayerDanmakuSwitch : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuSwitchSave : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1352,7 +1374,7 @@ public partial class PlayerDanmakuSwitchSave : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PlayerDanmakuUseDefaultConfig : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1364,7 +1386,7 @@ public partial class PlayerDanmakuUseDefaultConfig : global::ProtoBuf.IExtensibl
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PostPanel : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1400,7 +1422,7 @@ public partial class PostPanel : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class PostPanelV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1439,7 +1461,7 @@ public partial class PostPanelV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Response : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1455,7 +1477,7 @@ public partial class Response : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class SubtitleItem : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1499,7 +1521,7 @@ public partial class SubtitleItem : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class TextInput : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1532,7 +1554,7 @@ public partial class TextInput : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class TextInputV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1559,7 +1581,7 @@ public partial class TextInputV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class Toast : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1581,7 +1603,7 @@ public partial class Toast : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class ToastButtonV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1597,7 +1619,7 @@ public partial class ToastButtonV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class ToastV2 : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1616,7 +1638,7 @@ public partial class ToastV2 : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class UserInfo : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1647,7 +1669,7 @@ public partial class UserInfo : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class VideoMask : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1672,7 +1694,7 @@ public partial class VideoMask : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public partial class VideoSubtitle : global::ProtoBuf.IExtensible
 {
     private global::ProtoBuf.IExtension __pbn__extensionData;
@@ -1692,14 +1714,14 @@ public partial class VideoSubtitle : global::ProtoBuf.IExtensible
 
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum AvatarType
 {
     AvatarTypeNone = 0,
     AvatarTypeNFT = 1,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum BubbleType
 {
     BubbleTypeNone = 0,
@@ -1707,7 +1729,7 @@ public enum BubbleType
     BubbleTypeDmSettingPanel = 2,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum CheckboxType
 {
     CheckboxTypeNone = 0,
@@ -1715,7 +1737,7 @@ public enum CheckboxType
     CheckboxTypeColorDM = 2,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum DMAttrBit
 {
     DMAttrBitProtect = 0,
@@ -1723,14 +1745,21 @@ public enum DMAttrBit
     DMAttrHighLike = 2,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
+public enum DmColorfulType
+{
+    NoneType = 0,
+    VipGradualColor = 60001,
+}
+
+[global::ProtoBuf.ProtoContract()]
 public enum ExposureType
 {
     ExposureTypeNone = 0,
     ExposureTypeDMSend = 1,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum PostPanelBizType
 {
     PostPanelBizTypeNone = 0,
@@ -1741,14 +1770,14 @@ public enum PostPanelBizType
     PostPanelBizTypeRecommend = 5,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum PostStatus
 {
     PostStatusNormal = 0,
     PostStatusClosed = 1,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum RenderType
 {
     RenderTypeNone = 0,
@@ -1756,7 +1785,7 @@ public enum RenderType
     RenderTypeRotation = 2,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum SubtitleAiStatus
 {
     None = 0,
@@ -1764,14 +1793,14 @@ public enum SubtitleAiStatus
     Assist = 2,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum SubtitleAiType
 {
     Normal = 0,
     Translate = 1,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum SubtitleType
 {
     [global::ProtoBuf.ProtoEnum(Name = @"CC")]
@@ -1780,7 +1809,7 @@ public enum SubtitleType
     Ai = 1,
 }
 
-[global::ProtoBuf.ProtoContract]
+[global::ProtoBuf.ProtoContract()]
 public enum ToastFunctionType
 {
     ToastFunctionTypeNone = 0,

@@ -151,6 +151,9 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </controls:SettingsCard>
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{winUi:FontIcon Glyph=&#xED56;}">
+                    <ToggleSwitch IsOn="{x:Bind Vm.DanmakuDisableColorful, Mode=TwoWay}" />
+                </controls:SettingsCard>
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE186;}">
                     <Slider
                         Maximum="5"

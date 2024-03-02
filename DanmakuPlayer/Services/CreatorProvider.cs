@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
+using Windows.UI;
 using DanmakuPlayer.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI;
 
 namespace DanmakuPlayer.Services;
 
@@ -15,7 +18,9 @@ public class CreatorProvider(CanvasControl creator) : IDisposable
 {
     public ICanvasResourceCreator Creator { get; } = creator;
 
+#pragma warning disable CA1822 // 将成员标记为 static
     public AppConfig AppConfig => AppContext.AppConfig;
+#pragma warning restore CA1822 // 将成员标记为 static
 
     public double ViewWidth { get; } = creator.ActualWidth;
 
@@ -45,6 +50,8 @@ public class CreatorProvider(CanvasControl creator) : IDisposable
     /// <remarks>依赖于<see cref="Creator"/>、<see cref="Formats"/>、<see cref="Layouts"/></remarks>
     public Dictionary<string, CanvasGeometry> Geometries { get; } = [];
 
+    public CanvasLinearGradientBrush? ColorfulBrush { get; private set; }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);
@@ -52,6 +59,8 @@ public class CreatorProvider(CanvasControl creator) : IDisposable
         foreach (var brush in Brushes)
             brush.Value.Dispose();
         Brushes.Clear();
+        ColorfulBrush?.Dispose();
+        ColorfulBrush = null;
 
         ClearLayouts();
     }
@@ -140,6 +149,19 @@ public class CreatorProvider(CanvasControl creator) : IDisposable
         if (!Brushes.TryGetValue(color, out var value))
             Brushes[color] = value = new(Creator, color.GetColor((byte)(0xFF * alpha)));
         return value;
+    }
+
+    public CanvasLinearGradientBrush GetColorfulBrush(Vector2 position, double width, float alpha)
+    {
+        var brush = ColorfulBrush ??=
+            // B站网页使用的颜色
+            new(Creator, Color.FromArgb(0xFF, 0xF2, 0x50, 0x9E), Color.FromArgb(0xFF, 0x30, 0x8B, 0xCD))
+            {
+                Opacity = alpha
+            };
+        brush.StartPoint = position;
+        brush.EndPoint = position + new Vector2((float)width, 0f);
+        return brush;
     }
 
     #endregion

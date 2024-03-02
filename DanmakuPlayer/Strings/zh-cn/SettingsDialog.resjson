@@ -9,6 +9,8 @@
     "DanmakuFontCard/Description": "从计算机内已安装的字体搜索",
     "DanmakuScaleCard/Header": "弹幕大小",
     "DanmakuScaleCard/Description": "弹幕缩放倍数",
+    "DanmakuDisableColorfulCard/Header": "转化彩色弹幕",
+    "DanmakuDisableColorfulCard/Description": "将大会员专属彩色弹幕转换为普通弹幕",
     "DanmakuStrokeExpander/Header": "弹幕描边",
     "DanmakuStrokeExpander/Description": "描边宽度",
     "DanmakuStrokeColorCard/Header": "描边颜色",

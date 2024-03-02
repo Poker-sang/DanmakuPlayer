@@ -24,6 +24,7 @@ public partial record Danmaku(
     DanmakuMode Mode,
     int Size,
     uint Color,
+    bool Colorful,
     ulong UnixTimeStamp,
     DanmakuPool Pool,
     string UserHash) : IDanmakuWidth
@@ -38,23 +39,9 @@ public partial record Danmaku(
             (DanmakuMode)elem.Mode,
             elem.Fontsize,
             elem.Color,
+            elem.Colorful is DmColorfulType.VipGradualColor,
             (ulong)elem.Ctime,
             (DanmakuPool)elem.Pool,
             elem.midHash);
-    }
-
-    public static Danmaku Parse(XElement xElement)
-    {
-        var tempInfo = xElement.Attribute("p")!.Value.Split(',');
-        var size = int.Parse(tempInfo[2]);
-        return new(
-            xElement.Value,
-            float.Parse(tempInfo[0]),
-            Enum.Parse<DanmakuMode>(tempInfo[1]),
-            size,
-            uint.Parse(tempInfo[3]),
-            ulong.Parse(tempInfo[4]),
-            Enum.Parse<DanmakuPool>(tempInfo[5]),
-            tempInfo[6]);
     }
 }

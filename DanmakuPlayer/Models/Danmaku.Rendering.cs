@@ -200,13 +200,6 @@ public partial record Danmaku
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
         var brush = provider.GetBrush(Color, provider.AppConfig.DanmakuOpacity);
-        var outlineBrush = (CanvasSolidColorBrush)null!;
-        var geometry = (CanvasGeometry)null!;
-        if (provider.AppConfig.DanmakuEnableStrokes)
-        {
-            outlineBrush = provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, provider.AppConfig.DanmakuOpacity / 2);
-            geometry = provider.Geometries[ToString()];
-        }
 
         var pos = Mode switch
         {
@@ -216,7 +209,14 @@ public partial record Danmaku
             _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
         };
         renderTarget.DrawTextLayout(layout, pos, brush);
+
         if (provider.AppConfig.DanmakuEnableStrokes)
+        {
+            var geometry = provider.Geometries[ToString()];
+            ICanvasBrush outlineBrush = !provider.AppConfig.DanmakuDisableColorful && Colorful
+                ? provider.GetColorfulBrush(pos, width, provider.AppConfig.DanmakuOpacity / 2)
+                : provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, provider.AppConfig.DanmakuOpacity / 2);
             renderTarget.DrawGeometry(geometry, pos, outlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+        }
     }
 }

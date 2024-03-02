@@ -71,13 +71,27 @@ public sealed partial class InputDialog : UserControl
 
     private CancellationTokenSource? _cancellationTokenSource;
 
+    private int _activeCount;
+
+#pragma warning disable IDE0052
+    private int ActiveCount
+#pragma warning restore IDE0052
+    {
+        get => _activeCount;
+        set
+        {
+            _activeCount = value < 0 ? 0 : value;
+            ProgressRing.IsActive = value > 0;
+        }
+    }
+
     private async void InquireClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
         _cId = null;
         HideSecondButton(sender);
         e.Cancel = true;
         CancelToken();
-        ProgressRing.IsActive = true;
+        ++ActiveCount;
         _cancellationTokenSource = new();
         _codeType = InputBox.Text.Match(out var match);
         var code = 0;
@@ -124,7 +138,7 @@ public sealed partial class InputDialog : UserControl
         }
         finally
         {
-            ProgressRing.IsActive = false;
+            --ActiveCount;
         }
     }
 

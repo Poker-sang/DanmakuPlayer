@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Windows.UI;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -193,26 +192,6 @@ public sealed partial class BackgroundPanel : Grid
             var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
             tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
             return false;
-        }
-    }
-
-    private async void FileTapped(object sender, TappedRoutedEventArgs e)
-    {
-        try
-        {
-            Vm.LoadingDanmaku = true;
-
-            var file = await App.Window.PickSingleFileAsync();
-            if (file is not null)
-                await LoadDanmakuAsync(async token =>
-                {
-                    await using var stream = File.OpenRead(file.Path);
-                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
-                });
-        }
-        finally
-        {
-            Vm.LoadingDanmaku = false;
         }
     }
 

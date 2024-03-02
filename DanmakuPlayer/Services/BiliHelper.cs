@@ -143,6 +143,4 @@ public static partial class BiliHelper
     }
 
     public static IEnumerable<Danmaku> ToDanmaku(List<DanmakuElem> elems) => elems.Select(Danmaku.Parse).OrderBy(t => t.Time);
-
-    public static IEnumerable<Danmaku> ToDanmaku(XDocument xDocument) => xDocument.Element("i")!.Elements("d").Select(Danmaku.Parse).OrderBy(t => t.Time);
 }

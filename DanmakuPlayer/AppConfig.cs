@@ -100,7 +100,7 @@ public partial record AppConfig
     /// 弹幕是否允许重叠
     /// </summary>
     /// <remarks>default: <see langword="true"/></remarks>
-    public bool DanmakuEnableOverlap { get; set; }
+    public bool DanmakuEnableOverlap { get; set; } = true;
 
     #region 描边设置
 
@@ -121,6 +121,12 @@ public partial record AppConfig
     /// </summary>
     /// <remarks>default: 0xFFA9A9A9</remarks>
     public uint DanmakuStrokeColor { get; set; } = 0xFFA9A9A9;
+
+    /// <summary>
+    /// 转换大会员彩色弹幕
+    /// </summary>
+    /// <remarks>default: <see langword="false"/></remarks>
+    public bool DanmakuDisableColorful { get; set; } = false;
 
     #endregion
 

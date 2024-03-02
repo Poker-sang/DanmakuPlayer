@@ -197,6 +197,7 @@ public static class DanmakuCombiner
                         mode,
                         (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
                         (uint)peers.Average(t => t.Color),
+                        false,
                         0,
                         DanmakuPool.Normal,
                         ""

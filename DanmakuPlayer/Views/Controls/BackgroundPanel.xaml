@@ -105,7 +105,6 @@
                 IsEnabled="{x:Bind Vm.LoadingDanmaku, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton Icon="Download" Tapped="ImportTapped" />
-                <AppBarButton Icon="OpenFile" Tapped="FileTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="0"
