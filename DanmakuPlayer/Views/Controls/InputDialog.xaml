@@ -13,6 +13,15 @@
         DefaultButton="Close"
         PrimaryButtonClick="InquireClick"
         SecondaryButtonClick="SelectClick">
+        <ContentDialog.Title>
+            <StackPanel Orientation="Horizontal" Spacing="20">
+                <TextBlock x:Uid="/InputDialog/InputDialogTitleTextBlock" />
+                <ProgressRing
+                    x:Name="ProgressRing"
+                    IsActive="False"
+                    IsIndeterminate="True" />
+            </StackPanel>
+        </ContentDialog.Title>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

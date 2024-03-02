@@ -33,6 +33,12 @@
         <Page Update="Views\Controls\BackgroundPanel.xaml">
             <Generator>MSBuild:Compile</Generator>
         </Page>
+        <Page Update="Views\Controls\ColorPickerButton.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Views\Controls\WebView2ForVideo.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
     </ItemGroup>
 
     <ItemGroup>
@@ -96,11 +102,6 @@
       -->
     <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
         <ProjectCapability Include="Msix" />
-    </ItemGroup>
-    <ItemGroup>
-      <Page Update="Views\Controls\WebView2ForVideo.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
     </ItemGroup>
 
     <!-- 

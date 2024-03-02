@@ -12,20 +12,21 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class InputDialog : UserControl
 {
-    private bool _cancel;
+    private bool _canceled;
 
     private int? _cId;
 
     private BiliHelper.CodeType _codeType;
+
     public InputDialog() => InitializeComponent();
 
     private VideoPage[] ItemsSource { get; set; } = [];
 
     public async Task<int?> ShowAsync()
     {
-        _cancel = false;
+        _canceled = false;
         _ = await Content.To<ContentDialog>().ShowAsync();
-        return _cancel ? null : _cId;
+        return _canceled ? null : _cId;
     }
 
     #region 操作
@@ -52,19 +53,31 @@ public sealed partial class InputDialog : UserControl
         IbMessage.IsOpen = true;
     }
 
+    private void CancelToken()
+    {
+        if (_cancellationTokenSource is null)
+            return;
+        lock (_cancellationTokenSource)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
+        }
+    }
+
     #endregion
 
     #region 事件处理
 
-    private CancellationTokenSource _cancellationTokenSource = new();
+    private CancellationTokenSource? _cancellationTokenSource;
 
     private async void InquireClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
         _cId = null;
         HideSecondButton(sender);
         e.Cancel = true;
-        await _cancellationTokenSource.CancelAsync();
-        _cancellationTokenSource.Dispose();
+        CancelToken();
+        ProgressRing.IsActive = true;
         _cancellationTokenSource = new();
         _codeType = InputBox.Text.Match(out var match);
         var code = 0;
@@ -105,7 +118,14 @@ public sealed partial class InputDialog : UserControl
                     break;
             }
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException)
+        {
+            // ignored
+        }
+        finally
+        {
+            ProgressRing.IsActive = false;
+        }
     }
 
     private void CheckItemsSource(ContentDialog sender)
@@ -131,13 +151,13 @@ public sealed partial class InputDialog : UserControl
 
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) => Content.To<ContentDialog>().IsSecondaryButtonEnabled = true;
 
-    private void CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs e) => _cancel = true;
-
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    private void CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
+        _canceled = true;
+        CancelToken();
     }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e) => CancelToken();
 
     #endregion
 }

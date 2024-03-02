@@ -11,11 +11,11 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 
 namespace DanmakuPlayer.Services;
 
-public class CreatorProvider(CanvasControl creator, AppConfig appConfig) : IDisposable
+public class CreatorProvider(CanvasControl creator) : IDisposable
 {
     public ICanvasResourceCreator Creator { get; } = creator;
 
-    public AppConfig AppConfig { get; } = appConfig;
+    public AppConfig AppConfig => AppContext.AppConfig;
 
     public double ViewWidth { get; } = creator.ActualWidth;
 

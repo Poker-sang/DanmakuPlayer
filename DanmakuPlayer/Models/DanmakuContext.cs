@@ -22,7 +22,9 @@ public class DanmakuContext
     /// </list>
     /// </summary>
     /// ReSharper disable once UnusedMember.Local
+#pragma warning disable IDE0052
     private const bool DocProvider = false;
+#pragma warning restore IDE0052
 
     public DanmakuContext(float viewHeight, AppConfig appConfig)
     {

@@ -19,8 +19,7 @@ public record AdvancedDanmaku(
     bool Outline,
     string Font,
     bool LinearAccelerate,
-    string Path
-)
+    string Path)
 {
     private readonly bool _isPercentage = StartPosition is { X: <= 1, Y: <= 1 } && EndPosition is { X: <= 1, Y: <= 1 };
 

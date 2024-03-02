@@ -12,7 +12,7 @@ public partial record Danmaku
 {
     private double GetDistance(CreatorProvider provider, IDanmakuWidth previous)
     {
-        var time = LayoutWidth <= previous.LayoutWidth
+        var time = _layoutWidth <= previous.LayoutWidth
             ? Time
             : previous.Time + provider.AppConfig.DanmakuActualDuration;
 
