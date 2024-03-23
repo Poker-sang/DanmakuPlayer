@@ -89,10 +89,7 @@
     </Target>
     <ItemGroup>
         <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemGroup" />
-        <PRIResource Include="Strings\zh-cn\AppInfo.resjson" />
-        <PRIResource Include="Strings\zh-cn\InputDialog.resjson" />
-        <PRIResource Include="Strings\zh-cn\MainPanel.resjson" />
-        <PRIResource Include="Strings\zh-cn\SettingsDialog.resjson" />
+        <PRIResource Include="Strings\zh-cn\*.resjson" />
     </ItemGroup>
 
     <!-- 

@@ -23,6 +23,7 @@ using Microsoft.UI.Xaml.Input;
 using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
+using System.Xml.Linq;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -192,6 +193,26 @@ public sealed partial class BackgroundPanel : Grid
             var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
             tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
             return false;
+        }
+    }
+
+    private async void FileTapped(object sender, TappedRoutedEventArgs e)
+    {
+        try
+        {
+            Vm.LoadingDanmaku = true;
+
+            var file = await App.Window.PickSingleFileAsync();
+            if (file is not null)
+                await LoadDanmakuAsync(async token =>
+                {
+                    await using var stream = File.OpenRead(file.Path);
+                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
+                });
+        }
+        finally
+        {
+            Vm.LoadingDanmaku = false;
         }
     }
 

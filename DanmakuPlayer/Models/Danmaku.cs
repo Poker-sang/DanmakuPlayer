@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Resources;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
 
@@ -43,5 +44,34 @@ public partial record Danmaku(
             (ulong)elem.Ctime,
             (DanmakuPool)elem.Pool,
             elem.midHash);
+    }
+
+    public static Danmaku Parse(XElement xElement)
+    {
+        var tempInfo = xElement.Attribute("p")!.Value.Split(',');
+        return tempInfo.Length switch
+        {
+            8 => new(
+                xElement.Value,
+                float.Parse(tempInfo[0]),
+                Enum.Parse<DanmakuMode>(tempInfo[1]),
+                int.Parse(tempInfo[2]),
+                uint.Parse(tempInfo[3]),
+                false,
+                ulong.Parse(tempInfo[4]),
+                Enum.Parse<DanmakuPool>(tempInfo[5]),
+                tempInfo[6]),
+            9 => new(
+                xElement.Value,
+                float.Parse(tempInfo[0]),
+                Enum.Parse<DanmakuMode>(tempInfo[1]),
+                int.Parse(tempInfo[2]),
+                uint.Parse(tempInfo[3]),
+                false,
+                ulong.Parse(tempInfo[4]),
+                Enum.Parse<DanmakuPool>(tempInfo[5]),
+                tempInfo[6]),
+            _ => ThrowHelper.InvalidCast<Danmaku>()
+        };
     }
 }
