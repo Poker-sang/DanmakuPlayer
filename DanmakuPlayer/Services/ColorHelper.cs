@@ -15,7 +15,7 @@ public static class ColorHelper
     {
         var ptr = &color;
         var c = (byte*)ptr;
-        return Color.FromArgb(c[3], c[2], c[1], c[0]);
+        return Color.FromArgb(c[3], c[2], c[1], c[0]); 
     }
 
     public static unsafe uint GetUInt(this Color color)
@@ -29,6 +29,15 @@ public static class ColorHelper
         return ret;
     }
 
-    public static uint GetAlphaUInt(this Color color) =>
-        (uint)(color.B + (color.G << 8) + (color.R << 16) + (color.A << 24));
+    public static unsafe uint GetAlphaUInt(this Color color)
+    {
+        uint ret;
+        var ptr = &ret;
+        var c = (byte*)ptr;
+        c[0] = color.B;
+        c[1] = color.G;
+        c[2] = color.R;
+        c[3] = color.A;
+        return ret;
+    }
 }

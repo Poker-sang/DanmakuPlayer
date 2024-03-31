@@ -80,7 +80,7 @@ public sealed partial class SettingsDialog : UserControl
 
     private async void NavigateUriTapped(object sender, TappedRoutedEventArgs e)
     {
-        _ = await Launcher.LaunchUriAsync(new(sender.GetTag<string>()));
+        _ = await Launcher.LaunchUriAsync(new(sender.To<FrameworkElement>().GetTag<string>()));
     }
 
     private void ThemeChanged(object sender, SelectionChangedEventArgs e)
@@ -154,7 +154,7 @@ public sealed partial class SettingsDialog : UserControl
     }
 
     private void RemoveTapped(object sender, TappedRoutedEventArgs e) =>
-        Vm.RegexPatterns.Remove(sender.GetTag<string>());
+        Vm.RegexPatterns.Remove(sender.To<FrameworkElement>().GetTag<string>());
 
     private void CloseClick(ContentDialog sender, ContentDialogButtonClickEventArgs e)
     {

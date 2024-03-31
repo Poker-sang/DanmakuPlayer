@@ -4,16 +4,17 @@
     xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
     xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
     xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-    IgnorableNamespaces="uap rescap">
+    xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+    IgnorableNamespaces="uap rescap mp">
 
     <Identity
-      Name="70a1252b-77b7-4c9b-884e-3ee5eb046424"
-      Publisher="CN=poker"
+      Name="PokerKo.DanmakuPlayer"
+      Publisher="CN=D5BE94D7-0E23-4B10-BC6A-5550D9783A2A"
       Version="3.6.3.0" />
 
     <Properties>
         <DisplayName>Danmaku Player</DisplayName>
-        <PublisherDisplayName>Poker</PublisherDisplayName>
+        <PublisherDisplayName>PokerKo</PublisherDisplayName>
         <Logo>Assets\StoreLogo.png</Logo>
     </Properties>
 
@@ -45,4 +46,6 @@
     <Capabilities>
         <rescap:Capability Name="runFullTrust" />
     </Capabilities>
+
+    <mp:PhoneIdentity PhoneProductId="d8a04578-dbcf-4822-bf6b-5b54579c37a8" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 </Package>
