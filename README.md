@@ -1,6 +1,10 @@
+<div align="center">
+
+<img align="center" src="readme/DanmakuPlayer.svg" alt="logo" width="200">
+
 # DanmakuPlayer
 
-## 介绍
+</div>
 
 * 支持 [bilibili](bilibili.com) xml格式和protobuf直接下载的弹幕文件的透明弹幕播放器
 
@@ -9,9 +13,9 @@
 * 获取弹幕依赖 [protobuf-net](https://github.com/protobuf-net/protobuf-net) 库
 
 * 弹幕渲染使用 [Win2D](https://github.com/Microsoft/Win2D) 库
- 
+
 * WebView2操作使用 [Playwright](https://github.com/microsoft/playwright-dotnet) 自动化
- 
+
 * 龟速更新中
 
 ## 预览
@@ -21,19 +25,19 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 ### 完整弹幕
 
-![full](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/full.png)
+![full](readme/full.png)
 
 ### 合并类似弹幕、同屏不重叠
 
-![combined](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/combined.png)
+![combined](readme/combined.png)
 
 ### M7高级弹幕
 
-![m7](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/m7.png)
+![m7](readme/m7.png)
 
 ### 与背后播放器同步
 
-![webview2](https://github.com/Poker-sang/DanmakuPlayer/blob/master/readme/webview2.png)
+![webview2](readme/webview2.png)
 
 ## 使用说明
 

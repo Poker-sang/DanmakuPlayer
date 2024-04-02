@@ -31,7 +31,8 @@ public partial class App : Application
             Size = WindowHelper.EstimatedWindowSize(),
             ExtendTitleBar = true,
             BackdropType = BackdropType.Maintain,
-            Title = nameof(DanmakuPlayer)
+            Title = nameof(DanmakuPlayer),
+            IconPath = new(AppContext.ApplicationUriToPath(new("ms-appx:///Assets/DanmakuPlayer.ico")))
         });
         Window.RegisterUnhandledExceptionHandler();
         Window.Activate();

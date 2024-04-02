@@ -1,7 +1,11 @@
+using System;
+using System.IO;
 using Windows.Storage;
 using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using WinUI3Utilities.Attributes;
+using Windows.ApplicationModel;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer;
 
@@ -25,5 +29,18 @@ public static partial class AppContext
         || true
 #endif
             ? new() : appConfigurations;
+    }
+
+    public static string ApplicationUriToPath(Uri uri)
+    {
+        if (uri.Scheme is not "ms-appx")
+        {
+            // ms-appdata is handled by the caller.
+            ThrowHelper.InvalidOperation("Uri is not using the ms-appx scheme");
+        }
+
+        var path = Uri.UnescapeDataString(uri.PathAndQuery).TrimStart('/');
+
+        return Path.Combine(Package.Current.InstalledPath, uri.Host, path);
     }
 }

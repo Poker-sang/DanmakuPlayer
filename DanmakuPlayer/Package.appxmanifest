@@ -35,10 +35,14 @@
                 DisplayName="Danmaku Player"
                 Description="支持bilibili xml格式和protobuf直接下载的弹幕文件的透明弹幕播放器"
                 BackgroundColor="transparent"
-                Square150x150Logo="Assets\Square150x150Logo.png"
-                Square44x44Logo="Assets\Square44x44Logo.png">
-                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+                Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\Square71x71Logo.png" Square310x310Logo="Assets\Square310x310Logo.png">
+                    <uap:ShowNameOnTiles>
+                        <uap:ShowOn Tile="square310x310Logo"/>
+                    </uap:ShowNameOnTiles>
+                </uap:DefaultTile >
                 <uap:SplashScreen Image="Assets\SplashScreen.png" />
+                <uap:LockScreen BadgeLogo="Assets\Square24x24Logo.png" Notification="badge"/>
             </uap:VisualElements>
         </Application>
     </Applications>
