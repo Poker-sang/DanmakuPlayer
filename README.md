@@ -6,6 +6,8 @@
 
 </div>
 
+[![](https://get.microsoft.com/images/zh-cn%20dark.svg)](https://apps.microsoft.com/detail/Danmaku%20Player/9pmcjd6flbzs?launch=true&mode=mini)
+
 * 支持 [bilibili](bilibili.com) xml格式和protobuf直接下载的弹幕文件的透明弹幕播放器
 
 * UI使用WinUI3框架，上个WPF版本 [链接](https://github.com/Poker-sang/DanmakuPlayerWpf)
