@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DanmakuPlayer.Resources;
 using WinUI3Utilities.Attributes;
 
@@ -185,6 +186,12 @@ public partial record AppConfig
     /// </summary>
     /// <remarks>default: <see langword="true"/></remarks>
     public bool DanmakuCountM7Enable { get; set; } = true;
+
+    /// <summary>
+    /// B站Cookie
+    /// </summary>
+    /// <remarks>default: []</remarks>
+    public Dictionary<string, string> DanmakuCookie { get; set; } = [];
 
     #endregion
 

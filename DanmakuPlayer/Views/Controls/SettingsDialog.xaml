@@ -8,6 +8,8 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
+    xmlns:services="using:DanmakuPlayer.Services"
+    xmlns:viewModels="using:DanmakuPlayer.Views.ViewModels"
     xmlns:winUi="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -35,6 +37,7 @@
         <converters:CountLimitConverter x:Key="CountLimitConverter" />
         <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
         <converters:StringToFontFamilyConverter x:Key="StringToFontFamilyConverter" />
+        <converters:CollectionIsEmptyToVisibilityConverter x:Key="CollectionIsEmptyToVisibilityConverter" />
     </UserControl.Resources>
     <ContentDialog
         x:Uid="/SettingsDialog/SettingsDialog"
@@ -151,7 +154,7 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{winUi:FontIcon Glyph=&#xED56;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEE57;}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuDisableColorful, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE186;}">
@@ -175,6 +178,48 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xED56;}">
+                    <CommandBar DefaultLabelPosition="Collapsed">
+                        <AppBarButton
+                            x:Uid="/SettingsDialog/DanmakuGetCookieFromClipboardAppBarButton"
+                            Width="50"
+                            Icon="{winUi:FontIcon Glyph=&#xF0E3;}"
+                            Tapped="DanmakuGetCookieFromClipboardAppBarButton_OnTapped" />
+                        <AppBarButton
+                            x:Uid="/SettingsDialog/DanmakuGetCookieFromWebViewAppBarButton"
+                            Width="50"
+                            Icon="{winUi:FontIcon Glyph=&#xE774;}"
+                            Tapped="DanmakuGetCookieFromWebViewAppBarButton_OnTapped" />
+                    </CommandBar>
+                    <controls:SettingsExpander.Items>
+                        <controls:SettingsCard>
+                            <Grid>
+                                <ItemsRepeater Width="450" ItemsSource="{x:Bind viewModels:SettingsViewModel.GetStringPairs(Vm.DanmakuCookie), Mode=OneWay}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="services:StringPair">
+                                            <Grid HorizontalAlignment="Stretch" ColumnSpacing="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*" />
+                                                    <ColumnDefinition Width="3*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Text="{x:Bind Name}"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind Value}"
+                                                    TextWrapping="Wrap" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                                <TextBlock x:Uid="/SettingsDialog/CookieIsEmptyTextBlock" Visibility="{x:Bind Vm.DanmakuCookie, Converter={StaticResource CollectionIsEmptyToVisibilityConverter}, Mode=OneWay}" />
+                            </Grid>
+                        </controls:SettingsCard>
+                    </controls:SettingsExpander.Items>
+                </controls:SettingsExpander>
+
                 <!--  弹幕滤过  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xEA3C;}">

@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using Windows.Web.Http;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
@@ -12,6 +17,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.Web.WebView2.Core;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -19,7 +25,7 @@ namespace DanmakuPlayer.Views.Controls;
 [INotifyPropertyChanged]
 public sealed partial class SettingsDialog : UserControl
 {
-    [ObservableProperty] private SettingViewModel _vm = null!;
+    [ObservableProperty] private SettingsViewModel _vm = null!;
 
     public SettingsDialog() => InitializeComponent();
 
@@ -163,6 +169,40 @@ public sealed partial class SettingsDialog : UserControl
         AppContext.AppConfig = Vm.AppConfig;
         CompareChanges(copy, Vm.AppConfig);
         AppContext.SaveConfiguration(Vm.AppConfig);
+    }
+
+    private readonly JsonSerializerOptions _options = new(JsonSerializerDefaults.Web);
+
+    private async void DanmakuGetCookieFromClipboardAppBarButton_OnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        var cookieText = await Clipboard.GetContent().GetTextAsync();
+        try
+        {
+            if (JsonSerializer.Deserialize<Cookie[]>(cookieText, _options) is { Length: > 2 } cookie)
+            {
+                Vm.DanmakuCookie = cookie.ToDictionary(c => c.Name, c => c.Value);
+                return;
+            }
+        }
+        catch
+        {
+            // ignored
+        }
+
+        var cookiesDict = new Dictionary<string, string>();
+        if (cookieText.Split(';') is { Length: > 2 } cookies)
+            foreach (var cookie in cookies)
+                if (cookie.Split('=') is [var name, var value])
+                    cookiesDict[name.Trim()] = value.Trim();
+        if (cookiesDict.Count > 2)
+            Vm.DanmakuCookie = cookiesDict;
+    }
+
+    private async void DanmakuGetCookieFromWebViewAppBarButton_OnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        var backgroundPanel = Parent.To<BackgroundPanel>();
+        var cookie = await backgroundPanel.WebView.GetBiliCookieAsync();
+        Vm.DanmakuCookie = cookie.ToDictionary(c => c.Name, c => c.Value);
     }
 
     #endregion

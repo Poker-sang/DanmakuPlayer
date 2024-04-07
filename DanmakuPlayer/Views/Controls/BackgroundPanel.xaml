@@ -59,6 +59,7 @@
         x:Name="WebView"
         Grid.Row="0"
         Grid.RowSpan="3"
+        x:FieldModifier="public"
         IsHitTestVisible="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
         KeyboardAcceleratorPlacementMode="Hidden"
         VideoLoaded="WebViewOnPageLoaded"

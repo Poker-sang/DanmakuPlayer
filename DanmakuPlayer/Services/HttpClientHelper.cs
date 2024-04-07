@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -34,6 +35,8 @@ public static class HttpClientHelper
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new("Mozilla", "5.0"));
         client.DefaultRequestHeaders.UserAgent.Add(new("DanmakuPlayer", "0"));
+        if (AppContext.AppConfig.DanmakuCookie is { Count: > 0 } cookies)
+            client.DefaultRequestHeaders.Add("Cookie", string.Join("; ", cookies.Select(t => $"{t.Key}={t.Value}")));
         _shouldRefreshHeader = false;
         if (header is not null)
         {

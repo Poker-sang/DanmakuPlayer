@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -12,6 +13,7 @@ using Microsoft.UI.Xaml.Input;
 using WinUI3Utilities;
 using WinUI3Utilities.Attributes;
 using System.Xml;
+using Microsoft.Web.WebView2.Core;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -85,6 +87,8 @@ public sealed partial class WebView2ForVideo : UserControl
         Pw?.Dispose();
         WebView2.Close();
     }
+
+    public IAsyncOperation<IReadOnlyList<CoreWebView2Cookie>> GetBiliCookieAsync() => WebView2.CoreWebView2.CookieManager.GetCookiesAsync("https://bilibili.com");
 
     public async Task GotoAsync(string url)
     {
