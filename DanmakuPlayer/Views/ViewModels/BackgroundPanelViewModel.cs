@@ -74,6 +74,8 @@ public partial class BackgroundPanelViewModel : ObservableObject
 
     private double _tempPlaybackRate;
 
+    private int _tempDuration;
+
     /// <summary>
     /// 设为3倍速时，临时保存原来的倍速；
     /// 设为-1倍速时，恢复原来的倍速；
@@ -86,18 +88,21 @@ public partial class BackgroundPanelViewModel : ObservableObject
         {
             switch (value)
             {
-                // 如果是改为3倍速，临时保存原来的倍速
                 case 3 when AppConfig.PlaybackRate is 3:
                     return;
+                // 如果是改为3倍速，临时保存原来的倍速
                 case 3:
                     _tempPlaybackRate = AppConfig.PlaybackRate;
+                    _tempDuration = AppConfig.DanmakuDuration;
+                    AppConfig.DanmakuDuration /= 3;
                     AppConfig.PlaybackRate = value;
                     break;
-                // 如果是改为-1倍速，且原来是3倍速，恢复原来的倍速
                 case -1 when AppConfig.PlaybackRate is not 3:
                     return;
+                // 如果是改为-1倍速，且原来是3倍速，恢复原来的倍速
                 case -1:
                     AppConfig.PlaybackRate = _tempPlaybackRate;
+                    AppConfig.DanmakuDuration = _tempDuration;
                     break;
                 // 如果已经是3倍速，且改为别的倍速，则改变临时保存的倍速
                 // ReSharper disable once PatternAlwaysMatches
