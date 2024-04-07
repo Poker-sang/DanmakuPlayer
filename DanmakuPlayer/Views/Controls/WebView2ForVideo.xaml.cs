@@ -93,6 +93,7 @@ public sealed partial class WebView2ForVideo : UserControl
     {
         try
         {
+            Operations = null;
             if (Page == null!)
                 return;
             _ = await Page.GotoAsync(url, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
