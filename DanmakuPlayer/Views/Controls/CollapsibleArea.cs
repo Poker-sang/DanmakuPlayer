@@ -1,5 +1,4 @@
 using CommunityToolkit.WinUI;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using WinUI3Utilities;
@@ -14,7 +13,6 @@ public sealed class CollapsibleArea : ContentControl
         Loaded += (sender, _) =>
         {
             var that = sender.To<ContentControl>();
-            that.Content.To<UIElement>().Visibility = Visibility.Collapsed;
             if (that.FindDescendant<Border>() is { } border)
             {
                 border.PointerEntered += OnPointerEntered;
@@ -26,12 +24,12 @@ public sealed class CollapsibleArea : ContentControl
     public void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         OnPointerEntered(e);
-        sender.To<Border>().Child.To<UIElement>().Visibility = Visibility.Visible;
+        sender.To<Border>().Opacity = 1;
     }
 
     public void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         OnPointerExited(e);
-        sender.To<Border>().Child.To<UIElement>().Visibility = Visibility.Collapsed;
+        sender.To<Border>().Opacity = 0;
     }
 }

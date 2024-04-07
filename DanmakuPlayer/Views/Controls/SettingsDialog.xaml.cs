@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using Windows.Web.Http;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
@@ -17,7 +16,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.Web.WebView2.Core;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
