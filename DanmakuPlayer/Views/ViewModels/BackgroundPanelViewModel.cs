@@ -126,7 +126,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
         }
     }
 
-    public string PlaybackRateString => AppConfig.PlaybackRate.ToString("#.0#");
+    public string PlaybackRateString => AppConfig.PlaybackRate.ToString("0.0#");
 
     /// <summary>
     /// 现实时间

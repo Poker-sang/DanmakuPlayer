@@ -39,10 +39,10 @@ public sealed partial class BackgroundPanel : Grid
                 case nameof(Vm.Volume):
                     VolumeChanged(sender, e);
                     break;
-                // 临时调整为3倍速时不会触发重新加载弹幕
                 case nameof(Vm.PlaybackRate):
                     ResetProvider();
                     break;
+                // 临时调整为3倍速时不会触发重新加载弹幕
                 case nameof(Vm.PlaybackRateString):
                     TrySetPlaybackRate();
                     break;
@@ -248,6 +248,7 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
+    [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
 
     private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time, Vm.AppConfig);

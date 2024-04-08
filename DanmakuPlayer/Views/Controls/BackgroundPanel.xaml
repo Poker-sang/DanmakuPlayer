@@ -2,6 +2,7 @@
     x:Class="DanmakuPlayer.Views.Controls.BackgroundPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:WinUI3Utilities.Controls"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:ctkConverters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,32 +19,32 @@
         <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToPlayPauseConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE102;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE103;}" />
+            FalseValue="{controls:GlyphIcon Glyph=PlayE768}"
+            TrueValue="{controls:GlyphIcon Glyph=PauseE769}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToPinUnPinConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE196;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE141;}" />
+            FalseValue="{controls:GlyphIcon Glyph=UnpinE77A}"
+            TrueValue="{controls:GlyphIcon Glyph=PinE718}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToMuteVolumeConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE15D;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE198;}" />
+            FalseValue="{controls:GlyphIcon Glyph=VolumeE767}"
+            TrueValue="{controls:GlyphIcon Glyph=MuteE74F}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToMuteVolumeConverter2"
-            FalseValue="{winUi:FontIcon Glyph=&#xE15D;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE198;}" />
+            FalseValue="{controls:GlyphIcon Glyph=VolumeE767}"
+            TrueValue="{controls:GlyphIcon Glyph=MuteE74F}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToLockUnLockConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE785;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE72E;}" />
+            FalseValue="{controls:GlyphIcon Glyph=UnlockE785}"
+            TrueValue="{controls:GlyphIcon Glyph=LockE72E}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToChromeMaximizeRestoreConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE922;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE923;}" />
+            FalseValue="{controls:GlyphIcon Glyph=ChromeMaximizeE922}"
+            TrueValue="{controls:GlyphIcon Glyph=ChromeRestoreE923}" />
         <ctkConverters:BoolToObjectConverter
             x:Key="BoolToFullScreenBackToWindowConverter"
-            FalseValue="{winUi:FontIcon Glyph=&#xE1D9;}"
-            TrueValue="{winUi:FontIcon Glyph=&#xE1D8;}" />
+            FalseValue="{controls:GlyphIcon Glyph=FullScreenE740}"
+            TrueValue="{controls:GlyphIcon Glyph=BackToWindowE73F}" />
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <ctkConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
         <ctkConverters:StringFormatConverter x:Key="StringFormatConverter" />
@@ -140,7 +141,7 @@
                     Tapped="FrontTapped" />
                 <AppBarButton Icon="Setting" Tapped="SettingTapped" />
                 <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
-                <AppBarButton Icon="{winUi:FontIcon Glyph=&#xE8BB;}" Tapped="CloseTapped" />
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=ChromeCloseE8BB}" Tapped="CloseTapped" />
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>
@@ -188,7 +189,7 @@
                 <AppBarButton
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Icon="{winUi:FontIcon Glyph=&#xEB9E;}"
+                    Icon="{controls:GlyphIcon Glyph=RewindEB9E}"
                     RightTapped="RewindTapped"
                     Tapped="RewindTapped" />
                 <AppBarButton
@@ -199,7 +200,7 @@
                 <AppBarButton
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Icon="{winUi:FontIcon Glyph=&#xEB9D;}"
+                    Icon="{controls:GlyphIcon Glyph=FastForwardEB9D}"
                     RightTapped="FastForwardTapped"
                     Tapped="FastForwardTapped" />
             </CommandBar>
@@ -253,7 +254,7 @@
                 Grid.Column="4"
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="{winUi:FontIcon Glyph=&#xEC57;}" Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=PlaybackRate1xEC57}" Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <MenuFlyout x:Name="MenuFlyout" Placement="Top">
                             <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="2.0" />

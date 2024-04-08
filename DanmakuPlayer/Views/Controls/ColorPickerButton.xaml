@@ -2,6 +2,7 @@
     x:Class="DanmakuPlayer.Views.Controls.ColorPickerButton"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:WinUI3Utilities.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -22,10 +23,10 @@
                     </Rectangle>
                 </Grid>
             </Border>
-            <FontIcon
+            <controls:GlyphIcon
                 Margin="8,4,10,4"
                 FontSize="12"
-                Glyph="&#xE019;" />
+                IconGlyph="ChevronDownE70D" />
         </StackPanel>
         <Button.Flyout>
             <Flyout Placement="Left" />

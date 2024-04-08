@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls1="using:WinUI3Utilities.Controls"
     xmlns:converters="using:DanmakuPlayer.Views.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
@@ -51,7 +52,7 @@
                     x:Uid="/SettingsDialog/AppHeader"
                     Margin="1,0,0,4"
                     Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE771;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander" HeaderIcon="{controls1:GlyphIcon Glyph=PersonalizeE771}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard ContentAlignment="Left">
                             <RadioButtons SelectedIndex="{x:Bind Vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
@@ -74,10 +75,10 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE718;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{controls1:GlyphIcon Glyph=PinE718}">
                     <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE790;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard" HeaderIcon="{controls1:GlyphIcon Glyph=ColorE790}">
                     <local:ColorPickerButton>
                         <local:ColorPickerButton.ColorPicker>
                             <ColorPicker
@@ -89,19 +90,19 @@
                 </controls:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE81C;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{controls1:GlyphIcon Glyph=HistoryE81C}">
                     <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEB9D;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard" HeaderIcon="{controls1:GlyphIcon Glyph=FastForwardEB9D}">
                     <Slider
                         Maximum="20"
                         Minimum="1"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEC57;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard" HeaderIcon="{controls1:GlyphIcon Glyph=PlaybackRate1xEC57}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -110,7 +111,7 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.PlaybackRate, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE916;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard" HeaderIcon="{controls1:GlyphIcon Glyph=StopwatchE916}">
                     <Slider
                         Maximum="100"
                         Minimum="5"
@@ -120,14 +121,14 @@
                 </controls:SettingsCard>
                 <!--  弹幕设置  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE121;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{controls1:GlyphIcon Glyph=ScreenTimeF182}">
                     <Slider
                         Maximum="20"
                         Minimum="5"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEB42;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{controls1:GlyphIcon Glyph=DropEB42}">
                     <Slider
                         Maximum="1"
                         Minimum="0.2"
@@ -136,7 +137,7 @@
                         TickFrequency="0.2"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE185;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="{controls1:GlyphIcon Glyph=FontE8D2}">
                     <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
@@ -145,7 +146,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="{winUi:FontIcon Glyph=&#xE1C8;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="{controls1:GlyphIcon Glyph=FontSizeE8E9}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -154,10 +155,10 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{winUi:FontIcon Glyph=&#xEE57;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{controls1:GlyphIcon Glyph=GuestUserEE57}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuDisableColorful, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE186;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{controls1:GlyphIcon Glyph=FontColorE8D3}">
                     <Slider
                         Maximum="5"
                         Style="{StaticResource SliderStyle}"
@@ -165,7 +166,7 @@
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
-                            HeaderIcon="{winUi:FontIcon Glyph=&#xEF3C;}"
+                            HeaderIcon="{controls1:GlyphIcon Glyph=EyedropperEF3C}"
                             IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
                             <local:ColorPickerButton>
                                 <local:ColorPickerButton.ColorPicker>
@@ -178,17 +179,17 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xED56;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{controls1:GlyphIcon Glyph=EmojiTabFoodPlantsED56}">
                     <CommandBar DefaultLabelPosition="Collapsed">
                         <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuGetCookieFromClipboardAppBarButton"
                             Width="50"
-                            Icon="{winUi:FontIcon Glyph=&#xF0E3;}"
+                            Icon="{controls1:GlyphIcon Glyph=ClipboardListF0E3}"
                             Tapped="DanmakuGetCookieFromClipboardAppBarButton_OnTapped" />
                         <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuGetCookieFromWebViewAppBarButton"
                             Width="50"
-                            Icon="{winUi:FontIcon Glyph=&#xE774;}"
+                            Icon="{controls1:GlyphIcon Glyph=GlobeE774}"
                             Tapped="DanmakuGetCookieFromWebViewAppBarButton_OnTapped" />
                     </CommandBar>
                     <controls:SettingsExpander.Items>
@@ -222,7 +223,7 @@
 
                 <!--  弹幕滤过  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xEA3C;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{controls1:GlyphIcon Glyph=MergeCallEA3C}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
@@ -249,7 +250,7 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xE16E;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="{controls1:GlyphIcon Glyph=FilterE71C}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
@@ -289,10 +290,10 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{winUi:FontIcon Glyph=&#xF156;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{controls1:GlyphIcon Glyph=DialShape1F156}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{winUi:FontIcon Glyph=&#xECA5;}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{controls1:GlyphIcon Glyph=TilesECA5}">
                     <controls:SettingsExpander.Resources>
                         <Style
                             x:Key="DanmakuCountLimitSliderStyle"
@@ -325,22 +326,22 @@
 
                 <!--  WebView2设置  -->
                 <TextBlock x:Uid="/SettingsDialog/WebView2Header" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="{winUi:FontIcon Glyph=&#xE12B;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="{controls1:GlyphIcon Glyph=GlobeE774}">
                     <ToggleSwitch IsOn="{x:Bind Vm.EnableWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{winUi:FontIcon Glyph=&#xE72E;}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{controls1:GlyphIcon Glyph=LockE72E}">
                     <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
 
                 <!--  关于  -->
                 <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}" HeaderIcon="{winUi:FontIcon Glyph=&#xE946;}">
+                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}" HeaderIcon="{controls1:GlyphIcon Glyph=InfoE946}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/MailCard"
-                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
+                            ActionIcon="{controls1:GlyphIcon Glyph=OpenInNewWindowE8A7}"
                             Description="{x:Bind rs:ConstantStrings.Mail}"
-                            HeaderIcon="{winUi:FontIcon Glyph=&#xE119;}"
+                            HeaderIcon="{controls1:GlyphIcon Glyph=MailE715}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.MailToUri}"
                             Tapped="NavigateUriTapped">
@@ -348,7 +349,7 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/AuthorCard"
-                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
+                            ActionIcon="{controls1:GlyphIcon Glyph=OpenInNewWindowE8A7}"
                             Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.AuthorUri}"
@@ -359,7 +360,7 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/QqCard"
-                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
+                            ActionIcon="{controls1:GlyphIcon Glyph=OpenInNewWindowE8A7}"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.QqUri}"
@@ -370,9 +371,9 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/RepositoryCard"
-                            ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
+                            ActionIcon="{controls1:GlyphIcon Glyph=OpenInNewWindowE8A7}"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
-                            HeaderIcon="{winUi:FontIcon Glyph=&#xE7B8;}"
+                            HeaderIcon="{controls1:GlyphIcon Glyph=PackageE7B8}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}"
                             Tapped="NavigateUriTapped" />
@@ -380,7 +381,7 @@
                 </controls:SettingsExpander>
                 <controls:SettingsCard
                     x:Uid="/SettingsDialog/LicenseCard"
-                    ActionIcon="{winUi:FontIcon Glyph=&#xE8A7;}"
+                    ActionIcon="{controls1:GlyphIcon Glyph=OpenInNewWindowE8A7}"
                     IsClickEnabled="True"
                     Tag="{x:Bind rs:ConstantStrings.LicenseUri}"
                     Tapped="NavigateUriTapped">
