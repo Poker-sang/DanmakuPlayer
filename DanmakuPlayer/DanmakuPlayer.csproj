@@ -35,8 +35,9 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.1.240328-rc" />
         <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
-        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.1.240328-rc" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.0" />
         <PackageReference Include="Microsoft.Playwright" Version="1.42.0" />
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240311000" />

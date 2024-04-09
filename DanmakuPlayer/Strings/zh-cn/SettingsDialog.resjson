@@ -49,8 +49,6 @@
     "RepositoryCard/Header": "仓库",
     "LicenseCard/Header": "证书",
     "LicenseCard/Description": "GNU General Public License v3.0",
-    "AppForegroundCard/Description": "应用的前景色",
-    "AppForegroundCard/Header": "前景色",
     "AppHeader/Text": "应用设置",
     "AppThemeExpander/Description": "应用的主题色",
     "AppThemeExpander/Header": "主题",

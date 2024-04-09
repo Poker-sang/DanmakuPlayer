@@ -78,16 +78,6 @@
                 <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{controls1:GlyphIcon Glyph=PinE718}">
                     <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/AppForegroundCard" HeaderIcon="{controls1:GlyphIcon Glyph=ColorE790}">
-                    <local:ColorPickerButton>
-                        <local:ColorPickerButton.ColorPicker>
-                            <ColorPicker
-                                IsAlphaEnabled="True"
-                                IsMoreButtonVisible="True"
-                                Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
-                        </local:ColorPickerButton.ColorPicker>
-                    </local:ColorPickerButton>
-                </controls:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
                 <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{controls1:GlyphIcon Glyph=HistoryE81C}">
@@ -168,14 +158,13 @@
                             x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
                             HeaderIcon="{controls1:GlyphIcon Glyph=EyedropperEF3C}"
                             IsEnabled="{x:Bind Vm.DanmakuStrokeWidth, Converter={StaticResource IntToBoolConverter}, Mode=OneWay}">
-                            <local:ColorPickerButton>
-                                <local:ColorPickerButton.ColorPicker>
-                                    <ColorPicker
-                                        IsAlphaEnabled="True"
-                                        IsMoreButtonVisible="True"
-                                        Color="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}" />
-                                </local:ColorPickerButton.ColorPicker>
-                            </local:ColorPickerButton>
+                            <controls:ColorPickerButton SelectedColor="{x:Bind Vm.DanmakuStrokeColor, Converter={StaticResource UIntToColorConverter}, Mode=TwoWay}">
+                                <controls:ColorPickerButton.ColorPickerStyle>
+                                    <Style TargetType="controls:ColorPicker">
+                                        <Setter Property="IsAlphaEnabled" Value="True" />
+                                    </Style>
+                                </controls:ColorPickerButton.ColorPickerStyle>
+                            </controls:ColorPickerButton>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
@@ -195,8 +184,8 @@
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard>
                             <Grid>
-                                <ItemsRepeater Width="450" ItemsSource="{x:Bind viewModels:SettingsViewModel.GetStringPairs(Vm.DanmakuCookie), Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
+                                <ItemsControl Width="450" ItemsSource="{x:Bind viewModels:SettingsViewModel.GetStringPairs(Vm.DanmakuCookie), Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="services:StringPair">
                                             <Grid HorizontalAlignment="Stretch" ColumnSpacing="5">
                                                 <Grid.ColumnDefinitions>
@@ -213,8 +202,8 @@
                                                     TextWrapping="Wrap" />
                                             </Grid>
                                         </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                                 <TextBlock x:Uid="/SettingsDialog/CookieIsEmptyTextBlock" Visibility="{x:Bind Vm.DanmakuCookie, Converter={StaticResource CollectionIsEmptyToVisibilityConverter}, Mode=OneWay}" />
                             </Grid>
                         </controls:SettingsCard>
@@ -260,7 +249,7 @@
                             <StackPanel Orientation="Vertical">
                                 <AutoSuggestBox
                                     x:Uid="/SettingsDialog/AddRegexPatternAutoSuggestBox"
-                                    QueryIcon="Add"
+                                    QueryIcon="{controls1:GlyphIcon Glyph=AddE710}"
                                     QuerySubmitted="AddRegexPattern"
                                     TextChanged="RegexPatternChanged" />
                                 <InfoBar x:Name="RegexErrorInfoBar" IsClosable="True" />

@@ -36,12 +36,6 @@ public partial record AppConfig
     /// <remarks>default: <see langword="false"/></remarks>
     public bool TopMost { get; set; } = false;
 
-    /// <summary>
-    /// 前景色
-    /// </summary>
-    /// <remarks>default: 0xFFFFFFFF</remarks>
-    public uint Foreground { get; set; } = 0xFFFFFFFF;
-
     #endregion
 
     #region 播放设置

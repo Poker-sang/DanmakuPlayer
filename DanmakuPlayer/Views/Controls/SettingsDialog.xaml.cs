@@ -69,8 +69,6 @@ public sealed partial class SettingsDialog : UserControl
         }
         if (before.DanmakuFont != after.DanmakuFont)
             backgroundPanel.DanmakuFontChanged();
-        if (before.Foreground != after.Foreground)
-            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.Foreground));
         if (before.EnableWebView2 != after.EnableWebView2)
             backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.EnableWebView2));
         if (before.LockWebView2 != after.LockWebView2)

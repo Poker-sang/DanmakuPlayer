@@ -106,8 +106,8 @@
                 Grid.Column="0"
                 IsEnabled="{x:Bind Vm.LoadingDanmaku, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="Download" Tapped="ImportTapped" />
-                <AppBarButton Icon="OpenFile" Tapped="FileTapped" />
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=DownloadE896}" Tapped="ImportTapped" />
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=OpenFileE8E5}" Tapped="FileTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="0"
@@ -120,14 +120,14 @@
                 <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
                     <AppBarButton
                         DoubleTapped="UIElement_OnDoubleTapped"
-                        Icon="Back"
+                        Icon="{controls:GlyphIcon Glyph=BackE72B}"
                         IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
                         Tapped="GoBackTapped" />
                 </CommandBar>
                 <AutoSuggestBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    QueryIcon="Send"
+                    QueryIcon="{controls:GlyphIcon Glyph=SendE724}"
                     QuerySubmitted="AddressBoxOnQuerySubmitted"
                     Text="{x:Bind WebView.Url, Mode=OneWay}" />
             </Grid>
@@ -139,7 +139,7 @@
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinConverter}, Mode=OneWay}"
                     Tapped="FrontTapped" />
-                <AppBarButton Icon="Setting" Tapped="SettingTapped" />
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=SettingsE713}" Tapped="SettingTapped" />
                 <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
                 <AppBarButton Icon="{controls:GlyphIcon Glyph=ChromeCloseE8BB}" Tapped="CloseTapped" />
             </CommandBar>
@@ -298,7 +298,7 @@
                 </AppBarButton>
                 <AppBarButton
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Icon="Sync"
+                    Icon="{controls:GlyphIcon Glyph=SyncE895}"
                     LabelPosition="Collapsed"
                     Tapped="LoadSyncOnTapped" />
                 <AppBarButton
