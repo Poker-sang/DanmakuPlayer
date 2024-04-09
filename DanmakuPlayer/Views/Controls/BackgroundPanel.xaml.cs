@@ -40,6 +40,7 @@ public sealed partial class BackgroundPanel : Grid
                     VolumeChanged(sender, e);
                     break;
                 case nameof(Vm.PlaybackRate):
+                    SetPlaybackRate();
                     ResetProvider();
                     break;
                 // 临时调整为3倍速时不会触发重新加载弹幕
@@ -52,10 +53,16 @@ public sealed partial class BackgroundPanel : Grid
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
         DispatcherTimerHelper.Tick += TimerTick;
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (MenuFlyout.Items.OfType<RadioMenuFlyoutItem>()
-                .FirstOrDefault(t => Vm.PlaybackRateString == t.Text) is { } item)
-            item.IsChecked = true;
+        SetPlaybackRate();
+        return;
+
+        void SetPlaybackRate()
+        {
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            foreach (var item in MenuFlyout.Items.OfType<RadioMenuFlyoutItem>()) 
+                item.IsChecked = Vm.PlaybackRateString == item.Text;
+            Vm.RaisePropertyChanged(nameof(Vm.PlaybackRateString));
+        }
     }
 
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local", Justification = "For {x:Bind}")]

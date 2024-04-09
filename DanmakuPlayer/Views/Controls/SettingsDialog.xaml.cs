@@ -73,6 +73,8 @@ public sealed partial class SettingsDialog : UserControl
             backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.EnableWebView2));
         if (before.LockWebView2 != after.LockWebView2)
             backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.LockWebView2));
+        if (before.PlaybackRate != after.PlaybackRate)
+            backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.PlaybackRate));
         if (before.TopMost != after.TopMost)
             // 需要setter中设置OverlappedPresenter.IsAlwaysOnTop，所以不能直接用RaisePropertyChanged
             backgroundPanel.Vm.TopMost = after.TopMost;
