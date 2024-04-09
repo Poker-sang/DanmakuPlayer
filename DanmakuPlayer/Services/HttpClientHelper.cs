@@ -12,7 +12,7 @@ namespace DanmakuPlayer.Services;
 
 public static class HttpClientHelper
 {
-    private static bool _shouldRefreshHeader = true;
+    public static bool ShouldRefreshHeader { get; set; } = true;
 
     public static HttpClient Client { get; } =
         new(new HttpClientHandler
@@ -27,9 +27,9 @@ public static class HttpClientHelper
 
     public static void Initialize() { }
 
-    public static HttpClient InitializeHeader(this HttpClient client, Dictionary<string, string>? header = null)
+    public static HttpClient InitializeHeader(this HttpClient client, Dictionary<string, string>? tempHeader = null)
     {
-        if (!_shouldRefreshHeader && header is null)
+        if (!ShouldRefreshHeader)
             return client;
 
         client.DefaultRequestHeaders.Clear();
@@ -37,11 +37,11 @@ public static class HttpClientHelper
         client.DefaultRequestHeaders.UserAgent.Add(new("DanmakuPlayer", "0"));
         if (AppContext.AppConfig.DanmakuCookie is { Count: > 0 } cookies)
             client.DefaultRequestHeaders.Add("Cookie", string.Join("; ", cookies.Select(t => $"{t.Key}={t.Value}")));
-        _shouldRefreshHeader = false;
-        if (header is not null)
+        ShouldRefreshHeader = false;
+        if (tempHeader is not null)
         {
-            _shouldRefreshHeader = true;
-            foreach (var (k, v) in header)
+            ShouldRefreshHeader = true;
+            foreach (var (k, v) in tempHeader)
                 client.DefaultRequestHeaders.Add(k, v);
         }
 

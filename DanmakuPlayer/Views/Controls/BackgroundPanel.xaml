@@ -127,7 +127,7 @@
                 <AutoSuggestBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    QueryIcon="{controls:GlyphIcon Glyph=SendE724}"
+                    QueryIcon="Send"
                     QuerySubmitted="AddressBoxOnQuerySubmitted"
                     Text="{x:Bind WebView.Url, Mode=OneWay}" />
             </Grid>

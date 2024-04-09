@@ -78,6 +78,8 @@ public sealed partial class SettingsDialog : UserControl
         if (before.TopMost != after.TopMost)
             // 需要setter中设置OverlappedPresenter.IsAlwaysOnTop，所以不能直接用RaisePropertyChanged
             backgroundPanel.Vm.TopMost = after.TopMost;
+        if (!before.DanmakuCookie.SequenceEqual(after.DanmakuCookie))
+            HttpClientHelper.ShouldRefreshHeader = true;
     }
 
     #region 事件处理
