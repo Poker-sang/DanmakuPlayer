@@ -14,6 +14,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
+        LayerWindowHelper.SetLayerWindow(this);
         var overlappedPresenter = OverlappedPresenter;
         overlappedPresenter.IsResizable = false;
         overlappedPresenter.SetBorderAndTitleBar(false, false);

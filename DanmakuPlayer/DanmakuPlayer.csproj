@@ -94,23 +94,5 @@
     <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
         <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-        <NoWarn>IDE0060</NoWarn>
-    </PropertyGroup>
 
 </Project>
