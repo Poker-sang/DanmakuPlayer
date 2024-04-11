@@ -1,12 +1,12 @@
 <div align="center">
 
-<img align="center" src="readme/DanmakuPlayer.svg" alt="logo" width="200">
+<img src="readme/DanmakuPlayer.svg" alt="logo" width="200">
 
 # DanmakuPlayer
 
-</div>
+[<img src="https://get.microsoft.com/images/zh-cn%20dark.svg" alt="store-logo" width="200">](https://apps.microsoft.com/detail/Danmaku%20Player/9pmcjd6flbzs?launch=true&mode=mini)
 
-[![](https://get.microsoft.com/images/zh-cn%20dark.svg)](https://apps.microsoft.com/detail/Danmaku%20Player/9pmcjd6flbzs?launch=true&mode=mini)
+</div>
 
 * 支持 [bilibili](bilibili.com) xml格式和protobuf直接下载的弹幕文件的透明弹幕播放器
 
