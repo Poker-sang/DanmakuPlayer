@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 
@@ -89,8 +90,16 @@ public partial class WebView2ForVideo
 
         public async Task<double> DurationAsync()
         {
-            var duration = await video.EvaluateAsync("video => video.duration");
-            return duration!.Value.GetDouble();
+            try
+            {
+                var duration = await video.EvaluateAsync("video => video.duration");
+                return duration!.Value.GetDouble();
+            }
+            // 可能出现.NET不支持无穷浮点数异常
+            catch (ArgumentException)
+            {
+                return 0;
+            }
         }
 
         #region PlayPause

@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 using System.Xml;
 using CommunityToolkit.WinUI.Converters;
@@ -58,25 +59,31 @@ public partial class RadioMenuFlyout : MenuFlyout
     public static void OnItemsSourceChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
         var flyout = o.To<RadioMenuFlyout>();
-        flyout.Items.Clear();
-        if (flyout.ItemsSource is not IEnumerable source)
-            return;
+        if (flyout.ItemsSource is INotifyCollectionChanged ncc) 
+            ncc.CollectionChanged += (_, _) => flyout.UpdateSource();
+        flyout.UpdateSource();
+    }
 
+    private void UpdateSource()
+    {
+        Items.Clear();
+        if (ItemsSource is not IEnumerable source)
+            return;
         foreach (var item in source)
         {
             var flyoutItem = new RadioMenuFlyoutItem
             {
-                Text = string.IsNullOrEmpty(flyout.Formatter)
+                Text = string.IsNullOrEmpty(Formatter)
                     ? item.ToString()
-                    : string.Format(flyout.Formatter, item),
+                    : string.Format(Formatter, item),
                 Tag = item
             };
-            flyoutItem.Click += flyout.RadioMenuFlyoutItem_Click;
-            flyout.Items.Add(flyoutItem);
+            flyoutItem.Click += RadioMenuFlyoutItem_Click;
+            Items.Add(flyoutItem);
         }
 
-        if (flyout.SelectedItem is { } selectedItem)
-            foreach (var item in flyout.Items)
+        if (SelectedItem is { } selectedItem)
+            foreach (var item in Items)
                 item.To<RadioMenuFlyoutItem>().IsChecked = Equals(item.Tag, selectedItem);
     }
 

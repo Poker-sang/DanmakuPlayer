@@ -159,7 +159,7 @@ public partial class BackgroundPanel
             {
                 _tickCount = 0;
                 var lastTime = Vm.Time;
-                Vm.Time = await WebView.Operations.CurrentTimeAsync();
+                await WebView.LockOperationsAsync(async operations => Vm.Time = await operations.CurrentTimeAsync());
                 if (Math.Abs(Vm.Time - lastTime) > 0.5)
                     Sync();
             }
@@ -186,27 +186,21 @@ public partial class BackgroundPanel
         _lastTime = DateTime.Now;
         DanmakuHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
-        if (WebView.HasVideo)
-        {
-            await WebView.Operations.PlayAsync();
-            Sync();
-        }
+        await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
+        Sync();
     }
 
     private async void Pause()
     {
         DanmakuHelper.RenderType = RenderMode.RenderOnce;
         Vm.IsPlaying = false;
-        if (WebView.HasVideo)
-        {
-            await WebView.Operations.PauseAsync();
-            Sync();
-        }
+        await WebView.LockOperationsAsync(async operations => await operations.PauseAsync());
+        Sync();
     }
 
     public void TrySetPlaybackRate()
     {
-        _ = WebView.Operations?.SetPlaybackRateAsync(Vm.PlaybackRate);
+        _ = WebView.LockOperationsAsync(async operations => await operations.SetPlaybackRateAsync(Vm.PlaybackRate));
     }
 
     #endregion
@@ -224,7 +218,7 @@ public partial class BackgroundPanel
         var time = Math.Clamp(Vm.Time + fastForwardTime, 0, Vm.TotalTime);
         if (WebView.HasVideo)
         {
-            await WebView.Operations.SetCurrentTimeAsync(time);
+            await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time));
             Vm.Time = time;
         }
         else

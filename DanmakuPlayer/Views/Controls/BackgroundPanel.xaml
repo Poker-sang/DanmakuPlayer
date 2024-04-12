@@ -48,6 +48,7 @@
         <ctkConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <ctkConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
         <ctkConverters:StringFormatConverter x:Key="StringFormatConverter" />
+        <ctkConverters:CollectionVisibilityConverter x:Key="CollectionVisibilityConverter" />
         <!--<converters:UIntToColorConverter x:Key="UIntToColorConverter" />
         <SolidColorBrush x:Key="Foreground" Color="{x:Bind Vm.Foreground, Converter={StaticResource UIntToColorConverter}, Mode=OneWay}" />-->
     </Grid.Resources>
@@ -271,6 +272,18 @@
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed"
                 Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                <AppBarButton
+                    Icon="{controls:GlyphIcon Glyph=VideoE714}"
+                    LabelPosition="Collapsed"
+                    Visibility="{x:Bind WebView.Videos, Converter={StaticResource CollectionVisibilityConverter}, Mode=OneWay}">
+                    <AppBarButton.Flyout>
+                        <local:RadioMenuFlyout
+                            ItemsSource="{x:Bind WebView.Videos}"
+                            Placement="Top"
+                            SelectedItem="{x:Bind WebView.CurrentVideo, Mode=TwoWay}"
+                            SelectionChanged="CurrentVideoOnSelectionChanged" />
+                    </AppBarButton.Flyout>
+                </AppBarButton>
                 <AppBarButton Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}" Label="{x:Bind Vm.Volume, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <Flyout Placement="Top">

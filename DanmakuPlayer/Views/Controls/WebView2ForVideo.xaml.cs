@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -27,7 +28,35 @@ public sealed partial class WebView2ForVideo : UserControl
     {
         InitializeComponent();
         Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
+        Unloaded += OnUnloaded; 
+    }
+
+    public ObservableCollection<VideoLocatorDisplay> Videos { get; } = [];
+
+    public VideoLocatorDisplay? CurrentVideo
+    {
+        get => _currentVideo;
+        set
+        {
+            if (Equals(value, _currentVideo))
+                return;
+            _currentVideo = value;
+            OnPropertyChanged();
+            SetOperation();
+        }
+    }
+
+    private async void SetOperation()
+    {
+        await OperationsSemaphore.WaitAsync();
+        try
+        {
+            Operations = _currentVideo is null ? null : new(_currentVideo.Video);
+        }
+        finally
+        {
+            _ = OperationsSemaphore.Release();
+        }
     }
 
     private WebView2 WebView2 => Content.To<WebView2>();
@@ -51,9 +80,29 @@ public sealed partial class WebView2ForVideo : UserControl
     [MemberNotNullWhen(true, nameof(Operations))]
     public bool HasVideo => Operations is not null && !Page.IsClosed;
 
-    public JavaScriptOperations? Operations { get; private set; }
+    private JavaScriptOperations? Operations { get; set; }
+
+    public SemaphoreSlim OperationsSemaphore { get; } = new(1, 1);
+
+    public async Task LockOperationsAsync(Func<JavaScriptOperations, Task> task)
+    {
+        await OperationsSemaphore.WaitAsync();
+        try
+        {
+            if (HasVideo)
+            {
+                _ = await Task.WhenAny([task(Operations), Task.Delay(1000)]);
+            }
+        }
+        finally
+        {
+            _ = OperationsSemaphore.Release();
+        }
+    }
 
     [ObservableProperty] private bool _isLoading;
+
+    private VideoLocatorDisplay? _currentVideo;
 
     public event TypedEventHandler<WebView2ForVideo, EventArgs>? VideoLoaded;
 
@@ -93,7 +142,9 @@ public sealed partial class WebView2ForVideo : UserControl
     {
         try
         {
-            Operations = null;
+            CurrentVideo = null;
+            Videos.Clear();
+            OnPropertyChanged(nameof(Videos));
             if (Page == null!)
                 return;
             _ = await Page.GotoAsync(url, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
@@ -104,44 +155,64 @@ public sealed partial class WebView2ForVideo : UserControl
         }
     }
 
+    private CancellationTokenSource? _source;
+
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    [SuppressMessage("CodeQuality", "IDE0079:请删除不必要的忽略")]
     public async Task LoadVideoAsync()
     {
+        if (_source is not null)
+        {
+            await _source.CancelAsync();
+
+            for (var i = 0; i < 3 || IsLoading; ++i)
+                await Task.Delay(200);
+
+            if (IsLoading)
+                return;
+        }
         try
         {
             IsLoading = true;
-            var source = new CancellationTokenSource();
 
-            await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
-            var tasks = Page.Frames.Select(frame => TaskAsync(frame, source));
-            _ = Task.WhenAny(Task.WhenAll(tasks), Task.Delay(3000, source.Token)).ContinueWith(_ =>
+            using (_source = new())
             {
-                source.Cancel();
-                source.Dispose();
-            }, source.Token);
-            // ReSharper disable once MethodSupportsCancellation
-            while (!source.Token.IsCancellationRequested)
-                await Task.Delay(200);
+                CurrentVideo = null;
+                Videos.Clear();
+                await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+                var tasks = Page.Frames.Select(frame => TaskAsync(frame, _source));
+                _ = Task.WhenAny(Task.WhenAll(tasks), Task.Delay(3000, _source.Token)).ContinueWith(_ => _source.Cancel(), _source.Token);
+
+                // ReSharper disable once MethodSupportsCancellation
+                while (!_source.Token.IsCancellationRequested)
+                    await Task.Delay(200);
+            }
+            _source = null;
+
+            if (Videos.Count is not 0)
+                CurrentVideo = Videos[0];
+
+            // 触发 CollectionVisibilityConverter
+            OnPropertyChanged(nameof(Videos));
         }
         catch
         {
-            Operations = null;
+            CurrentVideo = null;
+            Videos.Clear();
+            OnPropertyChanged(nameof(Videos));
         }
         finally
         {
             IsLoading = false;
         }
         if (HasVideo)
-            try
+        {
+            await LockOperationsAsync(async operations =>
             {
-                Duration = await Operations.DurationAsync();
-                await Operations.PauseAsync();
-            }
-            // 可能出现.NET不支持无穷浮点数异常
-            catch (ArgumentException)
-            {
-                Duration = 0;
-                return;
-            }
+                Duration = await operations.DurationAsync();
+                await operations.PauseAsync();
+            });
+        }
         else
         {
             Duration = 0;
@@ -150,25 +221,25 @@ public sealed partial class WebView2ForVideo : UserControl
         VideoLoaded?.Invoke(this, EventArgs.Empty);
 
         return;
+        [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
         async Task TaskAsync(IFrame frame, CancellationTokenSource s)
         {
             try
             {
                 await frame.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
-                ILocator locator;
                 int count;
                 do
                 {
-                    locator = frame.Locator("video");
-                    count = await locator.CountAsync();
-                    await Task.Delay(200, s.Token);
+                    var first = frame.Locator("video");
+                    count = await first.CountAsync();
+                    if (count is not 0)
+                        foreach (var locator in await first.AllAsync())
+                            Videos.Add(await VideoLocatorDisplay.CreateAsync(locator));
+                    await Task.Delay(200);
                 } while (!s.Token.IsCancellationRequested && count is 0);
 
                 if (!s.Token.IsCancellationRequested && count is not 0)
-                {
-                    Operations = new(locator);
                     await s.CancelAsync();
-                }
             }
             catch
             {

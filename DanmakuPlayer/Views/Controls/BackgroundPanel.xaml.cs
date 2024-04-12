@@ -254,29 +254,36 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void Sync()
     {
-        if (WebView.HasVideo)
+        await WebView.LockOperationsAsync(async operations =>
         {
-            Vm.Time = await WebView.Operations.CurrentTimeAsync();
-            Vm.TotalTime = await WebView.Operations.DurationAsync();
-            Vm.IsPlaying = await WebView.Operations.IsPlayingAsync();
-            Vm.Volume = await WebView.Operations.VolumeAsync();
-            Vm.Mute = await WebView.Operations.MutedAsync();
-            Vm.FullScreen = await WebView.Operations.FullScreenAsync();
-            TrySetPlaybackRate();
+            Vm.Time = await operations.CurrentTimeAsync();
+            Vm.TotalTime = await operations.DurationAsync();
+            Vm.IsPlaying = await operations.IsPlayingAsync();
+            Vm.Volume = await operations.VolumeAsync();
+            Vm.Mute = await operations.MutedAsync();
+            Vm.FullScreen = await operations.FullScreenAsync();
+        });
+        TrySetPlaybackRate();
+
+        if (!WebView.HasVideo)
+        {
+            Vm.TotalTime = Vm.Time = Vm.Volume = 0;
+            Vm.FullScreen = Vm.IsPlaying = Vm.Mute = false;
         }
     }
 
     private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender) => Vm.PlaybackRate = sender.SelectedItem.To<double>();
 
-    private async void MuteOnTapped(object sender, TappedRoutedEventArgs e)
-    {
-        if (WebView.HasVideo)
-            Vm.Mute = await WebView.Operations.MutedFlipAsync();
-    }
+    private void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj) => Sync();
 
-    private void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) => WebView.Operations?.SetCurrentTimeAsync(Vm.Time);
+    private async void MuteOnTapped(object sender, TappedRoutedEventArgs e) =>
+        await WebView.LockOperationsAsync(async operations => Vm.Mute = await operations.MutedFlipAsync());
 
-    private void VolumeChanged(object? sender, PropertyChangedEventArgs e) => WebView.Operations?.SetVolumeAsync(Vm.Volume);
+    private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
+        await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time));
+
+    private async void VolumeChanged(object? sender, PropertyChangedEventArgs e) =>
+        await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
 
     private async void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e)
     {
@@ -286,11 +293,8 @@ public sealed partial class BackgroundPanel : Grid
 
     private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e) => Vm.LockWebView2 = !Vm.LockWebView2;
 
-    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e)
-    {
-        if (WebView.HasVideo)
-            Vm.FullScreen = await WebView.Operations.FullScreenFlipAsync();
-    }
+    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e) =>
+        await WebView.LockOperationsAsync(async operations => Vm.FullScreen = await operations.FullScreenFlipAsync());
 
     #endregion
 
@@ -315,7 +319,7 @@ public sealed partial class BackgroundPanel : Grid
                 2 => result.TotalSeconds,
                 _ => 1
             }, Vm.TotalTime), 0);
-            _ = WebView.Operations?.SetCurrentTimeAsync(Vm.Time);
+            _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time));
         }
 
         Vm.EditingTime = false;
