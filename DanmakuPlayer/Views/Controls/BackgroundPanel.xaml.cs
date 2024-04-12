@@ -29,6 +29,8 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class BackgroundPanel : Grid
 {
+    private readonly double[] _playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
     public BackgroundPanel()
     {
         AppContext.BackgroundPanel = this;
@@ -40,29 +42,15 @@ public sealed partial class BackgroundPanel : Grid
                     VolumeChanged(sender, e);
                     break;
                 case nameof(Vm.PlaybackRate):
-                    SetPlaybackRate();
-                    ResetProvider();
-                    break;
-                // 临时调整为3倍速时不会触发重新加载弹幕
-                case nameof(Vm.PlaybackRateString):
                     TrySetPlaybackRate();
                     break;
             }
         };
+        Vm.ResetProvider += ResetProvider;
 
         InitializeComponent();
         AppContext.DanmakuCanvas = DanmakuCanvas;
         DispatcherTimerHelper.Tick += TimerTick;
-        SetPlaybackRate();
-        return;
-
-        void SetPlaybackRate()
-        {
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            foreach (var item in MenuFlyout.Items.OfType<RadioMenuFlyoutItem>()) 
-                item.IsChecked = Vm.PlaybackRateString == item.Text;
-            Vm.RaisePropertyChanged(nameof(Vm.PlaybackRateString));
-        }
     }
 
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local", Justification = "For {x:Bind}")]
@@ -278,7 +266,7 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private void PlaybackRateOnClick(object sender, RoutedEventArgs e) => Vm.PlaybackRate = double.Parse(sender.To<MenuFlyoutItem>().Text);
+    private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender) => Vm.PlaybackRate = sender.SelectedItem.To<double>();
 
     private async void MuteOnTapped(object sender, TappedRoutedEventArgs e)
     {

@@ -254,16 +254,14 @@
                 Grid.Column="4"
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=PlaybackRate1xEC57}" Label="{x:Bind Vm.PlaybackRateString, Mode=OneWay}">
+                <AppBarButton Icon="{controls:GlyphIcon Glyph=PlaybackRate1xEC57}" Label="{x:Bind Vm.PlaybackRate, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:0.0#}', Mode=OneWay}">
                     <AppBarButton.Flyout>
-                        <MenuFlyout x:Name="MenuFlyout" Placement="Top">
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="2.0" />
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.5" />
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.25" />
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="1.0" />
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="0.75" />
-                            <RadioMenuFlyoutItem Click="PlaybackRateOnClick" Text="0.5" />
-                        </MenuFlyout>
+                        <local:RadioMenuFlyout
+                            Formatter="{}{0:0.0#}"
+                            ItemsSource="{x:Bind _playbackRates}"
+                            Placement="Top"
+                            SelectedItem="{x:Bind Vm.PlaybackRate, Mode=TwoWay}"
+                            SelectionChanged="PlaybackRateOnSelectionChanged" />
                     </AppBarButton.Flyout>
                 </AppBarButton>
             </CommandBar>
@@ -273,7 +271,7 @@
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed"
                 Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-                <AppBarButton Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}" Label="{x:Bind Vm.Volume, Converter={StaticResource StringFormatConverter}, Mode=OneWay}">
+                <AppBarButton Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}" Label="{x:Bind Vm.Volume, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <Flyout Placement="Top">
                             <StackPanel>

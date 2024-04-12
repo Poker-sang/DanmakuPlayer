@@ -117,16 +117,17 @@ public partial class BackgroundPanelViewModel : ObservableObject
                         return;
                     AppConfig.PlaybackRate = value;
                     AppContext.SaveConfiguration(AppConfig);
-                    OnPropertyChanged();
+                    // 临时调整为3倍速时不会触发重新加载弹幕
+                    ResetProvider?.Invoke();
                     break;
                 }
             }
             DispatcherTimerHelper.ResetTimerInterval();
-            OnPropertyChanged(nameof(PlaybackRateString));
+            OnPropertyChanged();
         }
     }
 
-    public string PlaybackRateString => AppConfig.PlaybackRate.ToString("0.0#");
+    public event Action? ResetProvider;
 
     /// <summary>
     /// 现实时间
