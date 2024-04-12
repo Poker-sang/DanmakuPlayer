@@ -139,7 +139,7 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.6.1
+版本：3.7.0
 
 ## 联系方式
 

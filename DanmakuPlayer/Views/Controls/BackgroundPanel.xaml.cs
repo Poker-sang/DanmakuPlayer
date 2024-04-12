@@ -29,7 +29,7 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class BackgroundPanel : Grid
 {
-    private readonly double[] _playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    private readonly double[] _playbackRates = [2, 1.5, 1.25, 1, 0.75, 0.5];
 
     public BackgroundPanel()
     {
@@ -265,7 +265,7 @@ public sealed partial class BackgroundPanel : Grid
         });
         TrySetPlaybackRate();
 
-        if (!WebView.HasVideo)
+        if (Vm.EnableWebView2 && !WebView.HasVideo)
         {
             Vm.TotalTime = Vm.Time = Vm.Volume = 0;
             Vm.FullScreen = Vm.IsPlaying = Vm.Mute = false;

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Playwright;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -28,7 +29,7 @@ public sealed partial class WebView2ForVideo : UserControl
     {
         InitializeComponent();
         Loaded += OnLoaded;
-        Unloaded += OnUnloaded; 
+        Unloaded += OnUnloaded;
     }
 
     public ObservableCollection<VideoLocatorDisplay> Videos { get; } = [];
@@ -255,15 +256,16 @@ public sealed partial class WebView2ForVideo : UserControl
     private async void WebView2Tapped(object sender, PointerRoutedEventArgs e)
     {
         var properties = e.GetCurrentPoint(sender.To<UIElement>()).Properties;
-        if (properties.IsXButton1Pressed)
+        switch (properties.PointerUpdateKind)
         {
-            if (CanGoBack)
-                await GoBackAsync();
-        }
-        else if (properties.IsXButton2Pressed)
-        {
-            if (CanGoForward)
-                await GoForwardAsync();
+            case PointerUpdateKind.XButton1Released:
+                if (CanGoBack)
+                    await GoBackAsync();
+                break;
+            case PointerUpdateKind.XButton2Released:
+                if (CanGoForward)
+                    await GoForwardAsync();
+                break;
         }
     }
 }

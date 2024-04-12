@@ -171,6 +171,11 @@
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{controls1:GlyphIcon Glyph=EmojiTabFoodPlantsED56}">
                     <CommandBar DefaultLabelPosition="Collapsed">
                         <AppBarButton
+                            x:Uid="/SettingsDialog/DanmakuClearCookieAppBarButton"
+                            Width="50"
+                            Icon="{controls1:GlyphIcon Glyph=DeleteE74D}"
+                            Tapped="DanmakuClearCookieAppBarButton_OnTapped" />
+                        <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuGetCookieFromClipboardAppBarButton"
                             Width="50"
                             Icon="{controls1:GlyphIcon Glyph=ClipboardListF0E3}"

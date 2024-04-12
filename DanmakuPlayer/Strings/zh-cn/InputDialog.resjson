@@ -1,5 +1,5 @@
 {
-    "InputDialogTitleTextBlock/Text": "在线获取弹幕",
+    "InputDialogTitleTextBlock/Text": "B站在线获取弹幕",
     "InputDialog/PrimaryButtonText": "获取视频弹幕",
     "InputDialog/CloseButtonText": "取消",
     "InputBox/PlaceholderText": "输入视频的网址",

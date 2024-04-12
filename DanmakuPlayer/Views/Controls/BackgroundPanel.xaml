@@ -72,16 +72,7 @@
         Grid.RowSpan="3"
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
-        IsHitTestVisible="False">
-        <xaml:CanvasControl.KeyboardAccelerators>
-            <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
-            <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
-            <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
-            <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
-            <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
-            <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
-        </xaml:CanvasControl.KeyboardAccelerators>
-    </xaml:CanvasControl>
+        IsHitTestVisible="False" />
 
     <local:CollapsibleArea Grid.Row="0" Grid.Column="2">
         <Grid>
@@ -107,8 +98,14 @@
                 Grid.Column="0"
                 IsEnabled="{x:Bind Vm.LoadingDanmaku, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=DownloadE896}" Tapped="ImportTapped" />
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=OpenFileE8E5}" Tapped="FileTapped" />
+                <AppBarButton
+                    x:Uid="/MainPanel/DownloadButton"
+                    Icon="{controls:GlyphIcon Glyph=DownloadE896}"
+                    Tapped="ImportTapped" />
+                <AppBarButton
+                    x:Uid="/MainPanel/OpenLocalButton"
+                    Icon="{controls:GlyphIcon Glyph=OpenFileE8E5}"
+                    Tapped="FileTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="0"
@@ -120,12 +117,14 @@
                 </Grid.ColumnDefinitions>
                 <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
                     <AppBarButton
+                        x:Uid="/MainPanel/GoBackButton"
                         DoubleTapped="UIElement_OnDoubleTapped"
                         Icon="{controls:GlyphIcon Glyph=BackE72B}"
                         IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
                         Tapped="GoBackTapped" />
                 </CommandBar>
                 <AutoSuggestBox
+                    x:Uid="/MainPanel/UriAutoSuggestBox"
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     QueryIcon="Send"
@@ -137,12 +136,26 @@
                 Grid.Column="2"
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
+                    x:Uid="/MainPanel/TopmostButton"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{x:Bind Vm.TopMost, Converter={StaticResource BoolToPinUnPinConverter}, Mode=OneWay}"
                     Tapped="FrontTapped" />
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=SettingsE713}" Tapped="SettingTapped" />
-                <AppBarButton Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreConverter}, Mode=OneWay}" Tapped="MaximizeRestoreTapped" />
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=ChromeCloseE8BB}" Tapped="CloseTapped" />
+                <AppBarButton
+                    x:Uid="/MainPanel/SettingsButton"
+                    Icon="{controls:GlyphIcon Glyph=SettingsE713}"
+                    Tapped="SettingTapped">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+                <AppBarButton
+                    x:Uid="/MainPanel/MaximizeButton"
+                    Icon="{x:Bind Vm.IsMaximized, Converter={StaticResource BoolToChromeMaximizeRestoreConverter}, Mode=OneWay}"
+                    Tapped="MaximizeRestoreTapped" />
+                <AppBarButton
+                    x:Uid="/MainPanel/CloseButton"
+                    Icon="{controls:GlyphIcon Glyph=ChromeCloseE8BB}"
+                    Tapped="CloseTapped" />
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>
@@ -188,24 +201,40 @@
                 Grid.Column="0"
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
+                    x:Uid="/MainPanel/RewindButton"
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{controls:GlyphIcon Glyph=RewindEB9E}"
                     RightTapped="RewindTapped"
-                    Tapped="RewindTapped" />
+                    Tapped="RewindTapped">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarButton
+                    x:Uid="/MainPanel/PlayPauseButton"
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{x:Bind Vm.IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}, Mode=OneWay}"
-                    Tapped="PauseResumeTapped" />
+                    Tapped="PauseResumeTapped">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
                 <AppBarButton
+                    x:Uid="/MainPanel/FastForwardButton"
                     Width="40"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{controls:GlyphIcon Glyph=FastForwardEB9D}"
                     RightTapped="FastForwardTapped"
-                    Tapped="FastForwardTapped" />
+                    Tapped="FastForwardTapped">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
             </CommandBar>
             <Grid
+                x:Uid="/MainPanel/TimeEditGrid"
                 Grid.Row="2"
                 Grid.Column="1"
                 Margin="10,0"
@@ -255,7 +284,10 @@
                 Grid.Column="4"
                 DefaultLabelPosition="Right"
                 OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="{controls:GlyphIcon Glyph=PlaybackRate1xEC57}" Label="{x:Bind Vm.PlaybackRate, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:0.0#}', Mode=OneWay}">
+                <AppBarButton
+                    x:Uid="/MainPanel/PlaybackRateButton"
+                    Icon="{controls:GlyphIcon Glyph=PlaybackRate1xEC57}"
+                    Label="{x:Bind Vm.PlaybackRate, Converter={StaticResource StringFormatConverter}, ConverterParameter='{}{0:0.0#}', Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <local:RadioMenuFlyout
                             Formatter="{}{0:0.0#}"
@@ -273,6 +305,7 @@
                 OverflowButtonVisibility="Collapsed"
                 Visibility="{x:Bind Vm.EnableWebView2, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                 <AppBarButton
+                    x:Uid="/MainPanel/VideosButton"
                     Icon="{controls:GlyphIcon Glyph=VideoE714}"
                     LabelPosition="Collapsed"
                     Visibility="{x:Bind WebView.Videos, Converter={StaticResource CollectionVisibilityConverter}, Mode=OneWay}">
@@ -284,7 +317,10 @@
                             SelectionChanged="CurrentVideoOnSelectionChanged" />
                     </AppBarButton.Flyout>
                 </AppBarButton>
-                <AppBarButton Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}" Label="{x:Bind Vm.Volume, Mode=OneWay}">
+                <AppBarButton
+                    x:Uid="/MainPanel/VolumeButton"
+                    Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter}, Mode=OneWay}"
+                    Label="{x:Bind Vm.Volume, Mode=OneWay}">
                     <AppBarButton.Flyout>
                         <Flyout Placement="Top">
                             <StackPanel>
@@ -298,6 +334,7 @@
                                     StepFrequency="1"
                                     Value="{x:Bind Vm.Volume, Mode=TwoWay}" />
                                 <AppBarButton
+                                    x:Uid="/MainPanel/MuteButton"
                                     Width="40"
                                     HorizontalAlignment="Center"
                                     Icon="{x:Bind Vm.Mute, Converter={StaticResource BoolToMuteVolumeConverter2}, Mode=OneWay}"
@@ -306,18 +343,25 @@
                             </StackPanel>
                         </Flyout>
                     </AppBarButton.Flyout>
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
+                        <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
+                    </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
                 <AppBarButton
+                    x:Uid="/MainPanel/SyncButton"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{controls:GlyphIcon Glyph=SyncE895}"
                     LabelPosition="Collapsed"
                     Tapped="LoadSyncOnTapped" />
                 <AppBarButton
+                    x:Uid="/MainPanel/LockWebView2Button"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{x:Bind Vm.LockWebView2, Converter={StaticResource BoolToLockUnLockConverter}, Mode=OneWay}"
                     LabelPosition="Collapsed"
                     Tapped="LockWebView2OnTapped" />
                 <AppBarButton
+                    x:Uid="/MainPanel/FullScreenButton"
                     DoubleTapped="UIElement_OnDoubleTapped"
                     Icon="{x:Bind Vm.FullScreen, Converter={StaticResource BoolToFullScreenBackToWindowConverter}, Mode=OneWay}"
                     LabelPosition="Collapsed"

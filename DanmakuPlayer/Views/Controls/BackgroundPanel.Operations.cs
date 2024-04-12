@@ -36,7 +36,7 @@ public partial class BackgroundPanel
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 
-        if (!WebView.HasVideo)
+        if (!Vm.EnableWebView2 || !WebView.HasVideo)
         {
             Vm.TotalTime = 0;
             Vm.Time = 0;
@@ -57,7 +57,7 @@ public partial class BackgroundPanel
             var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
-            if (!WebView.HasVideo)
+            if (!Vm.EnableWebView2 || !WebView.HasVideo)
                 Vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + Vm.AppConfig.DanmakuActualDuration;
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
@@ -152,7 +152,7 @@ public partial class BackgroundPanel
             _isRightPressing = true;
         }
 
-        if (WebView.HasVideo)
+        if (Vm.EnableWebView2 && WebView.HasVideo)
         {
             ++_tickCount;
             if (_tickCount is 10)
@@ -209,14 +209,14 @@ public partial class BackgroundPanel
     /// 快进
     /// </summary>
     /// <param name="fast">快速快进</param>
-    /// <param name="back">向前</param>
+    /// <param name="back">是否向前</param>
     private async void FastForward(bool fast, bool back)
     {
         var fastForwardTime = fast ? 90 : Vm.AppConfig.PlayFastForward;
         if (back)
             fastForwardTime = -fastForwardTime;
         var time = Math.Clamp(Vm.Time + fastForwardTime, 0, Vm.TotalTime);
-        if (WebView.HasVideo)
+        if (Vm.EnableWebView2 && WebView.HasVideo)
         {
             await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time));
             Vm.Time = time;

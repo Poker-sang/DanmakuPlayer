@@ -173,6 +173,11 @@ public sealed partial class SettingsDialog : UserControl
 
     private readonly JsonSerializerOptions _options = new(JsonSerializerDefaults.Web);
 
+    private void DanmakuClearCookieAppBarButton_OnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        Vm.DanmakuCookie = [];
+    }
+
     private async void DanmakuGetCookieFromClipboardAppBarButton_OnTapped(object sender, TappedRoutedEventArgs e)
     {
         var cookieText = await Clipboard.GetContent().GetTextAsync();
