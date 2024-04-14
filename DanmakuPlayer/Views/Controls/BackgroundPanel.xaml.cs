@@ -296,6 +296,8 @@ public sealed partial class BackgroundPanel : Grid
     private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e) =>
         await WebView.LockOperationsAsync(async operations => Vm.FullScreen = await operations.FullScreenFlipAsync());
 
+    private void GridOnPointerReleased(object sender, PointerRoutedEventArgs e) => WebView.WebView2PointerReleased(sender, e);
+
     #endregion
 
     #region 进度条时间输入

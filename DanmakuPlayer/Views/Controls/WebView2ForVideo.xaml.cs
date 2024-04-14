@@ -253,7 +253,7 @@ public sealed partial class WebView2ForVideo : UserControl
 
     public async Task GoForwardAsync() => await Page.GoForwardAsync();
 
-    private async void WebView2Tapped(object sender, PointerRoutedEventArgs e)
+    public async void WebView2PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         var properties = e.GetCurrentPoint(sender.To<UIElement>()).Properties;
         switch (properties.PointerUpdateKind)

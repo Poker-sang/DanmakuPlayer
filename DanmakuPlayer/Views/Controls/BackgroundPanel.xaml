@@ -8,10 +8,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:winUi="using:CommunityToolkit.WinUI"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="MaximizeRestoreTapped"
     Loaded="RootLoaded"
+    PointerReleased="GridOnPointerReleased"
     SizeChanged="RootSizeChanged"
     Unloaded="RootUnloaded"
     mc:Ignorable="d">
