@@ -118,15 +118,13 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private void Page_FrameNavigated(object? sender, IFrame e)
     {
+        if (e == Page.MainFrame)
+            _ = DispatcherQueue.TryEnqueue(() => Url = e.Url);
+
         _ = DispatcherQueue.TryEnqueue(Callback);
 
         return;
-        async void Callback()
-        {
-            Url = e.Url;
-
-            await LoadVideoAsync();
-        }
+        async void Callback() => await LoadVideoAsync();
     }
 
     private async void OnUnloaded(object sender, RoutedEventArgs e)
@@ -150,9 +148,9 @@ public sealed partial class WebView2ForVideo : UserControl
                 return;
             _ = await Page.GotoAsync(url, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
         }
-        // 网址错误不跳转
         catch (PlaywrightException)
         {
+            // 网址错误不跳转
         }
     }
 
@@ -176,6 +174,7 @@ public sealed partial class WebView2ForVideo : UserControl
         {
             IsLoading = true;
 
+            using (_source = new())
             using (_source = new())
             {
                 CurrentVideo = null;
