@@ -243,10 +243,16 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
+    private void AdvanceDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? 90 : 5;
+
+    private void DelayDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? 90 : 5;
+
+    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e) => Vm.DanmakuDelayTime = 0;
+
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
 
-    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time + 100, Vm.AppConfig);
+    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time + Vm.DanmakuDelayTime, Vm.AppConfig);
 
     #endregion
 

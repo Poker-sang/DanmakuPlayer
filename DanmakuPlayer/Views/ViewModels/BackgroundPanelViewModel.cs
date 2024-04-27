@@ -28,6 +28,8 @@ public partial class BackgroundPanelViewModel : ObservableObject
 
     [ObservableProperty] private bool _loadingDanmaku;
 
+    [ObservableProperty] private float _danmakuDelayTime;
+
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
     public bool LockWebView2
