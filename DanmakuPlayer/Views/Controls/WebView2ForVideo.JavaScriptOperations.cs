@@ -177,6 +177,11 @@ public partial class WebView2ForVideo
             _ = await video.EvaluateAsync("video => window.document.exitFullscreen()");
         }
 
+        public async Task ClearClassAsync()
+        {
+            _ = await video.EvaluateAsync("video => video.className = undefined");
+        }
+
         #endregion
     }
 }

@@ -235,10 +235,16 @@ public partial record AppConfig
     public bool EnableWebView2 { get; set; } = true;
 
     /// <summary>
-    /// 使用WebView2
+    /// 锁定WebView2
     /// </summary>
     /// <remarks>default: <see langword="true"/></remarks>
     public bool LockWebView2 { get; set; } = true;
+
+    /// <summary>
+    /// 全屏时自动清理视频样式
+    /// </summary>
+    /// <remarks>default: <see langword="false"/></remarks>
+    public bool ClearClassWhenFullScreen { get; set; } = false;
 
     #endregion
 }

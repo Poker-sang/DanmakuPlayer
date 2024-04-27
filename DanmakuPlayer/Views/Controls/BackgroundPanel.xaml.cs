@@ -246,7 +246,7 @@ public sealed partial class BackgroundPanel : Grid
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
 
-    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time, Vm.AppConfig);
+    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time + 100, Vm.AppConfig);
 
     #endregion
 
@@ -293,8 +293,15 @@ public sealed partial class BackgroundPanel : Grid
 
     private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e) => Vm.LockWebView2 = !Vm.LockWebView2;
 
-    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e) =>
-        await WebView.LockOperationsAsync(async operations => Vm.FullScreen = await operations.FullScreenFlipAsync());
+    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await WebView.LockOperationsAsync(async operations =>
+        {
+            Vm.FullScreen = await operations.FullScreenFlipAsync();
+            if (Vm.FullScreen && AppContext.AppConfig.ClearClassWhenFullScreen)
+                await operations.ClearClassAsync();
+        });
+    }
 
     private void GridOnPointerReleased(object sender, PointerRoutedEventArgs e) => WebView.WebView2PointerReleased(sender, e);
 
