@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -34,12 +33,12 @@ public sealed partial class BackgroundPanel : Grid
     public BackgroundPanel()
     {
         AppContext.BackgroundPanel = this;
-        Vm.PropertyChanged += (sender, e) =>
+        Vm.PropertyChanged += (_, e) =>
         {
             switch (e.PropertyName)
             {
                 case nameof(Vm.Volume):
-                    VolumeChanged(sender, e);
+                    VolumeChanged();
                     break;
                 case nameof(Vm.PlaybackRate):
                     TrySetPlaybackRate();
@@ -252,7 +251,7 @@ public sealed partial class BackgroundPanel : Grid
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
     private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
 
-    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time + Vm.DanmakuDelayTime, Vm.AppConfig);
+    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time - Vm.DanmakuDelayTime, Vm.AppConfig);
 
     #endregion
 
@@ -288,7 +287,7 @@ public sealed partial class BackgroundPanel : Grid
     private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
         await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time));
 
-    private async void VolumeChanged(object? sender, PropertyChangedEventArgs e) =>
+    private async void VolumeChanged() =>
         await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
 
     private async void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e)
