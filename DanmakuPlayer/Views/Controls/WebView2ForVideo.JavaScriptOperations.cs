@@ -177,9 +177,43 @@ public partial class WebView2ForVideo
             _ = await video.EvaluateAsync("video => window.document.exitFullscreen()");
         }
 
-        public async Task ClearClassAsync()
+        /// <summary>
+        /// <seealso href="https://stackoverflow.com/a/51726329"/>
+        /// </summary>
+        public async Task ClearControlsAsync()
         {
-            _ = await video.EvaluateAsync("video => video.className = undefined");
+            _ = await video.EvaluateAsync(
+                """
+                v => {
+                    function injectStyles(rule, id) {
+                        removeStyle(id);
+                        var div = $("<div />", {
+                            html: '<style id="' + id +'">' + rule + '</style>'
+                        }).appendTo("body");    
+                    }
+                    function removeStyle(id) {
+                        $('#'+id).remove();
+                    }
+                    injectStyles(`video::-webkit-media-controls-panel
+                    {
+                        display: none !important;
+                        opacity: 0 !important;
+                    }`, 'd');
+                }
+                """);
+        }
+
+        public async Task RestoreControlsAsync()
+        {
+            _ = await video.EvaluateAsync(
+                """
+                v => {
+                    function removeStyle(id) {
+                        $('#'+id).remove();
+                    }
+                    removeStyle('d');
+                }
+                """);
         }
 
         #endregion

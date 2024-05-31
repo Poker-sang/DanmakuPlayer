@@ -243,8 +243,8 @@ public partial record AppConfig
     /// <summary>
     /// 全屏时自动清理视频样式
     /// </summary>
-    /// <remarks>default: <see langword="false"/></remarks>
-    public bool ClearClassWhenFullScreen { get; set; } = false;
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool ClearStyleWhenFullScreen { get; set; } = true;
 
     #endregion
 }
