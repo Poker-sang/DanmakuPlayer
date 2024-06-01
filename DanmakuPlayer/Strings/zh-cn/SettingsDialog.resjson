@@ -76,8 +76,8 @@
     "EnableWebView2Card/Header": "使用WebView2",
     "LockWebView2Card/Description": "鼠标、键盘等操作不会输入到WebView2",
     "LockWebView2Card/Header": "锁定WebView2",
-    "ClearClassWhenFullScreenCard/Description": "如果网页自带的控制栏与软件的重合，可以打开此选项",
-    "ClearClassWhenFullScreenCard/Header": "全屏时关闭视频进度条",
+    "ClearStyleWhenFullScreenCard/Description": "如果网页自带的控制栏与软件的重合，可以打开此选项",
+    "ClearStyleWhenFullScreenCard/Header": "全屏时关闭视频进度条",
     "WebView2Header/Text": "WebView2设置",
     "DuplicatesWithExistingRegex": "与已有正则表达式重复",
     "RegexCannotBeEmpty": "正则表达式不能为空"

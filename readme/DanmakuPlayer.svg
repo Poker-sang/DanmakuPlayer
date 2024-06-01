@@ -1,42 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="540" height="405" viewBox="0 0 540 405" fill="none">
-<rect x="0" y="0" width="0" height="0" fill="rgba(249, 249, 249, 1)" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="548" height="413" viewBox="0 0 548 413" fill="none">
 <g  clip-path="url(#clip-path-0_25)">
-<path     fill="#FFFFFF" fill-opacity="0" d="M0 385L0 20C0 8.9543 8.9543 0 20 0L520 0C531.046 0 540 8.9543 540 20L540 385C540 396.046 531.046 405 520 405L20 405C8.9543 405 0 396.046 0 385Z">
-</path>
 <g filter="url(#filter_0_1)">
-<rect x="-1" y="-1.5" width="544" height="408"   fill="url(#linear_fill_0_1)" >
+<rect x="3" y="0.5" width="544" height="408"   fill="url(#linear_fill_0_1)" >
 </rect>
 </g>
 <g filter="url(#filter_0_52)">
-<path    stroke="url(#linear_border_0_52_0)" stroke-width="48"  stroke-linecap="round"  d="M249 128L447.5 128">
+<path    stroke="url(#linear_border_0_52_0)" stroke-width="48"  stroke-linecap="round"  d="M253 130L451.5 130">
 </path>
 </g>
 <g filter="url(#filter_0_16)">
-<circle cx="97" cy="223.655029296875" r="24"   fill="#56DBFE" >
+<circle cx="101" cy="225.655029296875" r="24"   fill="#A1EBFF" >
 </circle>
 </g>
 <g filter="url(#filter_0_30)">
-<circle cx="153" cy="128" r="24"   fill="#56DBFE" >
+<circle cx="157" cy="130" r="24"   fill="#B3EEFF" >
 </circle>
 </g>
 <g filter="url(#filter_0_41)">
-<rect x="-2" y="296" width="544" height="125"   fill="#24A0DA" >
+<rect x="2" y="298" width="544" height="125"   fill="#24A0DA" >
 </rect>
-<path    stroke="rgba(48, 174, 235, 1)" stroke-width="48"  stroke-linecap="round"  d="M193 224.295L431.46 224.295">
+<path    stroke="rgba(48, 174, 235, 1)" stroke-width="48"  stroke-linecap="round"  d="M197 226.295L435.46 226.295">
 </path>
-<path d="M250.333 297.5L405.333 297.5C405.886 297.5 406.333 297.052 406.333 296.5L406.333 296C393.079 296 382.333 285.255 382.333 272C382.333 258.745 393.079 248 406.333 248L406.333 247.5C406.333 246.948 405.886 246.5 405.333 246.5L250.333 246.5C249.781 246.5 249.333 246.948 249.333 247.5L249.333 248.02C262.125 248.545 272.333 259.08 272.333 272C272.333 284.92 262.125 295.455 249.333 295.98L249.333 296.5C249.333 297.052 249.781 297.5 250.333 297.5Z" fill-rule="evenodd"  fill="url(#linear_fill_0_68)" >
+<path d="M254.333 299.5L409.333 299.5C409.886 299.5 410.333 299.052 410.333 298.5L410.333 298C397.079 298 386.333 287.255 386.333 274C386.333 260.745 397.079 250 410.333 250L410.333 249.5C410.333 248.948 409.886 248.5 409.333 248.5L254.333 248.5C253.781 248.5 253.333 248.948 253.333 249.5L253.333 250.02C266.125 250.545 276.333 261.08 276.333 274C276.333 286.92 266.125 297.455 253.333 297.98L253.333 298.5C253.333 299.052 253.781 299.5 254.333 299.5Z" fill-rule="evenodd"  fill="url(#linear_fill_0_68)" >
 </path>
 </g>
 </g>
 <defs>
 <clipPath id="clip-path-0_25">
-<path d="M0 385L0 20C0 8.9543 8.9543 0 20 0L520 0C531.046 0 540 8.9543 540 20L540 385C540 396.046 531.046 405 520 405L20 405C8.9543 405 0 396.046 0 385Z" fill="white"/>
+<path d="M4 387L4 22C4 10.9543 12.9543 2 24 2L524 2C535.046 2 544 10.9543 544 22L544 387C544 398.046 535.046 407 524 407L24 407C12.9543 407 4 398.046 4 387Z" fill="white"/>
 </clipPath>
-<linearGradient id="linear_fill_0_1" x1="-1" y1="202.5" x2="543" y2="202.5" gradientUnits="userSpaceOnUse">
+<linearGradient id="linear_fill_0_1" x1="3" y1="204.5" x2="547" y2="204.5" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#2C79C7"  />
 <stop offset="1" stop-color="#0D559D"  />
 </linearGradient>
-<filter id="filter_0_1" x="-5" y="-3.5" width="552" height="416" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter_0_1" x="-1" y="-1.5" width="552" height="416" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="feFloodId_0_1"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha_0_1"/>
 <feOffset dx="0" dy="2"/>
@@ -46,11 +43,11 @@
 <feBlend mode="normal" in2="feFloodId_0_1" result="dropShadow_1_0_1"/>
 <feBlend mode="normal" in="SourceGraphic" in2="dropShadow_1_0_1" result="shape_0_1"/>
 </filter>
-<linearGradient id="linear_border_0_52_0" x1="187.42138671875" y1="128.00050354003906" x2="447.5" y2="128" gradientUnits="userSpaceOnUse">
+<linearGradient id="linear_border_0_52_0" x1="191.42138671875" y1="130.00050354003906" x2="451.5" y2="130" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#56D8FC"  />
 <stop offset="1" stop-color="#30AEEB"  />
 </linearGradient>
-<filter id="filter_0_52" x="205" y="86" width="286.5" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter_0_52" x="209" y="88" width="286.5" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="feFloodId_0_52"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha_0_52"/>
 <feOffset dx="0" dy="2"/>
@@ -60,7 +57,7 @@
 <feBlend mode="normal" in2="feFloodId_0_52" result="dropShadow_1_0_52"/>
 <feBlend mode="normal" in="SourceGraphic" in2="dropShadow_1_0_52" result="shape_0_52"/>
 </filter>
-<filter id="filter_0_16" x="53" y="181.655029296875" width="88" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter_0_16" x="57" y="183.655029296875" width="88" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="feFloodId_0_16"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha_0_16"/>
 <feOffset dx="0" dy="2"/>
@@ -70,7 +67,7 @@
 <feBlend mode="normal" in2="feFloodId_0_16" result="dropShadow_1_0_16"/>
 <feBlend mode="normal" in="SourceGraphic" in2="dropShadow_1_0_16" result="shape_0_16"/>
 </filter>
-<filter id="filter_0_30" x="109" y="86" width="88" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter_0_30" x="113" y="88" width="88" height="88" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="feFloodId_0_30"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha_0_30"/>
 <feOffset dx="0" dy="2"/>
@@ -80,11 +77,11 @@
 <feBlend mode="normal" in2="feFloodId_0_30" result="dropShadow_1_0_30"/>
 <feBlend mode="normal" in="SourceGraphic" in2="dropShadow_1_0_30" result="shape_0_30"/>
 </filter>
-<linearGradient id="linear_fill_0_68" x1="330.0001220703125" y1="295.8226089477539" x2="330.0001220703125" y2="248.48236846923828" gradientUnits="userSpaceOnUse">
+<linearGradient id="linear_fill_0_68" x1="334.0001220703125" y1="297.8226089477539" x2="334.0001220703125" y2="250.48236846923828" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#24A0DA"  />
 <stop offset="1" stop-color="#30AEEB"  />
 </linearGradient>
-<filter id="filter_0_41" x="-22" y="182.29458618164062" width="584" height="260.7054138183594" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter_0_41" x="-18" y="184.29458618164062" width="584" height="260.7054138183594" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="feFloodId_0_41"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha_0_41"/>
 <feOffset dx="0" dy="2"/>

@@ -326,8 +326,8 @@
                 <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{controls1:GlyphIcon Glyph=LockE72E}">
                     <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/ClearClassWhenFullScreenCard" HeaderIcon="{controls1:GlyphIcon Glyph=FullScreenE740}">
-                    <ToggleSwitch IsOn="{x:Bind Vm.ClearClassWhenFullScreen, Mode=TwoWay}" />
+                <controls:SettingsCard x:Uid="/SettingsDialog/ClearStyleWhenFullScreenCard" HeaderIcon="{controls1:GlyphIcon Glyph=FullScreenE740}">
+                    <ToggleSwitch IsOn="{x:Bind Vm.ClearStyleWhenFullScreen, Mode=TwoWay}" />
                 </controls:SettingsCard>
 
                 <!--  关于  -->
