@@ -1,7 +1,7 @@
 using System;
 using System.Xml.Linq;
+using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
-using DanmakuPlayer.Resources;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
@@ -41,7 +41,7 @@ public partial record Danmaku(
             elem.Colorful is DmColorfulType.VipGradualColor,
             (ulong)elem.Ctime,
             (DanmakuPool)elem.Pool,
-            elem.midHash);
+            elem.MidHash);
     }
 
     public static Danmaku Parse(XElement xElement)

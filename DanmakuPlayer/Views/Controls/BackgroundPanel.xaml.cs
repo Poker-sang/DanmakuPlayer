@@ -19,10 +19,10 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using ProtoBuf;
 using WinRT;
 using WinUI3Utilities;
 using System.Xml.Linq;
+using Bilibili.Community.Service.Dm.V1;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -184,7 +184,7 @@ public sealed partial class BackgroundPanel : Grid
             await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
             if (danmaku is null)
                 return true;
-            var reply = Serializer.Deserialize<DmSegMobileReply>(danmaku);
+            var reply = DmSegMobileReply.Parser.ParseFrom(danmaku);
             tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
             return false;
         }

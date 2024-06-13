@@ -12,7 +12,7 @@
 
 * UI使用WinUI3框架，上个WPF版本 [链接](https://github.com/Poker-sang/DanmakuPlayerWpf)
 
-* 获取弹幕依赖 [protobuf-net](https://github.com/protobuf-net/protobuf-net) 库
+* 获取弹幕依赖 [gRPC](https://github.com/grpc/grpc-dotnet) 库
 
 * 弹幕渲染使用 [Win2D](https://github.com/Microsoft/Win2D) 库
 

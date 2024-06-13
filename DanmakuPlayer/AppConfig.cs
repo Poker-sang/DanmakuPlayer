@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using DanmakuPlayer.Resources;
 using WinUI3Utilities.Attributes;
 
@@ -248,3 +249,7 @@ public partial record AppConfig
 
     #endregion
 }
+
+[JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(Dictionary<string, string>))]
+public partial class SettingsSerializeContext : JsonSerializerContext;

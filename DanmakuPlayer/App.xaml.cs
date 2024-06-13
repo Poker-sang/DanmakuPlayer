@@ -17,6 +17,7 @@ public partial class App : Application
 
     public App()
     {
+        SettingsValueConverter.Context = SettingsSerializeContext.Default;
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", $"--remote-debugging-port={RemoteDebuggingPort}");
         InitializeComponent();
         AppContext.Initialize();

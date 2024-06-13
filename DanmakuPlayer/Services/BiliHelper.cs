@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
 
@@ -142,7 +143,7 @@ public static partial class BiliHelper
         return CodeType.Error;
     }
 
-    public static IEnumerable<Danmaku> ToDanmaku(List<DanmakuElem> elems) => elems.Select(Danmaku.Parse).OrderBy(t => t.Time);
+    public static IEnumerable<Danmaku> ToDanmaku(IEnumerable<DanmakuElem> elems) => elems.Select(Danmaku.Parse).OrderBy(t => t.Time);
 
     public static IEnumerable<Danmaku> ToDanmaku(XDocument xDocument) => xDocument.Element("i")!.Elements("d").Select(Danmaku.Parse).OrderBy(t => t.Time);
 }

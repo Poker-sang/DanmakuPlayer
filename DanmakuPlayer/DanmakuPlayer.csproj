@@ -44,12 +44,12 @@
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
         <PackageReference Include="System.Drawing.Common" Version="8.0.6" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
-        <PackageReference Include="WinUI3Utilities" Version="1.1.7.1" />
+        <PackageReference Include="WinUI3Utilities" Version="1.1.7.3" />
         <PackageReference Include="PinYinConverterCore" Version="1.0.2" />
-        <PackageReference Include="protobuf-net" Version="3.2.30" />
-        <PackageReference Include="protobuf-net.Grpc" Version="1.1.1" />
         <PackageReference Include="WinUIEx" Version="2.3.4" />
         <Manifest Include="$(ApplicationManifest)" />
+
+        <ProjectReference Include="..\DanmakuPlayer.Proto\DanmakuPlayer.Proto.csproj" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -83,7 +83,7 @@
         <ProjectCapability Include="Msix" />
     </ItemGroup>
     <ItemGroup>
-      <None Remove="Assets\SplashScreen.scale-400.png" />
+        <None Remove="Assets\SplashScreen.scale-400.png" />
     </ItemGroup>
 
     <!-- 
