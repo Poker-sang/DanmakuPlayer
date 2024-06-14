@@ -17,6 +17,7 @@
     Unloaded="RootUnloaded"
     mc:Ignorable="d">
     <Grid.Resources>
+        <Color x:Key="TransparentColor">#7F000000</Color>
         <converters:DoubleToTimeTextConverter x:Key="DoubleToTimeTextConverter" />
     </Grid.Resources>
     <Grid.RowDefinitions>
@@ -45,7 +46,7 @@
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                     <LinearGradientBrush.GradientStops>
-                        <GradientStop Offset="0" Color="{x:Bind TransparentColor}" />
+                        <GradientStop Offset="0" Color="{StaticResource TransparentColor}" />
                         <GradientStop Offset="1" Color="Transparent" />
                     </LinearGradientBrush.GradientStops>
                 </LinearGradientBrush>
@@ -136,7 +137,7 @@
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                     <LinearGradientBrush.GradientStops>
                         <GradientStop Offset="0" Color="Transparent" />
-                        <GradientStop Offset="1" Color="{x:Bind TransparentColor}" />
+                        <GradientStop Offset="1" Color="{StaticResource TransparentColor}" />
                     </LinearGradientBrush.GradientStops>
                 </LinearGradientBrush>
             </controls:DockPanel.Background>
@@ -159,7 +160,7 @@
                         DoubleTapped="UIElement_OnDoubleTapped"
                         Tapped="PauseResumeTapped">
                         <AppBarButton.Icon>
-                            <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.IsMaximized, common:Symbol.Pulse, common:Symbol.Play), Mode=OneWay}" />
+                            <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.IsPlaying, common:Symbol.Pause, common:Symbol.Play), Mode=OneWay}" />
                         </AppBarButton.Icon>
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />

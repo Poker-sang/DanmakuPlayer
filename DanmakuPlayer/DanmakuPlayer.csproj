@@ -15,6 +15,9 @@
         <DefaultLanguage>zh-cn</DefaultLanguage>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <EnableDefaultPriItems>false</EnableDefaultPriItems>
+        <PublishAot>false</PublishAot>
+        <WindowsSdkPackageVersion Condition="'$(PublishAot)' == 'true'">10.0.22621.35-preview</WindowsSdkPackageVersion>
+        <PublishProfile Condition="'$(PublishAot)' == 'true'">win-$(Platform).pubxml</PublishProfile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -40,7 +43,9 @@
         <PackageReference Include="FluentIcons.WinUI" Version="1.1.242" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.0" />
         <PackageReference Include="Microsoft.Playwright" Version="1.44.0" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
+        <PackageReference Condition="'$(PublishAot)' == 'true'" Include="Microsoft.Windows.CsWinRT" Version="2.1.0-prerelease.240602.1" />
+        <PackageReference Condition="'$(PublishAot)' == 'true'" Include="Microsoft.WindowsAppSDK" Version="1.6.240531000-experimental1" />
+        <PackageReference Condition="'$(PublishAot)' == 'false'" Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
         <PackageReference Include="System.Drawing.Common" Version="8.0.6" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />

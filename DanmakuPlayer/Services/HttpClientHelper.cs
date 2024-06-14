@@ -54,22 +54,32 @@ public static class HttpClientHelper
     }
 
     public static Task<string> DownloadStringAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetStringAsync(uri, token);
+    {
+        Debug.WriteLine("Requesting uri: " + uri);
+        return Client.InitializeHeader(header).GetStringAsync(uri, token);
+    }
 
     public static Task<Stream> DownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetStreamAsync(uri, token);
+    {
+        Debug.WriteLine("Requesting uri: " + uri);
+        return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+    }
 
     public static async Task<Stream?> TryDownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
+        Debug.WriteLine("Requesting uri: " + uri);
         var response = await Client.InitializeHeader(header).GetAsync(uri, token);
         return response.IsSuccessStatusCode ? await Client.InitializeHeader(header).GetStreamAsync(uri, token) : null;
     }
 
     public static Task<byte[]> DownloadBytesAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-        => Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
+    {
+        return Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
+    }
 
     public static async Task<JsonDocument> DownloadJsonAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
+        Debug.WriteLine("Requesting uri: " + uri);
         await using var download = await uri.DownloadStreamAsync(token, header);
         return await JsonDocument.ParseAsync(download, default, token);
     }

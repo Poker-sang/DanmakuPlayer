@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
@@ -32,30 +31,32 @@ public sealed partial class BackgroundPanel : Grid
 
     public BackgroundPanel()
     {
-        AppContext.BackgroundPanel = this;
-        Vm.PropertyChanged += (_, e) =>
+        try
         {
-            switch (e.PropertyName)
+            AppContext.BackgroundPanel = this;
+            Vm.PropertyChanged += (_, e) =>
             {
-                case nameof(Vm.Volume):
-                    VolumeChanged();
-                    break;
-                case nameof(Vm.PlaybackRate):
-                    TrySetPlaybackRate();
-                    break;
-            }
-        };
-        Vm.ResetProvider += ResetProvider;
+                switch (e.PropertyName)
+                {
+                    case nameof(Vm.Volume):
+                        VolumeChanged();
+                        break;
+                    case nameof(Vm.PlaybackRate):
+                        TrySetPlaybackRate();
+                        break;
+                }
+            };
+            Vm.ResetProvider += ResetProvider;
 
-        InitializeComponent();
-        AppContext.DanmakuCanvas = DanmakuCanvas;
-        DispatcherTimerHelper.Tick += TimerTick;
+            InitializeComponent();
+            AppContext.DanmakuCanvas = DanmakuCanvas;
+            DispatcherTimerHelper.Tick += TimerTick;
+        }
+        catch (Exception e)
+        {
+            App._logger.LogCritical("", e);
+        }
     }
-
-    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local", Justification = "For {x:Bind}")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "For {x:Bind}")]
-    [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "For ReSharper")]
-    private Color TransparentColor => Color.FromArgb(0xff / 2, 0, 0, 0);
 
     public BackgroundPanelViewModel Vm { get; } = new();
 
