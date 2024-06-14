@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -171,8 +172,6 @@ public sealed partial class SettingsDialog : UserControl
         AppContext.SaveConfiguration(Vm.AppConfig);
     }
 
-    private readonly JsonSerializerOptions _options = new(JsonSerializerDefaults.Web);
-
     private void DanmakuClearCookieAppBarButton_OnTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.DanmakuCookie = [];
@@ -183,7 +182,7 @@ public sealed partial class SettingsDialog : UserControl
         var cookieText = await Clipboard.GetContent().GetTextAsync();
         try
         {
-            if (JsonSerializer.Deserialize<Cookie[]>(cookieText, _options) is { Length: > 2 } cookie)
+            if (JsonSerializer.Deserialize(cookieText, typeof(Cookie[]), CookieSerializerContext.Default) is Cookie[] { Length: > 2 } cookie)
             {
                 Vm.DanmakuCookie = cookie.ToDictionary(c => c.Name, c => c.Value);
                 return;
@@ -212,3 +211,7 @@ public sealed partial class SettingsDialog : UserControl
 
     #endregion
 }
+
+[JsonSerializable(typeof(Cookie[]))]
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+public partial class CookieSerializerContext : JsonSerializerContext;

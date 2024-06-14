@@ -4,6 +4,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using WinUI3Utilities;
 using WinUIEx;
+using FluentIcons.WinUI;
 
 namespace DanmakuPlayer;
 
@@ -17,6 +18,7 @@ public partial class App : Application
 
     public App()
     {
+        this.UseSegoeMetrics();
         SettingsValueConverter.Context = SettingsSerializeContext.Default;
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", $"--remote-debugging-port={RemoteDebuggingPort}");
         InitializeComponent();

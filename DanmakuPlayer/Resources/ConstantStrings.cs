@@ -14,6 +14,8 @@ public static class ConstantStrings
 
     public const string LicenseUri = RepositoryUri + "/blob/master/LICENSE";
 
+    public const string StoreUri = "ms-windows-store://pdp/?ProductId=9PMCJD6FLBZS";
+
     public const string Mail = "poker_sang@outlook.com";
 
     public const string MailToUri = "mailto:" + Mail;

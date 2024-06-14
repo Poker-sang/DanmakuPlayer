@@ -44,6 +44,7 @@
     "DanmakuCountTopLimitCard/Header": "顶端弹幕数量限制",
     "DanmakuCountInverseLimitCard/Header": "逆向弹幕数量限制",
     "AboutHeader/Text": "关于",
+    "StoreCard/Header": "微软商店",
     "MailCard/Header": "邮箱",
     "AuthorCard/Header": "作者",
     "QqCard/Header": "QQ",

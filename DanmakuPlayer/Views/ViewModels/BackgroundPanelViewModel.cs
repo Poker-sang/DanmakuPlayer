@@ -8,7 +8,6 @@ namespace DanmakuPlayer.Views.ViewModels;
 public partial class BackgroundPanelViewModel : ObservableObject
 {
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NegativeEditingTime))]
     private bool _editingTime;
 
     /// <summary>
@@ -139,8 +138,6 @@ public partial class BackgroundPanelViewModel : ObservableObject
         get => Time / AppConfig.PlaybackRate;
         set => Time = value * AppConfig.PlaybackRate;
     }
-
-    public bool NegativeEditingTime => !EditingTime;
 
     public bool IsPlaying
     {

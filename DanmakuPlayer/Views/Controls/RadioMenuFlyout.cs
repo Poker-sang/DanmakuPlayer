@@ -24,11 +24,8 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
-using System.Xml;
-using CommunityToolkit.WinUI.Converters;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
 using WinUI3Utilities;
 using WinUI3Utilities.Attributes;
 
@@ -38,8 +35,6 @@ namespace DanmakuPlayer.Views.Controls;
 [DependencyProperty<object>("ItemsSource", DependencyPropertyDefaultValue.Default, nameof(OnItemsSourceChanged))]
 public partial class RadioMenuFlyout : MenuFlyout
 {
-    private static StringFormatConverter? Converter { get; set; }
-
     public string Formatter { get; set; } = "";
 
     public event Action<RadioMenuFlyout>? SelectionChanged;
