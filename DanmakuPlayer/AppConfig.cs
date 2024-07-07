@@ -115,8 +115,8 @@ public partial record AppConfig
     /// <summary>
     /// 弹幕描边颜色
     /// </summary>
-    /// <remarks>default: 0xFFA9A9A9</remarks>
-    public uint DanmakuStrokeColor { get; set; } = 0xFFA9A9A9;
+    /// <remarks>default: 0xFF000000</remarks>
+    public uint DanmakuStrokeColor { get; set; } = 0xFF000000;
 
     /// <summary>
     /// 转换大会员彩色弹幕

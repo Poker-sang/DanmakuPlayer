@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using Windows.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
@@ -82,6 +83,8 @@ public sealed partial class SettingsDialog : UserControl
         if (!before.DanmakuCookie.SequenceEqual(after.DanmakuCookie))
             HttpClientHelper.ShouldRefreshHeader = true;
     }
+
+    private void ColorBindBack(Color color) => Vm.DanmakuStrokeColor = C.ToAlphaUInt(color);
 
     #region 事件处理
 
