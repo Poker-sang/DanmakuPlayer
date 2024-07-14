@@ -16,7 +16,7 @@
 
 * 弹幕渲染使用 [Win2D](https://github.com/Microsoft/Win2D) 库
 
-* WebView2操作使用 [Playwright](https://github.com/microsoft/playwright-dotnet) 自动化
+* 使用 [WebView2](https://learn.microsoft.com/zh-cn/microsoft-edge/webview2) 自动化操作
 
 * 龟速更新中
 
