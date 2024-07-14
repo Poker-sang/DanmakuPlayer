@@ -5,14 +5,9 @@ using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
 
-[GenerateConstructor]
-public partial record AppConfig
+[GenerateConstructor(CallParameterlessConstructor = true)]
+public partial record AppConfig()
 {
-    public AppConfig()
-    {
-
-    }
-
     #region 渲染设置
 
     /// <summary>

@@ -11,7 +11,6 @@ using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
-using DanmakuPlayer.Views.Converters;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -320,7 +319,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void TimeTextTapped(object sender, TappedRoutedEventArgs e)
     {
-        TimeText.Text = DoubleToTimeTextConverter.ToTime(Vm.Time);
+        TimeText.Text = C.ToTime(Vm.Time);
         Vm.EditingTime = true;
     }
 

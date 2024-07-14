@@ -29,7 +29,7 @@ namespace DanmakuPlayer.Views.Controls;
 
 public class VideoLocatorDisplay
 {
-    public override string ToString() => DoubleToTimeTextConverter.ToTime(Duration);
+    public override string ToString() => C.ToTime(Duration);
 
     public ILocator Video { get; set; } = null!;
 

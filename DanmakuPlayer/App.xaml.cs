@@ -23,13 +23,13 @@ public partial class App : Application
 
     public App()
     {
-        RegisterUnhandledExceptionHandler();
-        this.UseSegoeMetrics();
+        _ = this.UseSegoeMetrics();
         SettingsValueConverter.Context = SettingsSerializeContext.Default;
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", $"--remote-debugging-port={RemoteDebuggingPort}");
-        InitializeComponent();
         AppContext.Initialize();
+        RegisterUnhandledExceptionHandler();
         HttpClientHelper.Initialize();
+        InitializeComponent();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -59,8 +59,7 @@ public partial class App : Application
 
     private void RegisterUnhandledExceptionHandler()
     {
-        _logger = new FileLogger(@"C:\Users\poker\AppData\Local\Packages\PokerKo.DanmakuPlayer_0wpjzgvbyjvyr\LocalState\Logs");
-        // var logger = new FileLogger(Path.Combine(AppContext.AppLocalFolder, "Logs"));
+        _logger = new FileLogger(Path.Combine(AppContext.AppLocalFolder, "Logs"));
         DebugSettings.BindingFailed += (o, e) =>
         {
             _logger.LogWarning(e.Message, null);

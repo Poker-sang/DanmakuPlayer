@@ -2,7 +2,7 @@
 
 <img src="readme/DanmakuPlayer.svg" alt="logo" width="200">
 
-# DanmakuPlayer
+# Danmaku Player
 
 [<img src="https://get.microsoft.com/images/zh-cn%20dark.svg" alt="store-logo" width="200">](https://apps.microsoft.com/detail/Danmaku%20Player/9pmcjd6flbzs?launch=true&mode=mini)
 
