@@ -42,7 +42,6 @@
         <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
         <PackageReference Include="FluentIcons.WinUI" Version="1.1.249" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.0" />
-        <PackageReference Include="Microsoft.Playwright" Version="1.45.0" />
         <PackageReference Condition="'$(PublishAot)' == 'true'" Include="Microsoft.Windows.CsWinRT" Version="2.1.0-prerelease.240602.1" />
         <PackageReference Condition="'$(PublishAot)' == 'true'" Include="Microsoft.WindowsAppSDK" Version="1.6.240531000-experimental1" />
         <PackageReference Condition="'$(PublishAot)' == 'false'" Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
