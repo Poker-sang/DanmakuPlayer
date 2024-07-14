@@ -109,7 +109,12 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await WebView2.EnsureCoreWebView2Async();
+        var opt = new CoreWebView2EnvironmentOptions
+        {
+            AdditionalBrowserArguments = "--proxy-auto-detect"
+        };
+        var env = await CoreWebView2Environment.CreateWithOptionsAsync(null, null, opt);
+        await WebView2.EnsureCoreWebView2Async(env);
         Pw = await Playwright.CreateAsync();
         Browser = await Pw.Chromium.ConnectOverCDPAsync($"http://localhost:{App.RemoteDebuggingPort}");
         Page = Browser.Contexts[0].Pages[0];
