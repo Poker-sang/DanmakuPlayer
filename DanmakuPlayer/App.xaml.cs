@@ -13,8 +13,6 @@ namespace DanmakuPlayer;
 
 public partial class App : Application
 {
-    public const ushort RemoteDebuggingPort = 9222;
-
     public static MainWindow Window { get; set; } = null!;
 
     public static OverlappedPresenter OverlappedPresenter => Window.OverlappedPresenter;
@@ -22,7 +20,6 @@ public partial class App : Application
     public App()
     {
         SettingsValueConverter.Context = SettingsSerializeContext.Default;
-        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", $"--remote-debugging-port={RemoteDebuggingPort}");
         AppContext.Initialize();
         RegisterUnhandledExceptionHandler();
         HttpClientHelper.Initialize();
