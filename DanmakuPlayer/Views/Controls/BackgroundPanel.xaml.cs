@@ -311,7 +311,7 @@ public sealed partial class BackgroundPanel : Grid
     {
         await WebView.LockOperationsAsync(async operations =>
         {
-            Vm.FullScreen = await operations.FullScreenFlipAsync();
+            Vm.FullScreen = !Vm.FullScreen; // TODO: await operations.FullScreenFlipAsync();
             if (AppContext.AppConfig.ClearStyleWhenFullScreen)
                 if (Vm.FullScreen)
                     await operations.ClearControlsAsync();

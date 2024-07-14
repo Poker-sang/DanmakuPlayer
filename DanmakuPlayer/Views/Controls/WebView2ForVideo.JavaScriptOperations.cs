@@ -1,116 +1,59 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Playwright;
+using Windows.Foundation;
 
 namespace DanmakuPlayer.Views.Controls;
 
 public partial class WebView2ForVideo
 {
-    public class JavaScriptOperations(ILocator video)
+    public class JavaScriptOperations(Func<string, IAsyncOperation<string>> executeScriptAsync)
     {
         #region CurrentTime
 
-        public async Task<double> IncreaseCurrentTimeAsync(double second)
-        {
-            var currentTime = await video.EvaluateAsync($"video => video.currentTime += {second}");
-            return currentTime!.Value.GetDouble();
-        }
+        public async Task<double> IncreaseCurrentTimeAsync(double second) => double.Parse(await executeScriptAsync($"video.currentTime += {second}"));
 
-        public async Task SetCurrentTimeAsync(double second)
-        {
-            _ = await video.EvaluateAsync($"video => video.currentTime = {second}");
-        }
+        public async Task SetCurrentTimeAsync(double second) => _ = await executeScriptAsync($"video.currentTime = {second}");
 
-        public async Task<double> CurrentTimeAsync()
-        {
-            var currentTime = await video.EvaluateAsync("video => video.currentTime")!;
-            return currentTime!.Value.GetDouble();
-        }
+        public async Task<double> CurrentTimeAsync() => double.Parse(await executeScriptAsync("video.currentTime"));
 
         #endregion
 
         #region Volume
 
-        public async Task<double> IncreaseVolumeAsync(double volume)
-        {
-            var v = await video.EvaluateAsync($"video => video.volume += {volume / 100}");
-            return v!.Value.GetDouble();
-        }
+        public async Task<double> IncreaseVolumeAsync(double volume) => double.Parse(await executeScriptAsync($"video.volume += {volume / 100}"));
 
-        public async Task SetVolumeAsync(double volume)
-        {
-            _ = await video.EvaluateAsync($"video => video.volume = {volume / 100}");
-        }
+        public async Task SetVolumeAsync(double volume) => await executeScriptAsync($"video.volume = {volume / 100}");
 
-        public async Task<double> VolumeAsync()
-        {
-            var v = await video.EvaluateAsync("video => video.volume")!;
-            return v!.Value.GetDouble() * 100;
-        }
+        public async Task<double> VolumeAsync() => double.Parse(await executeScriptAsync("video.volume")) * 100;
 
-        public async Task<double> IncreaseVolumePercentageAsync(double volume)
-        {
-            var v = await video.EvaluateAsync($"video => video.volume += {volume}");
-            return v!.Value.GetDouble();
-        }
+        public async Task<double> IncreaseVolumePercentageAsync(double volume) => double.Parse(await executeScriptAsync($"video.volume += {volume}"));
 
-        public async Task SetVolumePercentageAsync(double volume)
-        {
-            _ = await video.EvaluateAsync($"video => video.volume = {volume}");
-        }
+        public async Task SetVolumePercentageAsync(double volume) => _ = await executeScriptAsync($"video.volume = {volume}");
 
-        public async Task<double> VolumePercentageAsync()
-        {
-            var v = await video.EvaluateAsync("video => video.volume")!;
-            return v!.Value.GetDouble();
-        }
+        public async Task<double> VolumePercentageAsync() => double.Parse(await executeScriptAsync("video.volume"));
 
         #endregion
 
         #region Muted
 
-        public async Task<bool> MutedFlipAsync()
-        {
-            var muted = await video.EvaluateAsync("video => video.muted = !video.muted");
-            return muted!.Value.GetBoolean();
-        }
+        public async Task<bool> MutedFlipAsync() => await executeScriptAsync("video.muted = !video.muted") is "true";
 
-        public async Task SetMutedAsync(bool muted)
-        {
-            _ = await video.EvaluateAsync("video => video.muted = " + (muted ? "true" : "false"));
-        }
+        public async Task SetMutedAsync(bool muted) => _ = await executeScriptAsync("video.muted = " + (muted ? "true" : "false"));
 
-        public async Task<bool> MutedAsync()
-        {
-            var muted = await video.EvaluateAsync("video => video.muted");
-            return muted!.Value.GetBoolean();
-        }
+        public async Task<bool> MutedAsync() => await executeScriptAsync("video.muted") is "true";
 
         #endregion
 
-        public async Task<double> DurationAsync()
-        {
-            try
-            {
-                var duration = await video.EvaluateAsync("video => video.duration");
-                return duration!.Value.GetDouble();
-            }
-            // 可能出现.NET不支持无穷浮点数异常
-            catch (ArgumentException)
-            {
-                return 0;
-            }
-        }
+        public async Task<double> DurationAsync() =>
+            await executeScriptAsync("video.duration") is var duration && duration is "Infinity" or "-Infinity"
+                ? 0
+                : double.Parse(duration);
 
         #region PlayPause
 
-        public async Task<bool> IsPlayingAsync()
-        {
-            var isPlaying =
-                await video.EvaluateAsync(
-                    "video => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)");
-            return isPlaying!.Value.GetBoolean();
-        }
+        public async Task<bool> IsPlayingAsync() =>
+            await executeScriptAsync(
+                "!!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2)") is "true";
 
         public async Task<bool> PlayPauseFlipTask()
         {
@@ -122,98 +65,70 @@ public partial class WebView2ForVideo
             return !isPlaying;
         }
 
-        public async Task PlayAsync()
-        {
-            _ = await video.EvaluateAsync("video => video.play()");
-        }
+        public async Task PlayAsync() => _ = await executeScriptAsync("video.play()");
 
-        public async Task PauseAsync()
-        {
-            _ = await video.EvaluateAsync("video => video.pause()");
-        }
+        public async Task PauseAsync() => _ = await executeScriptAsync("video.pause()");
 
         #endregion
 
         #region PlaybackRate
 
-        public async Task<double> PlaybackRateAsync()
-        {
-            var playbackRate = await video.EvaluateAsync("video => video.playbackRate");
-            return playbackRate!.Value.GetDouble();
-        }
+        public async Task<double> PlaybackRateAsync() => double.Parse(await executeScriptAsync("video.playbackRate"));
 
-        public async Task SetPlaybackRateAsync(double playbackRate)
-        {
-            _ = await video.EvaluateAsync($"video => video.playbackRate = {playbackRate}");
-        }
+        public async Task SetPlaybackRateAsync(double playbackRate) => await executeScriptAsync($"video.playbackRate = {playbackRate}");
 
         #endregion
 
         #region FullScreen
 
-        public async Task<bool> FullScreenAsync()
-        {
-            var fullScreen = await video.EvaluateAsync("video => window.document.fullscreenElement");
-            return fullScreen.HasValue;
-        }
+        public async Task<bool> FullScreenAsync() => await executeScriptAsync("currentDocument.fullscreenElement") is not "null";
 
         public async Task<bool> FullScreenFlipAsync()
         {
-            var fullScreen = (await video.EvaluateAsync("video => window.document.fullscreenElement")).HasValue;
-            if (fullScreen)
+            if (await FullScreenAsync())
                 await ExitFullScreenAsync();
             else
                 await RequestFullScreenAsync();
-            return !fullScreen;
+            return await FullScreenAsync();
         }
 
-        public async Task RequestFullScreenAsync()
-        {
-            _ = await video.EvaluateAsync("video => video.requestFullscreen()");
-        }
+        public async Task RequestFullScreenAsync() => _ = await executeScriptAsync("video.requestFullscreen()");
 
-        public async Task ExitFullScreenAsync()
-        {
-            _ = await video.EvaluateAsync("video => window.document.exitFullscreen()");
-        }
+        public async Task ExitFullScreenAsync() => _ = await executeScriptAsync("currentDocument.exitFullscreen()");
 
         /// <summary>
         /// <seealso href="https://stackoverflow.com/a/51726329"/>
         /// </summary>
         public async Task ClearControlsAsync()
         {
-            _ = await video.EvaluateAsync(
+            _ = await executeScriptAsync(
                 """
-                v => {
-                    function injectStyles(rule, id) {
-                        removeStyle(id);
-                        const tempStyle = document.createElement('style');
-                        tempStyle.id = id;
-                        tempStyle.innerHTML = rule;
-                        document.head.appendChild(tempStyle);
-                    }
-                    function removeStyle(id) {
-                        document.getElementById(id)?.remove();
-                    }
-                    injectStyles(`video::-webkit-media-controls-panel
-                    {
-                        display: none !important;
-                        opacity: 0 !important;
-                    }`, 'danmakuPlayerNoControlStyle');
+                function injectStyles(rule, id) {
+                    removeStyle(id);
+                    const tempStyle = currentDocument.createElement('style');
+                    tempStyle.id = id;
+                    tempStyle.innerHTML = rule;
+                    currentDocument.head.appendChild(tempStyle);
                 }
+                function removeStyle(id) {
+                    currentDocument.getElementById(id)?.remove();
+                }
+                injectStyles(`video::-webkit-media-controls-panel
+                {
+                    display: none !important;
+                    opacity: 0 !important;
+                }`, 'danmakuPlayerNoControlStyle');
                 """);
         }
 
         public async Task RestoreControlsAsync()
         {
-            _ = await video.EvaluateAsync(
+            _ = await executeScriptAsync(
                 """
-                v => {
-                    function removeStyle(id) {
-                        document.getElementById(id)?.remove();
-                    }
-                    removeStyle('danmakuPlayerNoControlStyle');
+                function removeStyle(id) {
+                    currentDocument.getElementById(id)?.remove();
                 }
+                removeStyle('danmakuPlayerNoControlStyle');
                 """);
         }
 

@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Playwright;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -40,9 +38,9 @@ public sealed partial class WebView2ForVideo : UserControl
         Unloaded += OnUnloaded;
     }
 
-    public ObservableCollection<VideoLocatorDisplay> Videos { get; } = [];
+    public ObservableCollection<VideoDisplay> Videos { get; } = [];
 
-    public VideoLocatorDisplay? CurrentVideo
+    public VideoDisplay? CurrentVideo
     {
         get => _currentVideo;
         set
@@ -60,7 +58,17 @@ public sealed partial class WebView2ForVideo : UserControl
         await OperationsSemaphore.WaitAsync();
         try
         {
-            Operations = _currentVideo is null ? null : new(_currentVideo.Video);
+            if (_currentVideo is null)
+                Operations = null;
+            else
+            {
+                _ = await WebView2.ExecuteScriptAsync(
+                    $"""
+                     var currentDocument = {_currentVideo.DocumentJsQuery};
+                     var video = currentDocument{_currentVideo.VideoJsQuery};
+                     """);
+                Operations = new(WebView2.ExecuteScriptAsync);
+            }
         }
         finally
         {
@@ -69,12 +77,6 @@ public sealed partial class WebView2ForVideo : UserControl
     }
 
     private WebView2 WebView2 => Content.To<WebView2>();
-
-    private IPlaywright Pw { get; set; } = null!;
-
-    private IBrowser Browser { get; set; } = null!;
-
-    private IPage Page { get; set; } = null!;
 
     private Uri? SourceUri
     {
@@ -87,7 +89,7 @@ public sealed partial class WebView2ForVideo : UserControl
     }
 
     [MemberNotNullWhen(true, nameof(Operations))]
-    public bool HasVideo => Operations is not null && !Page.IsClosed;
+    public bool HasVideo => Operations is not null;
 
     private JavaScriptOperations? Operations { get; set; }
 
@@ -111,7 +113,7 @@ public sealed partial class WebView2ForVideo : UserControl
 
     [ObservableProperty] public partial bool IsLoading { get; set; }
 
-    private VideoLocatorDisplay? _currentVideo;
+    private VideoDisplay? _currentVideo;
 
     public event TypedEventHandler<WebView2ForVideo, EventArgs>? VideoLoaded;
 
@@ -119,33 +121,23 @@ public sealed partial class WebView2ForVideo : UserControl
     {
         var opt = new CoreWebView2EnvironmentOptions
         {
-            AdditionalBrowserArguments = "--proxy-auto-detect"
+            AdditionalBrowserArguments = "--disable-web-security --disable-site-isolation-trials --proxy-auto-detect"
         };
         var env = await CoreWebView2Environment.CreateWithOptionsAsync(null, null, opt);
         await WebView2.EnsureCoreWebView2Async(env);
-        Pw = await Playwright.CreateAsync();
-        Browser = await Pw.Chromium.ConnectOverCDPAsync($"http://localhost:{App.RemoteDebuggingPort}");
-        Page = Browser.Contexts[0].Pages[0];
-        Page.FrameNavigated += Page_FrameNavigated;
+        WebView2.NavigationCompleted += Navigated;
     }
 
-    private void Page_FrameNavigated(object? sender, IFrame e)
+    private async void Navigated(WebView2 sender, CoreWebView2NavigationCompletedEventArgs e)
     {
-        if (e == Page.MainFrame)
-            _ = DispatcherQueue.TryEnqueue(() => Url = e.Url);
-
-        _ = DispatcherQueue.TryEnqueue(Callback);
-
-        return;
-        async void Callback() => await LoadVideoAsync();
+        Url = (await WebView2.ExecuteScriptAsync("document.location.href")).Trim('"');
+        await LoadVideoAsync();
     }
 
-    private async void OnUnloaded(object sender, RoutedEventArgs e)
+    private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        if (Browser is { } browser)
-            await browser.DisposeAsync();
-        Pw?.Dispose();
         WebView2.Close();
+        _loadSemaphore.Dispose();
     }
 
     public IAsyncOperation<IReadOnlyList<CoreWebView2Cookie>> GetBiliCookieAsync() => WebView2.CoreWebView2.CookieManager.GetCookiesAsync("https://bilibili.com");
@@ -157,11 +149,15 @@ public sealed partial class WebView2ForVideo : UserControl
             CurrentVideo = null;
             Videos.Clear();
             OnPropertyChanged(nameof(Videos));
-            if (Page == null!)
-                return;
-            _ = await Page.GotoAsync(url, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
+            WebView2.Source = new(url);
+            while (await WebView2.ExecuteScriptAsync("document.readyState === 'interactive' || document.readyState === 'complete'") is not "true")
+                await Task.Delay(200);
         }
-        catch (PlaywrightException)
+        catch (UriFormatException)
+        {
+            // 网址错误不跳转
+        }
+        catch (ArgumentNullException)
         {
             // 网址错误不跳转
         }
@@ -169,89 +165,113 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private CancellationTokenSource? _source;
 
+    private readonly SemaphoreSlim _loadSemaphore = new(1, 1);
+
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     [SuppressMessage("CodeQuality", "IDE0079:请删除不必要的忽略")]
     public async Task LoadVideoAsync()
     {
-        if (_source is not null)
-        {
-            await _source.CancelAsync();
-
-            for (var i = 0; i < 3 || IsLoading; ++i)
-                await Task.Delay(200);
-
-            if (IsLoading)
-                return;
-        }
+        await _loadSemaphore.WaitAsync();
         try
         {
-            IsLoading = true;
+            if (_source is not null)
+            {
+                if (!_source.IsCancellationRequested)
+                    await _source.CancelAsync();
 
-            using (_source = new())
-            using (_source = new())
+                for (var i = 0; i < 3 || IsLoading; ++i)
+                    await Task.Delay(200);
+
+                if (IsLoading)
+                    return;
+            }
+            try
+            {
+                IsLoading = true;
+
+                using (_source = new())
+                {
+                    CurrentVideo = null;
+                    Videos.Clear();
+                    SetOperation();
+                    while (await WebView2.ExecuteScriptAsync("document.readyState === 'interactive' || document.readyState === 'complete'") is not "true")
+                        await Task.Delay(200);
+                    if (!_source.IsCancellationRequested || Videos.Count is 0)
+                    {
+                        _ = WebView2.ExecuteScriptAsync("const frames = document.querySelectorAll('iframe')");
+                        var framesCount = int.Parse(await WebView2.ExecuteScriptAsync("document.querySelectorAll('iframe').length"));
+                        var tasks = new Task[framesCount + 1];
+                        tasks[0] = TaskAsync("document", _source);
+                        for (var i = 0; i < framesCount; i++)
+                            tasks[i + 1] = TaskAsync($"document.querySelectorAll('iframe')[{i}].contentDocument", _source);
+                        _ = Task.WhenAny(Task.WhenAll(tasks), Task.Delay(3000, _source.Token)).ContinueWith(_ => _source.Cancel(), _source.Token);
+                    }
+                    while (!_source.IsCancellationRequested)
+                        await Task.Delay(200);
+                }
+                _source = null;
+
+                if (Videos.Count is not 0)
+                    CurrentVideo = Videos[0];
+
+                // 触发 CollectionVisibility
+                OnPropertyChanged(nameof(Videos));
+            }
+            catch
             {
                 CurrentVideo = null;
                 Videos.Clear();
-                await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
-                var tasks = Page.Frames.Select(frame => TaskAsync(frame, _source));
-                _ = Task.WhenAny(Task.WhenAll(tasks), Task.Delay(3000, _source.Token)).ContinueWith(_ => _source.Cancel(), _source.Token);
-
-                // ReSharper disable once MethodSupportsCancellation
-                while (!_source.Token.IsCancellationRequested)
-                    await Task.Delay(200);
+                OnPropertyChanged(nameof(Videos));
             }
-            _source = null;
-
-            if (Videos.Count is not 0)
-                CurrentVideo = Videos[0];
-
-            // 触发 CollectionVisibilityConverter
-            OnPropertyChanged(nameof(Videos));
-        }
-        catch
-        {
-            CurrentVideo = null;
-            Videos.Clear();
-            OnPropertyChanged(nameof(Videos));
+            finally
+            {
+                IsLoading = false;
+            }
+            if (HasVideo)
+            {
+                await LockOperationsAsync(async operations =>
+                {
+                    Duration = await operations.DurationAsync();
+                    await operations.PauseAsync();
+                });
+            }
+            else
+            {
+                Duration = 0;
+                return;
+            }
+            VideoLoaded?.Invoke(this, EventArgs.Empty);
         }
         finally
         {
-            IsLoading = false;
+            _ = _loadSemaphore.Release();
         }
-        if (HasVideo)
-        {
-            await LockOperationsAsync(async operations =>
-            {
-                Duration = await operations.DurationAsync();
-                await operations.PauseAsync();
-            });
-        }
-        else
-        {
-            Duration = 0;
-            return;
-        }
-        VideoLoaded?.Invoke(this, EventArgs.Empty);
-
         return;
         [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
-        async Task TaskAsync(IFrame frame, CancellationTokenSource s)
+        async Task TaskAsync(string document, CancellationTokenSource s)
         {
             try
             {
-                await frame.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+                while (await WebView2.ExecuteScriptAsync($"{document}.readyState === 'interactive' || {document}.readyState === 'complete'") is not "true")
+                    await Task.Delay(200);
                 int count;
                 do
                 {
-                    var first = frame.Locator("video");
-                    count = await first.CountAsync();
+                    var videos = $"{document}.querySelectorAll('video')";
+                    count = int.Parse(await WebView2.ExecuteScriptAsync(videos + ".length"));
                     if (count is not 0)
-                        foreach (var locator in await first.AllAsync())
-                            Videos.Add(await VideoLocatorDisplay.CreateAsync(locator));
+                        for (var i = 0; i < count; i++)
+                        {
+                            var query = $".querySelectorAll('video')[{i}]";
+                            var durationStr = await WebView2.ExecuteScriptAsync(videos + query + ".duration");
+                            if (!int.TryParse(durationStr, out var duration))
+                                duration = -1;
+                            Videos.Add(new(document, query, duration));
+                        }
                     await Task.Delay(200);
-                } while (!s.Token.IsCancellationRequested && count is 0);
+                } while (!s.IsCancellationRequested && count is 0 && await WebView2.ExecuteScriptAsync($"{document}.readyState === 'complete'") is not "true");
 
-                if (!s.Token.IsCancellationRequested && count is not 0)
+                if (!s.IsCancellationRequested && count is not 0)
                     await s.CancelAsync();
             }
             catch
@@ -261,9 +281,9 @@ public sealed partial class WebView2ForVideo : UserControl
         }
     }
 
-    public async Task GoBackAsync() => await Page.GoBackAsync();
+    public async Task GoBackAsync() => await WebView2.ExecuteScriptAsync("history.back()");
 
-    public async Task GoForwardAsync() => await Page.GoForwardAsync();
+    public async Task GoForwardAsync() => await WebView2.ExecuteScriptAsync("history.forward()");
 
     public async void WebView2PointerReleased(object sender, PointerRoutedEventArgs e)
     {

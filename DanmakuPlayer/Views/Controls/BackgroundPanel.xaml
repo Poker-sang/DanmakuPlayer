@@ -323,6 +323,7 @@
                     <AppBarButton
                         x:Uid="/MainPanel/FullScreenButton"
                         DoubleTapped="UIElement_OnDoubleTapped"
+                        IsEnabled="False"
                         Tapped="FullScreenOnTapped">
                         <AppBarButton.Icon>
                             <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.FullScreen, common:Symbol.ArrowMinimize, common:Symbol.ArrowMaximize), Mode=OneWay}" />
