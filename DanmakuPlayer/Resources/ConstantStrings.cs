@@ -38,7 +38,7 @@ public static class ConstantStrings
 
     public static string AppTitle => AppInfoResources.AppTitle;
 
-    public static string AppAboutHeader => AppTitle + " v3.8.0";
+    public static string AppAboutHeader => AppTitle + " v3.8.1";
 
     public static IEnumerable<string> FontFamilies { get; }
 

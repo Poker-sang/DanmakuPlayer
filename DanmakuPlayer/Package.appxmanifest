@@ -10,7 +10,7 @@
     <Identity
       Name="PokerKo.DanmakuPlayer"
       Publisher="CN=D5BE94D7-0E23-4B10-BC6A-5550D9783A2A"
-      Version="3.8.0.0" />
+      Version="3.8.1.0" />
 
     <Properties>
         <DisplayName>Danmaku Player</DisplayName>
