@@ -1,3 +1,3 @@
-﻿namespace DanmakuPlayer.Models;
+namespace DanmakuPlayer.Models;
 
-public record VideoPage(int CId, string Index, string Title);
+public record VideoPage(ulong CId, string Index, string Title);

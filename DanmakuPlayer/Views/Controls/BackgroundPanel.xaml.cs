@@ -179,7 +179,7 @@ public sealed partial class BackgroundPanel : Grid
 
         return;
 
-        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, int cId, int i, CancellationToken token, Func<int, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
+        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, ulong cId, int i, CancellationToken token, Func<ulong, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
         {
             await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
             if (danmaku is null)

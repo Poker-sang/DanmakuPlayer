@@ -14,7 +14,7 @@ public sealed partial class InputDialog : UserControl
 {
     private bool _canceled;
 
-    private int? _cId;
+    private ulong? _cId;
 
     private BiliHelper.CodeType _codeType;
 
@@ -22,7 +22,7 @@ public sealed partial class InputDialog : UserControl
 
     private VideoPage[] ItemsSource { get; set; } = [];
 
-    public async Task<int?> ShowAsync()
+    public async Task<ulong?> ShowAsync()
     {
         _canceled = false;
         _ = await Content.To<ContentDialog>().ShowAsync();
@@ -94,9 +94,9 @@ public sealed partial class InputDialog : UserControl
         ++ActiveCount;
         _cancellationTokenSource = new();
         _codeType = InputBox.Text.Match(out var match);
-        var code = 0;
+        var code = 0ul;
         if (_codeType is not BiliHelper.CodeType.BvId and not BiliHelper.CodeType.Error)
-            code = int.Parse(match);
+            code = ulong.Parse(match);
         try
         {
             switch (_codeType)
@@ -117,8 +117,15 @@ public sealed partial class InputDialog : UserControl
                     sender.Hide();
                     break;
                 case BiliHelper.CodeType.MediaId:
-                    code = await BiliHelper.Md2SsAsync(code, _cancellationTokenSource.Token);
-                    goto case BiliHelper.CodeType.SeasonId;
+                    if (await BiliHelper.Md2SsAsync(code, _cancellationTokenSource.Token) is { } ss)
+                    {
+                        code = ss;
+                        goto case BiliHelper.CodeType.SeasonId;
+                    }
+
+                    ItemsSource = [];
+                    CheckItemsSource(sender);
+                    break;
                 case BiliHelper.CodeType.SeasonId:
                     ItemsSource = (await BiliHelper.Ss2CIdsAsync(code, _cancellationTokenSource.Token)).ToArray();
                     CheckItemsSource(sender);

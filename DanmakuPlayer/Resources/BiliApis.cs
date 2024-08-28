@@ -26,15 +26,15 @@ public static class BiliApis
 
     public static Task<JsonDocument> GetVideoPageListAsync(string bv, CancellationToken token) => $"{VideoPageList}bvid={bv}".DownloadJsonAsync(token);
 
-    public static Task<JsonDocument> GetVideoPageListAsync(int av, CancellationToken token) => $"{VideoPageList}aid={av}".DownloadJsonAsync(token);
+    public static Task<JsonDocument> GetVideoPageListAsync(ulong av, CancellationToken token) => $"{VideoPageList}aid={av}".DownloadJsonAsync(token);
 
-    public static Task<Stream?> GetWebDanmakuAsync(int cid, int segment, CancellationToken token) => $"{WebDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
+    public static Task<Stream?> GetWebDanmakuAsync(ulong cid, int segment, CancellationToken token) => $"{WebDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
 
-    public static Task<Stream?> GetMobileDanmaku(int cid, int segment, CancellationToken token) => $"{MobileDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
+    public static Task<Stream?> GetMobileDanmaku(ulong cid, int segment, CancellationToken token) => $"{MobileDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
 
-    public static Task<JsonDocument> GetBangumiInfoAsync(int mediaId, CancellationToken token) => $"{BangumiInfo}media_id={mediaId}".DownloadJsonAsync(token);
+    public static Task<JsonDocument> GetBangumiInfoAsync(ulong mediaId, CancellationToken token) => $"{BangumiInfo}media_id={mediaId}".DownloadJsonAsync(token);
 
-    public static Task<JsonDocument> GetBangumiEpisodeAsync(int seasonId, CancellationToken token) => $"{BangumiEpisode}season_id={seasonId}".DownloadJsonAsync(token);
+    public static Task<JsonDocument> GetBangumiEpisodeAsync(ulong seasonId, CancellationToken token) => $"{BangumiEpisode}season_id={seasonId}".DownloadJsonAsync(token);
 
-    public static Task<JsonDocument> GetBangumiEpisodeInfoAsync(int episodeId, CancellationToken token) => $"{BangumiEpisodeInfo}ep_id={episodeId}".DownloadJsonAsync(token);
+    public static Task<JsonDocument> GetBangumiEpisodeInfoAsync(ulong episodeId, CancellationToken token) => $"{BangumiEpisodeInfo}ep_id={episodeId}".DownloadJsonAsync(token);
 }
