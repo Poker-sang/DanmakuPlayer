@@ -3,14 +3,13 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <IsTrimmable>true</IsTrimmable>
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.27.2" />
+        <PackageReference Include="Google.Protobuf" Version="3.28.0" />
         <PackageReference Include="Grpc.Core.Api" Version="2.65.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.65.0">
+        <PackageReference Include="Grpc.Tools" Version="2.66.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

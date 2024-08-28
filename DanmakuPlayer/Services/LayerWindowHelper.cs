@@ -26,7 +26,7 @@ public static partial class LayerWindowHelper
     {
         var hWnd = (nint)window.AppWindow.Id.Value;
         var exStyle = GetWindowLongA(hWnd, GWL_EXSTYLE);
-        if ((exStyle & WS_EX_LAYERED) is 0) 
+        if ((exStyle & WS_EX_LAYERED) is 0)
             _ = SetWindowLongA(hWnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
     }
 }

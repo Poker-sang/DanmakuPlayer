@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+using System.Numerics;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
+using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
-using Microsoft.Graphics.Canvas;
-using System.Collections.Generic;
-using System.Numerics;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;

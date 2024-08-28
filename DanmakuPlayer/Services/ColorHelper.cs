@@ -15,7 +15,7 @@ public static class ColorHelper
     {
         var ptr = &color;
         var c = (byte*)ptr;
-        return Color.FromArgb(c[3], c[2], c[1], c[0]); 
+        return Color.FromArgb(c[3], c[2], c[1], c[0]);
     }
 
     public static unsafe uint GetUInt(this Color color)

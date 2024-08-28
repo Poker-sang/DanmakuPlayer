@@ -1,25 +1,3 @@
-#region Copyright
-
-// GPL v3 License
-// 
-// DanmakuPlayer/DanmakuPlayer
-// Copyright (c) 2024 DanmakuPlayer/RadioMenuFlyout.cs
-// 
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-#endregion
-
 using System;
 using System.Collections;
 using System.Collections.Specialized;
@@ -54,7 +32,7 @@ public partial class RadioMenuFlyout : MenuFlyout
     public static void OnItemsSourceChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
         var flyout = o.To<RadioMenuFlyout>();
-        if (flyout.ItemsSource is INotifyCollectionChanged ncc) 
+        if (flyout.ItemsSource is INotifyCollectionChanged ncc)
             ncc.CollectionChanged += (_, _) => flyout.UpdateSource();
         flyout.UpdateSource();
     }

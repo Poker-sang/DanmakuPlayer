@@ -4,7 +4,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Converters;
 
-public class CountLimitConverter : IValueConverter
+public partial class CountLimitConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

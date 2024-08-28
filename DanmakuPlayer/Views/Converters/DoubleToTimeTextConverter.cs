@@ -5,7 +5,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Converters;
 
-public class DoubleToTimeTextConverter : IValueConverter
+public partial class DoubleToTimeTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) => C.ToTime(value.To<double>());
 

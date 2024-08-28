@@ -1,11 +1,11 @@
 using System;
 using System.IO;
-using Windows.Storage;
 using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
-using WinUI3Utilities.Attributes;
+using Microsoft.Windows.Storage;
 using Windows.ApplicationModel;
 using WinUI3Utilities;
+using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
 
@@ -22,7 +22,7 @@ public static partial class AppContext
 
     public static void Initialize()
     {
-        AppLocalFolder = ApplicationData.Current.LocalFolder.Path;
+        AppLocalFolder = ApplicationData.GetDefault().LocalFolder.Path;
         InitializeConfiguration();
         AppConfig = LoadConfiguration() is not { } appConfigurations
 #if FIRST_TIME

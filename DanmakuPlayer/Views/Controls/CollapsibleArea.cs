@@ -5,7 +5,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed class CollapsibleArea : ContentControl
+public sealed partial class CollapsibleArea : ContentControl
 {
     public CollapsibleArea()
     {

@@ -5,11 +5,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using DanmakuPlayer.Services;
+using FluentIcons.WinUI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using WinUI3Utilities;
 using WinUIEx;
-using FluentIcons.WinUI;
 
 namespace DanmakuPlayer;
 
