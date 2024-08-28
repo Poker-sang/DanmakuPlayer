@@ -31,5 +31,5 @@ public static class Emoticon
 
     public static string Okay => OkayEmoticons.RandomGet();
 
-    private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[new Random().Next(arr.Count)];
+    private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[Random.Shared.Next(arr.Count)];
 }
