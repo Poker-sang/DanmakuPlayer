@@ -13,7 +13,7 @@ using Windows.UI;
 
 namespace DanmakuPlayer.Services;
 
-public class CreatorProvider(CanvasControl creator) : IDisposable
+public partial class CreatorProvider(CanvasControl creator) : IDisposable
 {
     public ICanvasResourceCreator Creator { get; } = creator;
 

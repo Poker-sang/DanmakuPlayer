@@ -153,6 +153,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     }
 
 #pragma warning disable CA1822
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822
 
