@@ -1,10 +1,10 @@
 {
-    "profiles": {
-        "DanmakuPlayer": {
-            "commandName": "MsixPackage"
-        },
-        "DanmakuPlayer (Unpackaged)": {
-            "commandName": "Project"
-        }
+  "profiles": {
+    "DanmakuPlayer": {
+      "commandName": "MsixPackage"
+    },
+    "DanmakuPlayer (Unpackaged)": {
+      "commandName": "Project"
     }
+  }
 }

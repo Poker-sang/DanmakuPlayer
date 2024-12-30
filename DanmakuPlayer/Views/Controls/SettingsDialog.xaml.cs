@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
@@ -22,10 +23,19 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-[INotifyPropertyChanged]
-public sealed partial class SettingsDialog : UserControl
+public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
 {
-    [ObservableProperty] private SettingsViewModel _vm = null!;
+    private SettingsViewModel Vm
+    {
+        get;
+        set
+        {
+            if (Equals(value, field))
+                return;
+            field = value;
+            OnPropertyChanged();
+        }
+    } = null!;
 
     public SettingsDialog() => InitializeComponent();
 
@@ -214,6 +224,10 @@ public sealed partial class SettingsDialog : UserControl
     }
 
     #endregion
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new(propertyName));
 }
 
 [JsonSerializable(typeof(Cookie[]))]

@@ -101,7 +101,7 @@ public sealed partial class WebView2ForVideo : UserControl
         }
     }
 
-    [ObservableProperty] private bool _isLoading;
+    [ObservableProperty] public partial bool IsLoading { get; set; }
 
     private VideoLocatorDisplay? _currentVideo;
 

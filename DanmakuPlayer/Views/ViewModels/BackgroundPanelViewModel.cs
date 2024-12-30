@@ -8,26 +8,34 @@ namespace DanmakuPlayer.Views.ViewModels;
 public partial class BackgroundPanelViewModel : ObservableObject
 {
     [ObservableProperty]
-    private bool _editingTime;
+    public partial bool EditingTime { get; set; }
 
     /// <summary>
     /// 进度条时间
     /// </summary>
-    [ObservableProperty] private double _time;
+    [ObservableProperty]
+    public partial double Time { get; set; }
 
-    [ObservableProperty] private bool _fullScreen;
+    [ObservableProperty]
+    public partial bool FullScreen { get; set; }
 
-    [ObservableProperty] private bool _mute;
+    [ObservableProperty]
+    public partial bool Mute { get; set; }
 
-    [ObservableProperty] private bool _startPlaying;
+    [ObservableProperty]
+    public partial bool StartPlaying { get; set; }
 
-    [ObservableProperty] private double _totalTime;
+    [ObservableProperty]
+    public partial double TotalTime { get; set; }
 
-    [ObservableProperty] private double _volume;
+    [ObservableProperty]
+    public partial double Volume { get; set; }
 
-    [ObservableProperty] private bool _loadingDanmaku;
+    [ObservableProperty]
+    public partial bool LoadingDanmaku { get; set; }
 
-    [ObservableProperty] private float _danmakuDelayTime;
+    [ObservableProperty]
+    public partial float DanmakuDelayTime { get; set; }
 
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
