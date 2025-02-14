@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Windows.ApplicationModel;
 
 namespace DanmakuPlayer.Resources;
 
@@ -38,7 +41,7 @@ public static class ConstantStrings
 
     public static string AppTitle => AppInfoResources.AppTitle;
 
-    public static string AppAboutHeader => AppTitle + " v3.8.1";
+    public static string AppAboutHeader => AppTitle + " v" + Package.Current.Id.Version.Let(t => $"{t.Major}.{t.Minor}.{t.Build}.{t.Revision}");
 
     public static IEnumerable<string> FontFamilies { get; }
 
@@ -47,4 +50,7 @@ public static class ConstantStrings
         using var collection = new InstalledFontCollection();
         FontFamilies = collection.Families.Select(t => t.Name);
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ROut Let<TIn, ROut>(this TIn obj, Func<TIn, ROut> block) => block(obj);
 }
