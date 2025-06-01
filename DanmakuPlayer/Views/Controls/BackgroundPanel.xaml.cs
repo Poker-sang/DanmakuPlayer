@@ -53,7 +53,7 @@ public sealed partial class BackgroundPanel : Grid
         }
         catch (Exception e)
         {
-            App._logger.LogCritical("", e);
+            App.Logger.LogCritical("", e);
         }
     }
 

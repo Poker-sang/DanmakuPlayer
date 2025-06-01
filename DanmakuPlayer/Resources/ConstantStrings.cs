@@ -41,16 +41,16 @@ public static class ConstantStrings
 
     public static string AppTitle => AppInfoResources.AppTitle;
 
-    public static string AppAboutHeader => AppTitle + " v" + Package.Current.Id.Version.Let(t => $"{t.Major}.{t.Minor}.{t.Build}.{t.Revision}");
+    public static string AppAboutHeader { get; } = AppTitle + " v" + Package.Current.Id.Version.Let(t => $"{t.Major}.{t.Minor}.{t.Build}.{t.Revision}");
 
-    public static IEnumerable<string> FontFamilies { get; }
+    public static IReadOnlyList<string> FontFamilies { get; }
 
     static ConstantStrings()
     {
         using var collection = new InstalledFontCollection();
-        FontFamilies = collection.Families.Select(t => t.Name);
+        FontFamilies = [.. collection.Families.Select(t => t.Name)];
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ROut Let<TIn, ROut>(this TIn obj, Func<TIn, ROut> block) => block(obj);
+    private static TOut Let<TIn, TOut>(this TIn obj, Func<TIn, TOut> block) => block(obj);
 }
