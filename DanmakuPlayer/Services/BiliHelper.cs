@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -20,35 +21,62 @@ public static partial class BiliHelper
         Error, AvId, BvId, CId, MediaId, SeasonId, EpisodeId
     }
 
-    private const int Xor = 177451812;
+    private const long Xor = 23442827791579L;
+    private const long Mask = 2251799813685247L;
 
-    private const long Add = 8728348608;
+    private const long MaxAid = 1L << 51;
+    private const long MinAid = 1L;
 
-    private static ReadOnlySpan<byte> Table => "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF"u8;
+    private const int Base = 58;
+    private const int BvLen = 12;
 
-    public static unsafe string Av2Bv(this ulong av)
+    private static ReadOnlySpan<byte> Table => "FcwAPNKTMug3GV5Lj7EJnHpWsx4tb8haYeviqBz6rkCy12mUSDQX9RdoZf"u8;
+
+    private static void Swap(Span<byte> str, int i, int j)
     {
-        fixed (byte* table = Table)
-        {
-            var result = stackalloc byte[10] { 49, 0, 0, 52, 0, 49, 0, 55, 0, 0 };
-            var temp = (av ^ Xor) + Add;
-            result[9] = table[temp % 58];
-            result[8] = table[temp / 58 % 58];
-            result[1] = table[temp / (58 * 58) % 58];
-            result[6] = table[temp / (58 * 58 * 58) % 58];
-            result[2] = table[temp / (58 * 58 * 58 * 58) % 58];
-            result[4] = table[temp / (58 * 58 * 58 * 58 * 58) % 58];
-            return Encoding.ASCII.GetString(result, 12);
-        }
+        (str[i], str[j]) = (str[j], str[i]);
     }
 
-    public static ulong Bv2Av(this string bv) =>
-        (ulong)((Table.IndexOf((byte)bv[9]) +
-            Table.IndexOf((byte)bv[8]) * 58 +
-            Table.IndexOf((byte)bv[1]) * 58 * 58 +
-            Table.IndexOf((byte)bv[6]) * 58 * 58 * 58 +
-            Table.IndexOf((byte)bv[2]) * 58 * 58 * 58 * 58 +
-            Table.IndexOf((byte)bv[4]) * 58 * 58 * 58 * 58 * 58 - Add) ^ Xor);
+    private static void Swap(StringBuilder str, int i, int j)
+    {
+        (str[i], str[j]) = (str[j], str[i]);
+    }
+
+    public static unsafe string Av2Bv(long av)
+    {
+        if (av is < MinAid or > MaxAid)
+            throw new InvalidDataException("av must be in range [1, 2251799813685248]");
+        var data = (MaxAid | av) ^ Xor;
+        Span<byte> arr = stackalloc byte[BvLen];
+        arr[0] = (byte)'B';
+        arr[1] = (byte)'V';
+        arr[2] = (byte)'1';
+        var bvArr = arr[3..];
+        fixed (byte* table = Table)
+            for (var i = BvLen - 4; i >= 0; --i)
+            {
+                bvArr[i] = table[data % Base];
+                data /= Base;
+            }
+        Swap(bvArr, 0, 6);
+        Swap(bvArr, 1, 4);
+        return Encoding.ASCII.GetString(arr);
+    }
+
+    public static long Bv2Av(string bv)
+    {
+        Span<byte> arr = stackalloc byte[BvLen - 3];
+        _ = Encoding.ASCII.GetBytes(bv.ToCharArray(3, BvLen - 3), arr);
+        Swap(arr, 0, 6);
+        Swap(arr, 1, 4);
+        long avData = 0;
+        foreach (var c in arr)
+        {
+            avData *= Base;
+            avData += Table.IndexOf(c);
+        }
+        return (avData & Mask) ^ Xor;
+    }
 
     private static bool CheckSuccess(JsonDocument jd) => jd.RootElement.GetProperty("code").GetInt32() is 0;
 
@@ -115,7 +143,7 @@ public static partial class BiliHelper
     [GeneratedRegex("(av|md|ss|ep)[0-9]+")]
     private static partial Regex DigitalRegex();
 
-    [GeneratedRegex(@"(?:BV)1\w\w4\w1\w7\w\w")]
+    [GeneratedRegex(@"(?:BV)1\w{9}")]
     private static partial Regex BvRegex();
 
     public static CodeType Match(this string url, out string result)
