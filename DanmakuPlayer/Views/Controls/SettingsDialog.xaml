@@ -106,14 +106,14 @@
                 </controls:SettingsCard>
                 <!--  弹幕设置  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{fluent:SymbolIcon Symbol=Timer10}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{fluent:SymbolIcon Symbol=TopSpeed}">
                     <Slider
                         Maximum="20"
                         Minimum="5"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{fluent:SymbolIcon Symbol=Drop}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{fluent:SymbolIcon Symbol=TransparencySquare}">
                     <Slider
                         Maximum="1"
                         Minimum="0.2"
@@ -215,26 +215,38 @@
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{fluent:SymbolIcon Symbol=Merge}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <controls:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard"
+                            HeaderIcon="{fluent:SymbolIcon Symbol=AutoFitWidth}"
+                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Style="{StaticResource SliderStyle}"
                                 Value="{x:Bind Vm.DanmakuMergeMaxDistance, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <controls:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard"
+                            HeaderIcon="{fluent:SymbolIcon Symbol=DataBarHorizontal}"
+                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Style="{StaticResource SliderStyle}"
                                 Value="{x:Bind Vm.DanmakuMergeMaxCosine, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <controls:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard"
+                            HeaderIcon="{fluent:SymbolIcon Symbol=Timer10}"
+                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="60"
                                 Style="{StaticResource SliderStyle}"
                                 TickFrequency="5"
                                 Value="{x:Bind Vm.DanmakuMergeTimeSpan, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard" IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
+                        <controls:SettingsCard
+                            x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard"
+                            HeaderIcon="{fluent:SymbolIcon Symbol=ArrowMoveInward}"
+                            IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuMergeCrossMode, Mode=TwoWay}" />
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
@@ -280,7 +292,7 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{fluent:SymbolIcon Symbol=Layer}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{fluent:SymbolIcon Symbol=Stack}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{fluent:SymbolIcon Symbol=TextWordCount}">
@@ -296,19 +308,19 @@
                         </Style>
                     </controls:SettingsExpander.Resources>
                     <controls:SettingsExpander.Items>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTopRight}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTop}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignBottom}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTopLeft}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard" HeaderIcon="{fluent:SymbolIcon Symbol=SlideTextSparkle}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" />
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>

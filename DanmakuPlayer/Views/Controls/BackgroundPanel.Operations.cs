@@ -106,7 +106,7 @@ public partial class BackgroundPanel
 
     private async void TimerTick(object? sender, object e)
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var timeNow = TimeOnly.FromDateTime(now);
         if (Vm.Time < Vm.TotalTime)
         {
@@ -183,7 +183,7 @@ public partial class BackgroundPanel
 
     private async void Resume()
     {
-        _lastTime = DateTime.Now;
+        _lastTime = DateTime.UtcNow;
         DanmakuHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
         await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
