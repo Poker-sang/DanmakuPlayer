@@ -49,7 +49,6 @@ public sealed partial class BackgroundPanel : Grid
 
             InitializeComponent();
             AppContext.DanmakuCanvas = DanmakuCanvas;
-            DispatcherTimerHelper.Tick += TimerTick;
         }
         catch (Exception e)
         {
@@ -119,7 +118,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void WebViewOnPageLoaded(WebView2ForVideo sender, EventArgs e)
     {
-        Vm.TotalTime = sender.Duration;
+        Vm.TotalTime = TimeSpan.FromSeconds(sender.Duration);
         TrySetPlaybackRate();
     }
 
@@ -242,16 +241,25 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private void AdvanceDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? 90 : 5;
+    private static readonly TimeSpan _LargeStep = TimeSpan.FromSeconds(90);
 
-    private void DelayDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? 90 : 5;
+    private static readonly TimeSpan _SmallStep = TimeSpan.FromSeconds(5);
 
-    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e) => Vm.DanmakuDelayTime = 0;
+    private void AdvanceDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+
+    private void DelayDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+
+    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e) => Vm.DanmakuDelayTime = TimeSpan.Zero;
 
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
-    private void DanmakuCanvasCreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
+    private void DanmakuCanvasCreateResources(CanvasAnimatedControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
 
-    private void DanmakuCanvasDraw(CanvasControl sender, CanvasDrawEventArgs e) => DanmakuHelper.Rendering(sender, e, (float)Vm.Time - Vm.DanmakuDelayTime, Vm.AppConfig);
+    private void DanmakuCanvasDraw(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e)
+    {
+        DispatcherQueue.TryEnqueue(() => TimerTick(e.Timing.ElapsedTime));
+       
+        DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.AppConfig);
+    }
 
     #endregion
 
@@ -261,8 +269,8 @@ public sealed partial class BackgroundPanel : Grid
     {
         await WebView.LockOperationsAsync(async operations =>
         {
-            Vm.Time = await operations.CurrentTimeAsync();
-            Vm.TotalTime = await operations.DurationAsync();
+            Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
+            Vm.TotalTime = TimeSpan.FromSeconds(await operations.DurationAsync());
             Vm.IsPlaying = await operations.IsPlayingAsync();
             Vm.Volume = await operations.VolumeAsync();
             Vm.Mute = await operations.MutedAsync();
@@ -272,7 +280,8 @@ public sealed partial class BackgroundPanel : Grid
 
         if (Vm.EnableWebView2 && !WebView.HasVideo)
         {
-            Vm.TotalTime = Vm.Time = Vm.Volume = 0;
+            Vm.Volume = 0;
+            Vm.TotalTime = Vm.Time = TimeSpan.Zero;
             Vm.FullScreen = Vm.IsPlaying = Vm.Mute = false;
         }
     }
@@ -285,7 +294,7 @@ public sealed partial class BackgroundPanel : Grid
         await WebView.LockOperationsAsync(async operations => Vm.Mute = await operations.MutedFlipAsync());
 
     private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
-        await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time));
+        await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
 
     private async void VolumeChanged() =>
         await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
@@ -319,7 +328,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void TimeTextTapped(object sender, TappedRoutedEventArgs e)
     {
-        TimeText.Text = C.ToTime(Vm.Time);
+        TimeText.Text = C.ToTimeString(Vm.Time);
         Vm.EditingTime = true;
     }
 
@@ -329,14 +338,14 @@ public sealed partial class BackgroundPanel : Grid
     {
         if (TimeSpan.TryParse(TimeText.Text/*.ReplaceLineEndings("")*/, out var result))
         {
-            Vm.Time = Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
+            Vm.Time = TimeSpan.FromSeconds(Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
             {
                 0 => result.TotalDays,
                 1 => result.TotalMinutes,
                 2 => result.TotalSeconds,
                 _ => 1
-            }, Vm.TotalTime), 0);
-            _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time));
+            }, Vm.TotalTime.TotalSeconds), 0));
+            _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
         }
 
         Vm.EditingTime = false;
@@ -353,4 +362,9 @@ public sealed partial class BackgroundPanel : Grid
     }
 
     #endregion
+
+    public void SecondToTimeSpan(double d)
+    {
+        Vm.Time = TimeSpan.FromSeconds(d);
+    }
 }

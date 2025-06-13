@@ -25,8 +25,9 @@ public static class DanmakuHelper
 
     public static bool IsRendering { get; set; }
 
-    public static void Rendering(CanvasControl sender, CanvasDrawEventArgs e, float time, AppConfig appConfig)
+    public static void Rendering(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e, TimeSpan timeSpan, AppConfig appConfig)
     {
+        var time = (float)timeSpan.TotalSeconds;
         if ((RenderType & RenderMode.RenderInit) is not 0)
         {
             if ((RenderType & RenderMode.ReloadProvider) is not 0)
@@ -42,7 +43,7 @@ public static class DanmakuHelper
                 RenderType &= ~RenderMode.ReloadProvider;
             }
 
-            var context = new DanmakuContext((float)sender.ActualHeight, appConfig);
+            var context = new DanmakuContext((float)Current.ViewHeight, appConfig);
             var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
             if (appConfig.RenderBefore)
             {
@@ -85,14 +86,14 @@ public static class DanmakuHelper
 
     public static void ClearPool() => Pool = [];
 
-    public static async Task<int> RenderAsync(CanvasControl canvas, RenderMode renderType, CancellationToken token)
+    public static async Task<int> RenderAsync(CanvasAnimatedControl canvas, RenderMode renderType, CancellationToken token)
     {
         RenderType = renderType;
         await WaitForRenderAsync(canvas, token);
         return _renderCount;
     }
 
-    private static async Task WaitForRenderAsync(CanvasControl canvas, CancellationToken token)
+    private static async Task WaitForRenderAsync(CanvasAnimatedControl canvas, CancellationToken token)
     {
         IsRendering = true;
         canvas.Invalidate();

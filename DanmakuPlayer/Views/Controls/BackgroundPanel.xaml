@@ -34,7 +34,7 @@
         KeyboardAcceleratorPlacementMode="Hidden"
         VideoLoaded="WebViewOnPageLoaded"
         Visibility="{x:Bind local:C.ToVisibility(Vm.EnableWebView2), Mode=OneWay}" />
-    <xaml:CanvasControl
+    <xaml:CanvasAnimatedControl
         x:Name="DanmakuCanvas"
         Grid.Row="0"
         Grid.RowSpan="3"
@@ -191,7 +191,7 @@
                         Visibility="{x:Bind local:C.ToVisibilityNegation(Vm.EditingTime), Mode=OneWay}">
                         <TextBlock
                             VerticalAlignment="Center"
-                            Text="{x:Bind local:C.ToTime(Vm.Time), Mode=OneWay}"
+                            Text="{x:Bind local:C.ToTimeString(Vm.Time), Mode=OneWay}"
                             TextAlignment="Right" />
                         <TextBlock
                             VerticalAlignment="Center"
@@ -199,7 +199,7 @@
                             TextAlignment="Center" />
                         <TextBlock
                             VerticalAlignment="Center"
-                            Text="{x:Bind local:C.ToTime(Vm.TotalTime), Mode=OneWay}"
+                            Text="{x:Bind local:C.ToTimeString(Vm.TotalTime), Mode=OneWay}"
                             TextAlignment="Left" />
                     </StackPanel>
                     <TextBox
@@ -235,7 +235,7 @@
                         x:Uid="/MainPanel/SyncDanmakuButton"
                         DoubleTapped="UIElement_OnDoubleTapped"
                         Icon="{fluent:SymbolIcon Symbol=ArrowRepeatAll}"
-                        Label="{x:Bind Vm.DanmakuDelayTime, Mode=OneWay}"
+                        Label="{x:Bind Vm.DanmakuDelayTime.TotalSeconds, Mode=OneWay}"
                         Tapped="SyncDanmakuTapped" />
                     <AppBarButton
                         x:Uid="/MainPanel/DelayDanmakuButton"
@@ -345,11 +345,11 @@
                 controls:DockPanel.Dock="Bottom"
                 DoubleTapped="UIElement_OnDoubleTapped"
                 IsTabStop="False"
-                Maximum="{x:Bind Vm.TotalTime, Mode=OneWay}"
+                Maximum="{x:Bind Vm.TotalTime.TotalSeconds, Mode=OneWay}"
                 Minimum="0"
                 StepFrequency="0.1"
                 ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
-                UserValue="{x:Bind Vm.Time, Mode=TwoWay}"
+                UserValue="{x:Bind local:C.ToSecondDouble(Vm.Time), BindBack=SecondToTimeSpan, Mode=TwoWay}"
                 UserValueChangedByManipulation="VideoSliderOnUserValueChangedByManipulation" />
         </controls:DockPanel>
     </local:CollapsibleArea>

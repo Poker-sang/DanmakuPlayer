@@ -13,7 +13,7 @@ using Windows.UI;
 
 namespace DanmakuPlayer.Services;
 
-public partial class CreatorProvider(CanvasControl creator) : IDisposable
+public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposable
 {
     public ICanvasResourceCreator Creator { get; } = creator;
 
@@ -21,9 +21,9 @@ public partial class CreatorProvider(CanvasControl creator) : IDisposable
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822 // 将成员标记为 static
 
-    public double ViewWidth { get; } = creator.ActualWidth;
+    public double ViewWidth { get; } = creator.Size.Width;
 
-    public double ViewHeight { get; } = creator.ActualHeight;
+    public double ViewHeight { get; } = creator.Size.Height;
 
     /// <summary>
     /// 颜色和对应笔刷

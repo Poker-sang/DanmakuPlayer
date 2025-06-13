@@ -18,7 +18,7 @@ public static partial class AppContext
 
     public static BackgroundPanel BackgroundPanel { get; set; } = null!;
 
-    public static CanvasControl DanmakuCanvas { get; set; } = null!;
+    public static CanvasAnimatedControl DanmakuCanvas { get; set; } = null!;
 
     public static void Initialize()
     {
@@ -42,5 +42,10 @@ public static partial class AppContext
         var path = Uri.UnescapeDataString(uri.PathAndQuery).TrimStart('/');
 
         return Path.Combine(Package.Current.InstalledPath, uri.Host, path);
+    }
+
+    public static void SetTimerInterval()
+    {
+        DanmakuCanvas.TargetElapsedTime = TimeSpan.FromSeconds(1d / AppConfig.PlayFramePerSecond);
     }
 }

@@ -25,7 +25,6 @@ public sealed partial class MainWindow : Window
 
     ~MainWindow()
     {
-        DispatcherTimerHelper.IsRunning = false;
         DanmakuHelper.Current.Dispose();
         CreatorProvider.DisposeFormats();
     }

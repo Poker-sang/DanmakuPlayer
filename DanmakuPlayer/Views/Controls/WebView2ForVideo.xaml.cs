@@ -13,18 +13,26 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Web.WebView2.Core;
 using Windows.Foundation;
+using CommunityToolkit.WinUI;
 using WinUI3Utilities;
-using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
-[DependencyProperty<double>("Duration")]
-[DependencyProperty<bool>("CanGoForward")]
-[DependencyProperty<bool>("CanGoBack")]
-[DependencyProperty<string>("Url")]
 [ObservableObject]
 public sealed partial class WebView2ForVideo : UserControl
 {
+    [GeneratedDependencyProperty]
+    public partial double Duration { get; set; }
+
+    [GeneratedDependencyProperty]
+    public partial bool CanGoForward { get; set; }
+
+    [GeneratedDependencyProperty]
+    public partial bool CanGoBack { get; set; }
+
+    [GeneratedDependencyProperty(DefaultValue = "")]
+    public partial string Url { get; set; }
+
     public WebView2ForVideo()
     {
         InitializeComponent();

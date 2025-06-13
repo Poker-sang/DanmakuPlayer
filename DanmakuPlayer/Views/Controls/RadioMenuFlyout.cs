@@ -2,39 +2,41 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinUI3Utilities;
-using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
-[DependencyProperty<object>("SelectedItem", DependencyPropertyDefaultValue.Default, nameof(OnSelectedItemChanged), IsNullable = true)]
-[DependencyProperty<object>("ItemsSource", DependencyPropertyDefaultValue.Default, nameof(OnItemsSourceChanged))]
 public partial class RadioMenuFlyout : MenuFlyout
 {
+    [GeneratedDependencyProperty]
+    public partial object? SelectedItem { get; set; }
+
+    [GeneratedDependencyProperty]
+    public partial object ItemsSource { get; set; }
+
     public string Formatter { get; set; } = "";
 
     public event Action<RadioMenuFlyout>? SelectionChanged;
 
-    public static void OnSelectedItemChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    partial void OnSelectedItemPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
-        var flyout = o.To<RadioMenuFlyout>();
-        if (flyout._suppressPropertyChanged)
-            flyout._suppressPropertyChanged = false;
+        if (_suppressPropertyChanged)
+            _suppressPropertyChanged = false;
         else
-            foreach (var item in flyout.Items)
-                item.To<RadioMenuFlyoutItem>().IsChecked = Equals(item.Tag, flyout.SelectedItem);
+            foreach (var item in Items)
+                item.To<RadioMenuFlyoutItem>().IsChecked = Equals(item.Tag, SelectedItem);
 
-        flyout.SelectionChanged?.Invoke(flyout);
+        SelectionChanged?.Invoke(this);
     }
 
-    public static void OnItemsSourceChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    partial void OnItemsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
     {
-        var flyout = o.To<RadioMenuFlyout>();
-        if (flyout.ItemsSource is INotifyCollectionChanged ncc)
-            ncc.CollectionChanged += (_, _) => flyout.UpdateSource();
-        flyout.UpdateSource();
+        if (ItemsSource is INotifyCollectionChanged ncc)
+            ncc.CollectionChanged += (_, _) => UpdateSource();
+        UpdateSource();
     }
 
     private void UpdateSource()

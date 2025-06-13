@@ -59,7 +59,7 @@ public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
         var backgroundPanel = Parent.To<BackgroundPanel>();
         if (before.PlaybackRate != after.PlaybackRate)
         {
-            DispatcherTimerHelper.ResetTimerInterval();
+            AppContext.SetTimerInterval();
             backgroundPanel.ResetProvider();
             backgroundPanel.TrySetPlaybackRate();
         }
@@ -77,7 +77,7 @@ public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
                 || before.DanmakuCountM7Enable != after.DanmakuCountM7Enable)
                 backgroundPanel.ResetProvider();
             if (before.PlayFramePerSecond != after.PlayFramePerSecond)
-                DispatcherTimerHelper.ResetTimerInterval();
+                AppContext.SetTimerInterval();
         }
         if (before.DanmakuFont != after.DanmakuFont)
             backgroundPanel.DanmakuFontChanged();

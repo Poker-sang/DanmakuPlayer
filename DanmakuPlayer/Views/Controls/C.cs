@@ -56,6 +56,13 @@ public static class C
         return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
     }
 
+    public static double ToSecondDouble(TimeSpan timeSpan) => timeSpan.TotalSeconds;
+
+    public static string ToTimeString(TimeSpan time)
+    {
+        return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+    }
+
     public static unsafe Color ToAlphaColor(uint color)
     {
         var ptr = &color;

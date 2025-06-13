@@ -172,7 +172,7 @@ public partial record Danmaku
             aFormat.FontFamily = AdvancedInfo.Font;
             aFormat.FontSize = Size;
             using var aLayout = new CanvasTextLayout(renderTarget, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
-
+            
             var lastTransform = renderTarget.Transform;
 
             if (AdvancedInfo.ZFlip is not 0)

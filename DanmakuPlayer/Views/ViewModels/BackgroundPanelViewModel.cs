@@ -1,6 +1,5 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DanmakuPlayer.Services;
 using Microsoft.UI.Windowing;
 
 namespace DanmakuPlayer.Views.ViewModels;
@@ -14,7 +13,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     /// 进度条时间
     /// </summary>
     [ObservableProperty]
-    public partial double Time { get; set; }
+    public partial TimeSpan Time { get; set; }
 
     [ObservableProperty]
     public partial bool FullScreen { get; set; }
@@ -26,7 +25,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     public partial bool StartPlaying { get; set; }
 
     [ObservableProperty]
-    public partial double TotalTime { get; set; }
+    public partial TimeSpan TotalTime { get; set; }
 
     [ObservableProperty]
     public partial double Volume { get; set; }
@@ -35,7 +34,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     public partial bool LoadingDanmaku { get; set; }
 
     [ObservableProperty]
-    public partial float DanmakuDelayTime { get; set; }
+    public partial TimeSpan DanmakuDelayTime { get; set; }
 
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
@@ -81,8 +80,6 @@ public partial class BackgroundPanelViewModel : ObservableObject
         }
     }
 
-    private double _tempPlaybackRate;
-
     private int _tempDuration;
 
     /// <summary>
@@ -101,7 +98,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
                     return;
                 // 如果是改为3倍速，临时保存原来的倍速
                 case 3:
-                    _tempPlaybackRate = AppConfig.PlaybackRate;
+                    field = AppConfig.PlaybackRate;
                     _tempDuration = AppConfig.DanmakuDuration;
                     AppConfig.DanmakuDuration /= 3;
                     AppConfig.PlaybackRate = value;
@@ -110,13 +107,13 @@ public partial class BackgroundPanelViewModel : ObservableObject
                     return;
                 // 如果是改为-1倍速，且原来是3倍速，恢复原来的倍速
                 case -1:
-                    AppConfig.PlaybackRate = _tempPlaybackRate;
+                    AppConfig.PlaybackRate = field;
                     AppConfig.DanmakuDuration = _tempDuration;
                     break;
                 // 如果已经是3倍速，且改为别的倍速，则改变临时保存的倍速
                 // ReSharper disable once PatternAlwaysMatches
                 case double when AppConfig.PlaybackRate is 3:
-                    _tempPlaybackRate = value;
+                    field = value;
                     return;
                 // 其他情况直接改变倍速
                 default:
@@ -131,7 +128,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
                     break;
                 }
             }
-            DispatcherTimerHelper.ResetTimerInterval();
+            AppContext.SetTimerInterval();
             OnPropertyChanged();
         }
     }
@@ -141,7 +138,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     /// <summary>
     /// 现实时间
     /// </summary>
-    public double ActualTime
+    public TimeSpan ActualTime
     {
         get => Time / AppConfig.PlaybackRate;
         set => Time = value * AppConfig.PlaybackRate;
@@ -149,12 +146,12 @@ public partial class BackgroundPanelViewModel : ObservableObject
 
     public bool IsPlaying
     {
-        get => DispatcherTimerHelper.IsRunning;
+        get => !AppContext.DanmakuCanvas.Paused;
         set
         {
-            if (value != DispatcherTimerHelper.IsRunning)
+            if (value != !AppContext.DanmakuCanvas.Paused)
             {
-                DispatcherTimerHelper.IsRunning = value;
+                AppContext.DanmakuCanvas.Paused = !value;
                 OnPropertyChanged();
             }
         }

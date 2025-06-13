@@ -1,16 +1,17 @@
 using System;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using WinUI3Utilities;
-using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer.Views.Controls;
 
-[DependencyProperty<double>("UserValue", "0d", nameof(OnUserValuePropertyChanged))]
 public partial class VideoSlider : Slider
 {
+    [GeneratedDependencyProperty]
+    public partial double UserValue { get; set; }
+
     public VideoSlider() => Style = Application.Current.Resources["DefaultSliderStyle"] as Style;
 
     public event EventHandler? SliderManipulationStarted;
@@ -22,11 +23,10 @@ public partial class VideoSlider : Slider
     private bool _isThumbHeld;
     private bool _isContainerHeld;
 
-    private static void OnUserValuePropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    partial void OnUserValuePropertyChanged(DependencyPropertyChangedEventArgs e)
     {
-        var sliderEx = o.To<VideoSlider>();
-        if (!sliderEx.IsSliderBeingManipulated)
-            sliderEx.Value = sliderEx.UserValue;
+        if (!IsSliderBeingManipulated)
+            Value = UserValue;
     }
 
     protected override void OnApplyTemplate()

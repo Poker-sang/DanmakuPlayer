@@ -18,7 +18,6 @@ public partial class BackgroundPanel
 {
     private readonly DanmakuFilter _filter = [DanmakuCombiner.CombineAsync, DanmakuRegex.MatchAsync];
     private CancellationTokenSource _cancellationTokenSource = new();
-    private DateTime _lastTime;
     private int _tickCount;
     private bool _isRightPressing;
     private TimeOnly _lastPressTime;
@@ -38,8 +37,8 @@ public partial class BackgroundPanel
 
         if (!Vm.EnableWebView2 || !WebView.HasVideo)
         {
-            Vm.TotalTime = 0;
-            Vm.Time = 0;
+            Vm.TotalTime = TimeSpan.Zero;
+            Vm.Time = TimeSpan.Zero;
         }
         DanmakuHelper.ClearPool();
 
@@ -58,7 +57,7 @@ public partial class BackgroundPanel
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             if (!Vm.EnableWebView2 || !WebView.HasVideo)
-                Vm.TotalTime = (DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + Vm.AppConfig.DanmakuActualDuration;
+                Vm.TotalTime = TimeSpan.FromSeconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + Vm.AppConfig.DanmakuActualDuration);
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
         }
@@ -104,22 +103,22 @@ public partial class BackgroundPanel
 
     #region 播放及暂停
 
-    private async void TimerTick(object? sender, object e)
+    private async void TimerTick(TimeSpan elapsedTime)
     {
-        var now = DateTime.UtcNow;
-        var timeNow = TimeOnly.FromDateTime(now);
+        var now = DanmakuCanvas.TargetElapsedTime;
+        var timeNow = TimeOnly.FromTimeSpan(now);
         if (Vm.Time < Vm.TotalTime)
         {
             if (Vm.IsPlaying)
             {
-                Vm.ActualTime += (now - _lastTime).TotalSeconds;
+                Vm.ActualTime += elapsedTime;
                 DanmakuCanvas.Invalidate();
             }
         }
         else
         {
             Pause();
-            Vm.Time = 0;
+            Vm.Time = TimeSpan.Zero;
         }
 
         if ((InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Right) & CoreVirtualKeyStates.Down) is 0)
@@ -159,13 +158,12 @@ public partial class BackgroundPanel
             {
                 _tickCount = 0;
                 var lastTime = Vm.Time;
-                await WebView.LockOperationsAsync(async operations => Vm.Time = await operations.CurrentTimeAsync());
-                if (Math.Abs(Vm.Time - lastTime) > 0.5)
+                await WebView.LockOperationsAsync(async operations =>
+                    Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
+                if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
                     Sync();
             }
         }
-
-        _lastTime = now;
     }
 
     private void TryPause()
@@ -183,7 +181,6 @@ public partial class BackgroundPanel
 
     private async void Resume()
     {
-        _lastTime = DateTime.UtcNow;
         DanmakuHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
         await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
@@ -212,17 +209,19 @@ public partial class BackgroundPanel
     /// <param name="back">是否向前</param>
     private async void FastForward(bool fast, bool back)
     {
-        var fastForwardTime = fast ? 90 : Vm.AppConfig.PlayFastForward;
+        var fastForwardTime = fast ? _LargeStep : TimeSpan.FromSeconds(Vm.AppConfig.PlayFastForward);
         if (back)
             fastForwardTime = -fastForwardTime;
-        var time = Math.Clamp(Vm.Time + fastForwardTime, 0, Vm.TotalTime);
+        var time = TimeSpan.FromSeconds(Math.Clamp(
+            (Vm.Time + fastForwardTime).TotalSeconds,
+            0,
+            Vm.TotalTime.TotalSeconds));
         if (Vm.EnableWebView2 && WebView.HasVideo)
         {
-            await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time));
-            Vm.Time = time;
+            await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time.TotalSeconds));
         }
-        else
-            Vm.Time = time;
+
+        Vm.Time = time;
     }
 
     private void VolumeUp(int volumeUp)
