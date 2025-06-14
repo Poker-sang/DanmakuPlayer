@@ -7,7 +7,7 @@ namespace DanmakuPlayer.Views.Converters;
 
 public partial class DoubleToTimeTextConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language) => C.ToTime(value.To<double>());
+    public object Convert(object value, Type targetType, object parameter, string language) => C.SecondToTime(value.To<double>());
 
     public object ConvertBack(object value, Type targetType, object parameter, string language) => ThrowHelper.InvalidCast<object>();
 }

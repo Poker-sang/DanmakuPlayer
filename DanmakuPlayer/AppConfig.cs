@@ -65,9 +65,8 @@ public partial record AppConfig()
     public int DanmakuDuration { get; set; } = 15;
 
     /// <inheritdoc cref="DanmakuDuration"/>
-    /// 方便计算使用float
     [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
-    public float DanmakuActualDuration => (float)(DanmakuDuration * PlaybackRate);
+    public int DanmakuActualDurationMs => (int)(DanmakuDuration * PlaybackRate * 1000);
 
     /// <summary>
     /// 弹幕透明度

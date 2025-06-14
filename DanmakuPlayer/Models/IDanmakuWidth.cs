@@ -2,7 +2,7 @@ namespace DanmakuPlayer.Models;
 
 public interface IDanmakuWidth
 {
-    public float Time { get; }
+    public int TimeMs { get; }
 
     public double LayoutWidth { get; }
 }

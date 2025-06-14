@@ -50,7 +50,7 @@ public static class C
     public static Symbol SymbolSelector(bool value, Symbol trueValue, Symbol falseValue) =>
         value ? trueValue : falseValue;
 
-    public static string ToTime(double sec)
+    public static string SecondToTime(double sec)
     {
         var time = TimeSpan.FromSeconds(sec);
         return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");

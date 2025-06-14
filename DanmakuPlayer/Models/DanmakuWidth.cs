@@ -1,3 +1,3 @@
 namespace DanmakuPlayer.Models;
 
-public record DanmakuWidth(float Time, double LayoutWidth = 0) : IDanmakuWidth;
+public record DanmakuWidth(int TimeMs, double LayoutWidth = 0) : IDanmakuWidth;

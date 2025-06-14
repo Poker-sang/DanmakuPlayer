@@ -27,7 +27,7 @@ public static class DanmakuHelper
 
     public static void Rendering(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e, TimeSpan timeSpan, AppConfig appConfig)
     {
-        var time = (float)timeSpan.TotalSeconds;
+        var timeMs = (int)timeSpan.TotalMilliseconds;
         if ((RenderType & RenderMode.RenderInit) is not 0)
         {
             if ((RenderType & RenderMode.ReloadProvider) is not 0)
@@ -63,15 +63,15 @@ public static class DanmakuHelper
             e.DrawingSession.Clear(Colors.Transparent);
 
             if (appConfig.RenderBefore)
-                foreach (var t in DisplayingDanmaku(time, appConfig))
-                    t.OnRender(e.DrawingSession, Current, time);
+                foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                    t.OnRender(e.DrawingSession, Current, timeMs);
             else
             {
                 Current.ClearLayoutRefCount();
-                foreach (var t in DisplayingDanmaku(time, appConfig))
+                foreach (var t in DisplayingDanmaku(timeMs, appConfig))
                 {
                     Current.AddLayoutRef(t);
-                    t.OnRender(e.DrawingSession, Current, time);
+                    t.OnRender(e.DrawingSession, Current, timeMs);
                 }
 
                 Current.ClearUnusedLayoutRef();
@@ -101,14 +101,14 @@ public static class DanmakuHelper
             await Task.Delay(500, token);
     }
 
-    public static Danmaku[] DisplayingDanmaku(float time, AppConfig appConfig)
+    public static Danmaku[] DisplayingDanmaku(int timeMs, AppConfig appConfig)
     {
-        var actualDuration = Math.Max(10, appConfig.DanmakuDuration) * appConfig.PlaybackRate;
+        var actualDurationMs = (int) (Math.Max(10, appConfig.DanmakuDuration) * appConfig.PlaybackRate * 1000);
 
-        var firstIndex = Array.FindIndex(Pool, t => t.Time > time - actualDuration);
+        var firstIndex = Array.FindIndex(Pool, t => t.TimeMs > timeMs - actualDurationMs);
         if (firstIndex is -1)
             return [];
-        var lastIndex = Array.FindLastIndex(Pool, t => t.Time <= time);
+        var lastIndex = Array.FindLastIndex(Pool, t => t.TimeMs <= timeMs);
 #pragma warning disable IDE0046 // 转换为条件表达式
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (lastIndex < firstIndex)

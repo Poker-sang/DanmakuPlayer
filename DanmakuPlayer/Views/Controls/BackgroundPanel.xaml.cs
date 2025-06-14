@@ -338,13 +338,13 @@ public sealed partial class BackgroundPanel : Grid
     {
         if (TimeSpan.TryParse(TimeText.Text/*.ReplaceLineEndings("")*/, out var result))
         {
-            Vm.Time = TimeSpan.FromSeconds(Math.Max(Math.Min(TimeText.Text.Count(c => c is ':') switch
+            Vm.Time = TimeSpan.FromSeconds(Math.Clamp(0, Vm.TotalTime.TotalSeconds, TimeText.Text.Count(c => c is ':') switch
             {
                 0 => result.TotalDays,
                 1 => result.TotalMinutes,
                 2 => result.TotalSeconds,
                 _ => 1
-            }, Vm.TotalTime.TotalSeconds), 0));
+            }));
             _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
         }
 

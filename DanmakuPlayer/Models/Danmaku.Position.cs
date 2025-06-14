@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using DanmakuPlayer.Services;
 using DanmakuRoomRollList = System.Collections.Generic.LinkedList<(float BottomPos, DanmakuPlayer.Models.IDanmakuWidth Danmaku)>;
-using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
+using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, int TimeMs)>;
 using RollNode = System.Collections.Generic.LinkedListNode<(float BottomPos, DanmakuPlayer.Models.IDanmakuWidth Danmaku)>;
-using StaticNode = System.Collections.Generic.LinkedListNode<(float BottomPos, double Time)>;
+using StaticNode = System.Collections.Generic.LinkedListNode<(float BottomPos, int TimeMs)>;
 
 namespace DanmakuPlayer.Models;
 
@@ -12,14 +12,14 @@ public partial record Danmaku
 {
     private double GetDistance(CreatorProvider provider, IDanmakuWidth previous)
     {
-        var time = _layoutWidth <= previous.LayoutWidth
-            ? Time
-            : previous.Time + provider.AppConfig.DanmakuActualDuration;
+        var timeMs = _layoutWidth <= previous.LayoutWidth
+            ? TimeMs
+            : previous.TimeMs + provider.AppConfig.DanmakuActualDurationMs;
 
-        return GetPosition(previous, time) - GetPosition(this, time) - previous.LayoutWidth;
+        return GetPosition(previous, timeMs) - GetPosition(this, timeMs) - previous.LayoutWidth;
 
         // 弹幕左边缘距离屏幕右边缘的距离
-        double GetPosition(IDanmakuWidth danmaku, float t) => (t - danmaku.Time) * (provider.ViewWidth + danmaku.LayoutWidth) / provider.AppConfig.DanmakuActualDuration;
+        double GetPosition(IDanmakuWidth danmaku, int ms) => (ms - danmaku.TimeMs) * (provider.ViewWidth + danmaku.LayoutWidth) / provider.AppConfig.DanmakuActualDurationMs;
     }
 
     #region Roll
@@ -39,9 +39,9 @@ public partial record Danmaku
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
-        var firstNode = (RollNode?)null;
+        var firstNode = null as RollNode;
         // 插入的最后一个区间（靠下）
-        var lastNode = (RollNode?)null;
+        var lastNode = null as RollNode;
         // 应该放置的位置（取左上角位置）
         var pos = 0f;
         // 是否重叠
@@ -122,9 +122,9 @@ public partial record Danmaku
         // 目前可用区间中，距离上条弹幕的最大距离
         var mostDistance = allowOverlap ? double.NegativeInfinity : 0;
         // 插入的第一个区间（靠下）
-        var firstNode = (RollNode?)null;
+        var firstNode = null as RollNode;
         // 插入的最后一个区间（靠上）
-        var lastNode = (RollNode?)null;
+        var lastNode = null as RollNode;
         // 应该放置的位置（取左下角位置）
         var pos = 0f;
         // 是否重叠
@@ -199,14 +199,14 @@ public partial record Danmaku
     /// 自上至下插入弹幕
     /// </summary>
     /// <param name="list"></param>
-    /// <param name="occupyTime"></param>
+    /// <param name="occupyTimeMs"></param>
     /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool TopDownStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, bool allowOverlap, Func<bool, bool> overlapPredicate)
+    private bool TopDownStaticDanmaku(DanmakuRoomStaticList list, int occupyTimeMs, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
         // 目前可用区间中，上条弹幕最短的显示时间
-        var leastTime = allowOverlap ? double.PositiveInfinity : Time;
+        var leastTime = allowOverlap ? double.PositiveInfinity : TimeMs;
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
@@ -238,7 +238,7 @@ public partial record Danmaku
             return false;
 
         _showPositionY = pos;
-        list.AddBefore(firstNode!, new StaticNode((pos + (float)_layoutHeight, occupyTime)));
+        list.AddBefore(firstNode!, new StaticNode((pos + (float)_layoutHeight, occupyTimeMs)));
         for (var current = firstNode!; current != lastNode!;)
         {
             current = current.Next!;
@@ -254,16 +254,16 @@ public partial record Danmaku
             for (; node is not null; node = node.Next)
             {
                 // 高于目前最小时间
-                if (node.Value.Time >= leastTime)
+                if (node.Value.TimeMs >= leastTime)
                     return false;
-                intervalMostTime = Math.Max(intervalMostTime, node.Value.Time);
+                intervalMostTime = Math.Max(intervalMostTime, node.Value.TimeMs);
                 if (_layoutHeight <= node.Value.BottomPos - startPos)
                 {
                     outNode = new()
                     {
                         LeastTime = intervalMostTime,
                         LastNode = node,
-                        Overlapped = Time < intervalMostTime
+                        Overlapped = TimeMs < intervalMostTime
                     };
                     // 既没有高于最小时间，也没有超过屏幕高度
                     return true;
@@ -278,14 +278,14 @@ public partial record Danmaku
     /// 自下至上插入弹幕
     /// </summary>
     /// <param name="list"></param>
-    /// <param name="occupyTime"></param>
+    /// <param name="occupyTimeMs"></param>
     /// <param name="overlapPredicate"></param>
     /// <param name="allowOverlap"></param>
     /// <returns></returns>
-    private bool BottomUpStaticDanmaku(DanmakuRoomStaticList list, double occupyTime, bool allowOverlap, Func<bool, bool> overlapPredicate)
+    private bool BottomUpStaticDanmaku(DanmakuRoomStaticList list, int occupyTimeMs, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
         // 目前可用区间中，上条弹幕最短的显示时间
-        var leastTime = allowOverlap ? double.PositiveInfinity : Time;
+        var leastTime = allowOverlap ? double.PositiveInfinity : TimeMs;
         // 插入的第一个区间（靠下）
         var firstNode = (StaticNode?)null;
         // 插入的最后一个区间（靠上）
@@ -316,8 +316,8 @@ public partial record Danmaku
             return false;
 
         _showPositionY = pos - (float)_layoutHeight;
-        list.AddAfter(firstNode!, new StaticNode((pos, occupyTime)));
-        list.AddBefore(lastNode!, new StaticNode((_showPositionY, lastNode!.Value.Time)));
+        list.AddAfter(firstNode!, new StaticNode((pos, occupyTimeMs)));
+        list.AddBefore(lastNode!, new StaticNode((_showPositionY, lastNode!.Value.TimeMs)));
         for (var current = firstNode!; current != lastNode;)
         {
             current = current.Previous!;
@@ -333,16 +333,16 @@ public partial record Danmaku
             for (; node is not null; node = node.Previous)
             {
                 // 高于目前最小时间
-                if (node.Value.Time >= leastTime)
+                if (node.Value.TimeMs >= leastTime)
                     return false;
-                intervalMostTime = Math.Max(intervalMostTime, node.Value.Time);
+                intervalMostTime = Math.Max(intervalMostTime, node.Value.TimeMs);
                 if (_layoutHeight <= startPos - (node.Previous?.Value.BottomPos ?? 0))
                 {
                     outNode = new()
                     {
                         LeastTime = intervalMostTime,
                         LastNode = node,
-                        Overlapped = Time < intervalMostTime
+                        Overlapped = TimeMs < intervalMostTime
                     };
                     // 既没有高于最小时间，也没有超过屏幕高度
                     return true;

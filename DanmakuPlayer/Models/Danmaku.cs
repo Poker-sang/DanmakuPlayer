@@ -2,7 +2,6 @@ using System;
 using System.Xml.Linq;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
 
@@ -10,7 +9,8 @@ namespace DanmakuPlayer.Models;
 /// 弹幕
 /// </summary>
 /// <param name="Text">内容</param>
-/// <param name="Time">出现时间</param>
+/// <param name="Id">Used to sort danmaku with the same StartMs</param>
+/// <param name="TimeMs">出现时间</param>
 /// <param name="Mode">模式</param>
 /// <param name="Size">大小</param>
 /// <param name="Color">颜色</param>
@@ -19,7 +19,8 @@ namespace DanmakuPlayer.Models;
 /// <param name="UserHash">用户ID</param>
 public partial record Danmaku(
     string Text,
-    float Time,
+    ulong Id,
+    int TimeMs,
     DanmakuMode Mode,
     int Size,
     uint Color,
@@ -34,7 +35,8 @@ public partial record Danmaku(
     {
         return new(
             elem.Content,
-            elem.Progress / 1000f,
+            (ulong)elem.Id,
+            elem.Progress,
             (DanmakuMode)elem.Mode,
             elem.Fontsize,
             elem.Color,
@@ -44,32 +46,31 @@ public partial record Danmaku(
             elem.MidHash);
     }
 
-    public static Danmaku Parse(XElement xElement)
+    public static Danmaku Parse(XElement xElement, bool isNewFormat)
     {
         var tempInfo = xElement.Attribute("p")!.Value.Split(',');
-        return tempInfo.Length switch
-        {
-            8 => new(
+        return isNewFormat
+            ? new(
                 xElement.Value,
-                float.Parse(tempInfo[0]),
+                ulong.Parse(tempInfo[0]),
+                int.Parse(tempInfo[2]),
+                Enum.Parse<DanmakuMode>(tempInfo[3]),
+                int.Parse(tempInfo[4]),
+                uint.Parse(tempInfo[5]),
+                false,
+                ulong.Parse(tempInfo[4]),
+                Enum.Parse<DanmakuPool>(tempInfo[5]),
+                tempInfo[6])
+            : new(
+                xElement.Value,
+                0,
+                (int) (double.Parse(tempInfo[0]) * 1000),
                 Enum.Parse<DanmakuMode>(tempInfo[1]),
                 int.Parse(tempInfo[2]),
                 uint.Parse(tempInfo[3]),
                 false,
                 ulong.Parse(tempInfo[4]),
                 Enum.Parse<DanmakuPool>(tempInfo[5]),
-                tempInfo[6]),
-            9 => new(
-                xElement.Value,
-                float.Parse(tempInfo[0]),
-                Enum.Parse<DanmakuMode>(tempInfo[1]),
-                int.Parse(tempInfo[2]),
-                uint.Parse(tempInfo[3]),
-                false,
-                ulong.Parse(tempInfo[4]),
-                Enum.Parse<DanmakuPool>(tempInfo[5]),
-                tempInfo[6]),
-            _ => ThrowHelper.InvalidCast<Danmaku>()
-        };
+                tempInfo[6]);
     }
 }

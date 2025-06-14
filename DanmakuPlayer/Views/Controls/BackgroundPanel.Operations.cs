@@ -57,7 +57,7 @@ public partial class BackgroundPanel
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
             if (!Vm.EnableWebView2 || !WebView.HasVideo)
-                Vm.TotalTime = TimeSpan.FromSeconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].Time) + Vm.AppConfig.DanmakuActualDuration);
+                Vm.TotalTime = TimeSpan.FromMilliseconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
             RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
         }
@@ -211,10 +211,10 @@ public partial class BackgroundPanel
         var fastForwardTime = fast ? _LargeStep : TimeSpan.FromSeconds(Vm.AppConfig.PlayFastForward);
         if (back)
             fastForwardTime = -fastForwardTime;
-        var time = TimeSpan.FromSeconds(Math.Clamp(
-            (Vm.Time + fastForwardTime).TotalSeconds,
+        var time = TimeSpan.FromTicks(Math.Clamp(
+            (Vm.Time + fastForwardTime).Ticks,
             0,
-            Vm.TotalTime.TotalSeconds));
+            Vm.TotalTime.Ticks));
         if (Vm.EnableWebView2 && WebView.HasVideo)
         {
             await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time.TotalSeconds));

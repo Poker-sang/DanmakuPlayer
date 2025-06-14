@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using DanmakuRoomRollList = System.Collections.Generic.LinkedList<(float BottomPos, DanmakuPlayer.Models.IDanmakuWidth Danmaku)>;
-using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, double Time)>;
+using DanmakuRoomStaticList = System.Collections.Generic.LinkedList<(float BottomPos, int TimeMs)>;
 
 namespace DanmakuPlayer.Models;
 
@@ -29,8 +29,8 @@ public class DanmakuContext
     public DanmakuContext(float viewHeight, AppConfig appConfig)
     {
         _ = StaticRoom.AddFirst((viewHeight, 0));
-        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDuration)));
-        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDuration)));
+        _ = RollRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDurationMs)));
+        _ = InverseRoom.AddFirst((viewHeight, new DanmakuWidth(-appConfig.DanmakuActualDurationMs)));
         if (appConfig.DanmakuCountRollEnableLimit)
             Roll = new(appConfig.DanmakuCountRollLimit);
         if (appConfig.DanmakuCountBottomEnableLimit)

@@ -151,7 +151,7 @@ public static class DanmakuCombiner
 
                         var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
                         while (danmakuChunk.Count > 0 &&
-                               danmaku.Time - danmakuChunk.Peek().Peers[0].Time > appConfig.DanmakuMergeTimeSpan)
+                               danmaku.TimeMs - danmakuChunk.Peek().Peers[0].TimeMs > appConfig.DanmakuMergeTimeSpan * 1000)
                             outDanmaku.Add(danmakuChunk.Dequeue().Peers);
 
                         var addNew = true;
@@ -193,7 +193,8 @@ public static class DanmakuCombiner
 
                     var represent = new Danmaku(
                         (peers.Count > 4 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
-                        peers.Average(t => t.Time),
+                        0,
+                        (int) peers.Average(t => t.TimeMs),
                         mode,
                         (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
                         (uint)peers.Average(t => t.Color),
@@ -205,7 +206,7 @@ public static class DanmakuCombiner
                     ret.Add(represent);
                 }
 
-                ret.Sort((d1, d2) => d1.Time.CompareTo(d2.Time));
+                ret.Sort((d1, d2) => d1.TimeMs.CompareTo(d2.TimeMs));
                 return ret;
             }, token);
     }

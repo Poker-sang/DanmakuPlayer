@@ -86,12 +86,12 @@ public partial record Danmaku
                     return false;
                 break;
             case DanmakuMode.Bottom:
-                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
+                if (!BottomUpStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDurationMs + TimeMs, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 _showPositionX = (float)(provider.ViewWidth - _layoutWidth) / 2;
                 break;
             case DanmakuMode.Top:
-                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDuration + Time, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
+                if (!TopDownStaticDanmaku(context.StaticRoom, provider.AppConfig.DanmakuActualDurationMs + TimeMs, provider.AppConfig.DanmakuEnableOverlap, OverlapPredicate))
                     return false;
                 _showPositionX = (float)(provider.ViewWidth - _layoutWidth) / 2;
                 break;
@@ -131,7 +131,7 @@ public partial record Danmaku
             while (queue.Count is not 0)
             {
                 var danmaku = queue.Peek();
-                if (danmaku.Time + provider.AppConfig.DanmakuActualDuration < Time)
+                if (danmaku.TimeMs + provider.AppConfig.DanmakuActualDurationMs < TimeMs)
                     _ = queue.Dequeue();
                 else
                     break;
@@ -153,20 +153,20 @@ public partial record Danmaku
         }
     }
 
-    public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, float time)
+    public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, int timeMs)
     {
         if (!NeedRender)
             return;
 
-        var t = time - Time;
+        var ms = timeMs - TimeMs;
 
         if (Mode is DanmakuMode.Advanced)
         {
-            if (!(0 <= t) || !(t < AdvancedInfo!.Duration))
+            if (!(0 <= ms) || !(ms < AdvancedInfo!.DurationMs))
                 return;
 
-            var aPos = AdvancedInfo.GetPosition(t, (float)provider.ViewWidth, (float)provider.ViewHeight);
-            var aOpacity = AdvancedInfo.GetOpacity(t);
+            var aPos = AdvancedInfo.GetPosition(ms, (float)provider.ViewWidth, (float)provider.ViewHeight);
+            var aOpacity = AdvancedInfo.GetOpacity(ms);
             using var aBrush = new CanvasSolidColorBrush(renderTarget, Color.GetColor((byte)(aOpacity * 0xFF)));
             using var aFormat = new CanvasTextFormat();
             aFormat.FontFamily = AdvancedInfo.Font;
@@ -194,7 +194,7 @@ public partial record Danmaku
             return;
         }
 
-        if (!(0 <= t) || !(t < provider.AppConfig.DanmakuActualDuration))
+        if (!(0 <= ms) || !(ms < provider.AppConfig.DanmakuActualDurationMs))
             return;
 
         var layout = provider.Layouts[ToString()];
@@ -203,9 +203,9 @@ public partial record Danmaku
 
         var pos = Mode switch
         {
-            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration)), _showPositionY),
+            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs)), _showPositionY),
             DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
-            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * t / provider.AppConfig.DanmakuActualDuration) - width), _showPositionY),
+            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs) - width), _showPositionY),
             _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
         };
         renderTarget.DrawTextLayout(layout, pos, brush);

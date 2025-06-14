@@ -171,7 +171,12 @@ public static partial class BiliHelper
         return CodeType.Error;
     }
 
-    public static IEnumerable<Danmaku> ToDanmaku(IEnumerable<DanmakuElem> elems) => elems.Select(Danmaku.Parse).OrderBy(t => t.Time);
+    public static IEnumerable<Danmaku> ToDanmaku(IEnumerable<DanmakuElem> elems) => elems.Select(Danmaku.Parse).OrderBy(t => t.TimeMs);
 
-    public static IEnumerable<Danmaku> ToDanmaku(XDocument xDocument) => xDocument.Element("i")!.Elements("d").Select(Danmaku.Parse).OrderBy(t => t.Time);
+    public static IEnumerable<Danmaku> ToDanmaku(XDocument xDocument)
+    {
+        var i = xDocument.Element("i")!;
+        var isNewFormat = i.Element("oid") is not null;
+        return i.Elements("d").Select(element => Danmaku.Parse(element, isNewFormat)).OrderBy(t => t.TimeMs);
+    }
 }

@@ -10,12 +10,12 @@ public record AdvancedDanmaku(
     Vector2 EndPosition,
     float StartOpacity,
     float EndOpacity,
-    float Duration,
+    int DurationMs,
     string Text,
     float ZFlip,
     float YFlip,
-    float ActionTime,
-    float DelayTime,
+    int ActionTimeMs,
+    int DelayTimeMs,
     bool Outline,
     string Font,
     bool LinearAccelerate,
@@ -33,19 +33,19 @@ public record AdvancedDanmaku(
             new(ParseValue<float>(jsonArray[0]), ParseValue<float>(jsonArray[1])),
             new(ParseValue<float>(jsonArray[7]), ParseValue<float>(jsonArray[8])),
             float.Parse(opacity[0]), float.Parse(opacity[1]),
-            ParseValue<float>(jsonArray[3]),
+            (int) (ParseValue<float>(jsonArray[3]) * 1000),
             jsonArray[4].GetString()!,
             ParseValue<float>(jsonArray[5]) * float.Pi / 180,
             ParseValue<float>(jsonArray[6]) * float.Pi / 180,
-            ParseValue<float>(jsonArray[9]) / 1000,
-            ParseValue<float>(jsonArray[10]) / 1000,
+            ParseValue<int>(jsonArray[9]),
+            ParseValue<int>(jsonArray[10]),
             ParseValue<bool>(jsonArray[11]),
             jsonArray[12].GetString()!,
             ParseValue<bool>(jsonArray[13]),
             path
         );
 
-        static T ParseValue<T>(JsonElement jsonElement) where T : struct
+        static T ParseValue<T>(JsonElement jsonElement) where T : struct, IParsable<T>
         {
             if (jsonElement.ValueKind is JsonValueKind.String)
             {
@@ -54,50 +54,50 @@ public record AdvancedDanmaku(
                     return default;
                 return default(T) switch
                 {
-                    float => (T)(object)float.Parse(s),
-                    int => (T)(object)int.Parse(s),
-                    bool => (T)(object)(bool.TryParse(s, out var b) ? b : int.Parse(s) is 1),
+                    float => T.Parse(s, null),
+                    int => T.Parse(s, null),
+                    bool => T.TryParse(s, null, out var b) ? b : (T)(object)(int.Parse(s) is not 0),
                     _ => ThrowHelper.ArgumentOutOfRange<T, T>(default)
                 };
             }
 
-            return default(T) switch
+            return (T)(object) (default(T) switch
             {
-                float => (T)(object)jsonElement.GetSingle(),
-                int => (T)(object)jsonElement.GetInt32(),
-                bool => (T)(object)(jsonElement.ValueKind switch
+                float => jsonElement.GetSingle(),
+                int => jsonElement.GetInt32(),
+                bool => jsonElement.ValueKind switch
                 {
-                    JsonValueKind.Number => jsonElement.GetInt32() is 1,
+                    JsonValueKind.Number => jsonElement.GetInt32() is not 0,
                     JsonValueKind.False or JsonValueKind.True => jsonElement.GetBoolean(),
                     _ => ThrowHelper.ArgumentOutOfRange<JsonValueKind, T>(jsonElement.ValueKind)
-                }),
+                },
                 _ => ThrowHelper.ArgumentOutOfRange<T, T>(default)
-            };
+            });
         }
     }
 
-    public float GetOpacity(float time)
+    public float GetOpacity(int timeMs)
     {
-        return (EndOpacity - StartOpacity) * time / Duration + StartOpacity;
+        return (EndOpacity - StartOpacity) * timeMs / DurationMs + StartOpacity;
     }
 
-    public Vector2 GetPosition(float time, float width, float height)
+    public Vector2 GetPosition(int timeMs, float width, float height)
     {
-        var t = time - DelayTime;
+        var ms = timeMs - DelayTimeMs;
         float x;
         float y;
-        switch (t)
+        switch (ms)
         {
             case <= 0:
                 x = StartPosition.X;
                 y = StartPosition.Y;
                 break;
-            case > 0 when t >= ActionTime:
+            case > 0 when ms >= ActionTimeMs:
                 x = EndPosition.X;
                 y = EndPosition.Y;
                 break;
             default:
-                var scale = t / ActionTime;
+                var scale = ms / ActionTimeMs;
                 if (LinearAccelerate)
                 {
                     x = (EndPosition.X - StartPosition.X) * MathF.Pow(scale, 2) + StartPosition.X;
