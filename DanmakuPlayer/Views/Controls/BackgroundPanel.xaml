@@ -127,7 +127,14 @@
                 <AppBarButton
                     x:Uid="/MainPanel/CloseButton"
                     Icon="{fluent:SymbolIcon Symbol=Dismiss}"
-                    Tapped="CloseTapped" />
+                    Tapped="CloseTapped">
+                    <AppBarButton.Resources>
+                        <!--  ReSharper disable once Xaml.RedundantResource  -->
+                        <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver" Color="Red" />
+                        <!--  ReSharper disable once Xaml.RedundantResource  -->
+                        <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="DarkRed" />
+                    </AppBarButton.Resources>
+                </AppBarButton>
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>
