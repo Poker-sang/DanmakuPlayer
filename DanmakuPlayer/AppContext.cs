@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using DanmakuPlayer.Views.Controls;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.Windows.Storage;
 using Windows.ApplicationModel;
@@ -15,8 +14,6 @@ public static partial class AppContext
     public static string AppLocalFolder { get; private set; } = null!;
 
     public static AppConfig AppConfig { get; set; } = null!;
-
-    public static BackgroundPanel BackgroundPanel { get; set; } = null!;
 
     public static CanvasAnimatedControl DanmakuCanvas { get; set; } = null!;
 

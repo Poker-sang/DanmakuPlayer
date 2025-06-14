@@ -32,7 +32,6 @@ public sealed partial class BackgroundPanel : Grid
     {
         try
         {
-            AppContext.BackgroundPanel = this;
             Vm.PropertyChanged += (_, e) =>
             {
                 switch (e.PropertyName)
@@ -49,6 +48,7 @@ public sealed partial class BackgroundPanel : Grid
 
             InitializeComponent();
             AppContext.DanmakuCanvas = DanmakuCanvas;
+            AppContext.SetTimerInterval();
         }
         catch (Exception e)
         {

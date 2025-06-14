@@ -112,7 +112,6 @@ public partial class BackgroundPanel
             if (Vm.IsPlaying)
             {
                 Vm.ActualTime += elapsedTime;
-                DanmakuCanvas.Invalidate();
             }
         }
         else
