@@ -97,7 +97,7 @@ public record AdvancedDanmaku(
                 y = EndPosition.Y;
                 break;
             default:
-                var scale = ms / ActionTimeMs;
+                var scale = ms / (float) ActionTimeMs;
                 if (LinearAccelerate)
                 {
                     x = (EndPosition.X - StartPosition.X) * MathF.Pow(scale, 2) + StartPosition.X;

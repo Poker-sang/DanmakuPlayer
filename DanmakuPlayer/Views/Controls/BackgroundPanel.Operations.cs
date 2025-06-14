@@ -18,6 +18,7 @@ public partial class BackgroundPanel
 {
     private readonly DanmakuFilter _filter = [DanmakuCombiner.CombineAsync, DanmakuRegex.MatchAsync];
     private CancellationTokenSource _cancellationTokenSource = new();
+    private DateTime _lastTime;
     private int _tickCount;
     private bool _isRightPressing;
     private TimeOnly _lastPressTime;
@@ -103,65 +104,74 @@ public partial class BackgroundPanel
 
     #region 播放及暂停
 
-    private async void TimerTick(TimeSpan elapsedTime)
+    private async void TimerTick()
     {
-        var now = DanmakuCanvas.TargetElapsedTime;
-        var timeNow = TimeOnly.FromTimeSpan(now);
-        if (Vm.Time < Vm.TotalTime)
+        var now = DateTime.UtcNow;
+        var timeNow = TimeOnly.FromDateTime(now);
+        var timeSpan = now - _lastTime;
+        try
         {
-            if (Vm.IsPlaying)
-            {
-                Vm.ActualTime += elapsedTime;
-            }
-        }
-        else
-        {
-            Pause();
-            Vm.Time = TimeSpan.Zero;
-        }
+            if (timeSpan > TimeSpan.FromSeconds(0.5))
+                return;
 
-        if ((InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Right) & CoreVirtualKeyStates.Down) is 0)
-        {
-            // 如果是 按下->抬起
-            if (_isRightPressing)
-                // 之前改变了倍速，则恢复
-                if (Vm.PlaybackRate is 3)
-                    Vm.PlaybackRate = -1;
-                // 之前按下不超过500ms，认为是单击
-                else
-                    FastForward(false, false);
-
-            _isRightPressing = false;
-        }
-        else
-        {
-            // 如果是 按下->按下
-            if (_isRightPressing)
+            if (Vm.Time < Vm.TotalTime)
             {
-                // 按下超过500ms，设为3倍速
-                if ((timeNow - _lastPressTime).TotalMilliseconds > 500)
-                    Vm.PlaybackRate = 3;
+                if (Vm.IsPlaying)
+                    Vm.ActualTime += timeSpan;
             }
-            // 如果是 抬起->按下
             else
-                // 记录按下的时间点
-                _lastPressTime = timeNow;
-
-            _isRightPressing = true;
-        }
-
-        if (Vm.EnableWebView2 && WebView.HasVideo)
-        {
-            ++_tickCount;
-            if (_tickCount is 10)
             {
-                _tickCount = 0;
-                var lastTime = Vm.Time;
-                await WebView.LockOperationsAsync(async operations =>
-                    Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
-                if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
-                    Sync();
+                Pause();
+                Vm.Time = TimeSpan.Zero;
             }
+
+            if ((InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Right) & CoreVirtualKeyStates.Down) is 0)
+            {
+                // 如果是 按下->抬起
+                if (_isRightPressing)
+                    // 之前改变了倍速，则恢复
+                    if (Vm.PlaybackRate is 3)
+                        Vm.PlaybackRate = -1;
+                    // 之前按下不超过500ms，认为是单击
+                    else
+                        FastForward(false, false);
+
+                _isRightPressing = false;
+            }
+            else
+            {
+                // 如果是 按下->按下
+                if (_isRightPressing)
+                {
+                    // 按下超过500ms，设为3倍速
+                    if ((timeNow - _lastPressTime).TotalMilliseconds > 500)
+                        Vm.PlaybackRate = 3;
+                }
+                // 如果是 抬起->按下
+                else
+                    // 记录按下的时间点
+                    _lastPressTime = timeNow;
+
+                _isRightPressing = true;
+            }
+
+            if (Vm.EnableWebView2 && WebView.HasVideo)
+            {
+                ++_tickCount;
+                if (_tickCount >= 10)
+                {
+                    _tickCount = 0;
+                    var lastTime = Vm.Time;
+                    await WebView.LockOperationsAsync(async operations =>
+                        Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
+                    if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
+                        Sync();
+                }
+            }
+        }
+        finally
+        {
+            _lastTime = now;
         }
     }
 
@@ -205,7 +215,7 @@ public partial class BackgroundPanel
     /// 快进
     /// </summary>
     /// <param name="fast">快速快进</param>
-    /// <param name="back">是否向前</param>
+    /// <param name="back">是否后退</param>
     private async void FastForward(bool fast, bool back)
     {
         var fastForwardTime = fast ? _LargeStep : TimeSpan.FromSeconds(Vm.AppConfig.PlayFastForward);

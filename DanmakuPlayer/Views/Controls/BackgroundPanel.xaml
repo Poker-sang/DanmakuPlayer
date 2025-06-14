@@ -106,7 +106,7 @@
                 <AppBarButton
                     x:Uid="/MainPanel/TopmostButton"
                     DoubleTapped="UIElement_OnDoubleTapped"
-                    Tapped="FrontTapped">
+                    Tapped="TopMostTapped">
                     <AppBarButton.Icon>
                         <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.TopMost, common:Symbol.Pin, common:Symbol.PinOff), Mode=OneWay}" />
                     </AppBarButton.Icon>

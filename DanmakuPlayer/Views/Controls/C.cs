@@ -53,7 +53,7 @@ public static class C
     public static string SecondToTime(double sec)
     {
         var time = TimeSpan.FromSeconds(sec);
-        return time is { Hours: 0 } ? time.ToString(@"mm\:ss") : time.ToString(@"hh\:mm\:ss");
+        return ToTimeString(time);
     }
 
     public static double ToSecondDouble(TimeSpan timeSpan) => timeSpan.TotalSeconds;

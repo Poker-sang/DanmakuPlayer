@@ -89,7 +89,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void CloseTapped(object sender, TappedRoutedEventArgs e) => Application.Current.Exit();
 
-    private void FrontTapped(object sender, TappedRoutedEventArgs e)
+    private void TopMostTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.TopMost = !App.OverlappedPresenter.IsAlwaysOnTop;
         RootTeachingTip.ShowAndHide(
@@ -256,7 +256,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void DanmakuCanvasDraw(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e)
     {
-        DispatcherQueue.TryEnqueue(() => TimerTick(e.Timing.ElapsedTime));
+        DispatcherQueue.TryEnqueue(TimerTick);
        
         DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.AppConfig);
     }
