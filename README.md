@@ -119,9 +119,13 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 * [x] M7高级弹幕基础功能
 
-* [ ] ⚠️ M7高级弹幕Y轴翻转、跟踪拾取
+* [x] M7高级弹幕Y轴翻转
+
+* [ ] ⚠️ M7高级弹幕跟踪拾取
 
 * [ ] ⚠️ M9代码弹幕
+
+* [ ] ⚠️ 字幕弹幕与ASS字幕
 
 ### 其他
 
@@ -141,8 +145,6 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 项目地址：[GitHub](https://github.com/Poker-sang/DanmakuPlayer)
 
-版本：3.8.1
-
 ## 联系方式
 
 作者：[扑克](https://github.com/Poker-sang)
@@ -151,4 +153,4 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 
 QQ：[2639914082](http://wpa.qq.com/msgrd?v=3&uin=2639914082&site=qq&menu=yes)
 
-2024.2.2
+2025.6.14

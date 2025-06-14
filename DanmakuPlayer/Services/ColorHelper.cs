@@ -1,43 +1,48 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Windows.UI;
 
 namespace DanmakuPlayer.Services;
 
 public static class ColorHelper
 {
-    public static unsafe Color GetColor(this uint color, byte alpha = 0xFF)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Color GetColor(this uint color, float alpha = 1)
     {
-        var ptr = &color;
-        var c = (byte*)ptr;
-        return Color.FromArgb(alpha, c[2], c[1], c[0]);
+        return color.GetColor((byte) (0xFF * alpha));
     }
 
-    public static unsafe Color GetAlphaColor(this uint color)
+    public static Color GetColor(this uint color, byte alpha = 0xFF)
     {
-        var ptr = &color;
-        var c = (byte*)ptr;
-        return Color.FromArgb(c[3], c[2], c[1], c[0]);
+        var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref color), 4);
+        return Color.FromArgb(alpha, span[2], span[1], span[0]);
     }
 
-    public static unsafe uint GetUInt(this Color color)
+    public static Color GetAlphaColor(this uint color)
     {
-        uint ret;
-        var ptr = &ret;
-        var c = (byte*)ptr;
-        c[0] = color.B;
-        c[1] = color.G;
-        c[2] = color.R;
+        var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref color), 4);
+        return Color.FromArgb(span[3], span[2], span[1], span[0]);
+    }
+
+    public static uint GetUInt(this Color color, byte alpha = 0xFF)
+    {
+        var ret = 0u;
+        var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref ret), 4);
+        span[0] = color.B;
+        span[1] = color.G;
+        span[2] = color.R;
+        span[3] = alpha;
         return ret;
     }
 
-    public static unsafe uint GetAlphaUInt(this Color color)
+    public static uint GetAlphaUInt(this Color color)
     {
-        uint ret;
-        var ptr = &ret;
-        var c = (byte*)ptr;
-        c[0] = color.B;
-        c[1] = color.G;
-        c[2] = color.R;
-        c[3] = color.A;
+        var ret = 0u;
+        var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref ret), 4);
+        span[0] = color.B;
+        span[1] = color.G;
+        span[2] = color.R;
+        span[3] = color.A;
         return ret;
     }
 }

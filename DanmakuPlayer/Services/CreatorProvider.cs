@@ -146,7 +146,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
     public CanvasSolidColorBrush GetBrush(uint color, float alpha)
     {
         if (!Brushes.TryGetValue(color, out var value))
-            Brushes[color] = value = new(Creator, color.GetColor((byte)(0xFF * alpha)));
+            Brushes[color] = value = new(Creator, color.GetColor(alpha));
         return value;
     }
 

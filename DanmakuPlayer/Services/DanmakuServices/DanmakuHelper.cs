@@ -59,27 +59,28 @@ public static class DanmakuHelper
         }
 
         if ((RenderType & RenderMode.RenderOnce) is not 0 || (RenderType & RenderMode.RenderAlways) is not 0)
-        {
-            e.DrawingSession.Clear(Colors.Transparent);
-
-            if (appConfig.RenderBefore)
-                foreach (var t in DisplayingDanmaku(timeMs, appConfig))
-                    t.OnRender(e.DrawingSession, Current, timeMs);
-            else
+            using (e.DrawingSession)
             {
-                Current.ClearLayoutRefCount();
-                foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                e.DrawingSession.Clear(Colors.Transparent);
+
+                if (appConfig.RenderBefore)
+                    foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                        t.OnRender(e.DrawingSession, Current, timeMs);
+                else
                 {
-                    Current.AddLayoutRef(t);
-                    t.OnRender(e.DrawingSession, Current, timeMs);
+                    Current.ClearLayoutRefCount();
+                    foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                    {
+                        Current.AddLayoutRef(t);
+                        t.OnRender(e.DrawingSession, Current, timeMs);
+                    }
+
+                    Current.ClearUnusedLayoutRef();
                 }
 
-                Current.ClearUnusedLayoutRef();
+                if ((RenderType & RenderMode.RenderOnce) is not 0)
+                    RenderType &= ~RenderMode.RenderOnce;
             }
-
-            if ((RenderType & RenderMode.RenderOnce) is not 0)
-                RenderType &= ~RenderMode.RenderOnce;
-        }
 
         IsRendering = false;
     }

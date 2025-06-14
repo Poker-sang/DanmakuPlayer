@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Services;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
+using Microsoft.Graphics.Canvas.UI.Xaml;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
@@ -165,31 +168,57 @@ public partial record Danmaku
             if (!(0 <= ms) || !(ms < AdvancedInfo!.DurationMs))
                 return;
 
-            var aPos = AdvancedInfo.GetPosition(ms, (float)provider.ViewWidth, (float)provider.ViewHeight);
+            CanvasDrawingSession drawingSession;
+            CanvasCommandList? commandList = null;
+            if (AdvancedInfo.YFlip is 0)
+                drawingSession = renderTarget;
+            else
+            {
+                commandList = new(renderTarget);
+                drawingSession = commandList.CreateDrawingSession();
+            }
+
+            var aPos = AdvancedInfo.GetPosition(ms, (float) provider.ViewWidth, (float) provider.ViewHeight);
             var aOpacity = AdvancedInfo.GetOpacity(ms);
-            using var aBrush = new CanvasSolidColorBrush(renderTarget, Color.GetColor((byte)(aOpacity * 0xFF)));
+            using var aBrush = new CanvasSolidColorBrush(drawingSession, Color.GetColor(aOpacity));
             using var aFormat = new CanvasTextFormat();
             aFormat.FontFamily = AdvancedInfo.Font;
             aFormat.FontSize = Size;
-            using var aLayout = new CanvasTextLayout(renderTarget, AdvancedInfo.Text, aFormat, int.MaxValue, int.MaxValue);
-            
-            var lastTransform = renderTarget.Transform;
+            using var aLayout = new CanvasTextLayout(drawingSession, AdvancedInfo.Text, aFormat, int.MaxValue,
+                int.MaxValue);
+
+            var lastTransform = drawingSession.Transform;
 
             if (AdvancedInfo.ZFlip is not 0)
-                renderTarget.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
-            // Y轴翻转没有完全实现，Win2D无法实现三维变换效果
-            if (AdvancedInfo.YFlip is not 0)
-                renderTarget.Transform *= Matrix3x2.CreateSkew(0, AdvancedInfo.YFlip, aPos);
+                drawingSession.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
 
-            renderTarget.DrawTextLayout(aLayout, aPos, aBrush);
+            drawingSession.DrawTextLayout(aLayout, aPos, aBrush);
 
             if (AdvancedInfo.Outline)
             {
                 using var aGeometry = CanvasGeometry.CreateText(aLayout);
-                using var aOutlineBrush = new CanvasSolidColorBrush(renderTarget, provider.AppConfig.DanmakuStrokeColor.GetColor((byte)(aOpacity * 0xFF / 2)));
-                renderTarget.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+                using var aOutlineBrush = new CanvasSolidColorBrush(drawingSession,
+                    provider.AppConfig.DanmakuStrokeColor.GetColor(aOpacity / 2));
+                drawingSession.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
             }
-            renderTarget.Transform = lastTransform;
+
+            drawingSession.Transform = lastTransform;
+
+            // Y轴翻转需使用3D变换
+            if (commandList is not null)
+            {
+                // reference: https://github.com/cotaku/DanmakuFrostMaster/blob/main/DanmakuFrostMaster/DanmakuRender.cs
+                using var effect = new Transform3DEffect();
+                var rotation = Matrix4x4.CreateRotationY(AdvancedInfo.YFlip, new(aPos, 0));
+                rotation.M14 = (float) -(1 / aLayout.LayoutBounds.Width * Math.Sin(AdvancedInfo.YFlip)); // Perspective transform
+                rotation *= Matrix4x4.CreateTranslation((float) (aLayout.LayoutBounds.Width / 2), (float)
+                    (aLayout.LayoutBounds.Height / 2), 0); // Move back to original position
+                effect.TransformMatrix = rotation;
+                effect.Source = commandList;
+                renderTarget.DrawImage(effect);
+                drawingSession.Dispose();
+                commandList.Dispose();
+            }
 
             return;
         }
