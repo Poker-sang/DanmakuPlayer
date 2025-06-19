@@ -184,22 +184,27 @@ public partial class WebView2ForVideo
         {
             _ = await video.EvaluateAsync(
                 """
-                v => {
+                v = () => {
                     function injectStyles(rule, id) {
                         removeStyle(id);
-                        var div = $("<div />", {
-                            html: '<style id="' + id +'">' + rule + '</style>'
-                        }).appendTo("body");    
+                        const style = document.createElement('style');
+                        style.id = id;
+                        style.textContent = rule;
+                        document.head.appendChild(style);
                     }
+                    
                     function removeStyle(id) {
-                        $('#'+id).remove();
+                        const existing = document.getElementById(id);
+                        if (existing) existing.remove();
                     }
-                    injectStyles(`video::-webkit-media-controls-panel
-                    {
+                    
+                    const css = `video::-webkit-media-controls-panel {
                         display: none !important;
                         opacity: 0 !important;
-                    }`, 'd');
-                }
+                    }`;
+                    
+                    injectStyles(css, 'd');
+                };
                 """);
         }
 
@@ -207,12 +212,15 @@ public partial class WebView2ForVideo
         {
             _ = await video.EvaluateAsync(
                 """
-                v => {
+                v = () => {
                     function removeStyle(id) {
-                        $('#'+id).remove();
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.remove();
+                        }
                     }
                     removeStyle('d');
-                }
+                };
                 """);
         }
 
