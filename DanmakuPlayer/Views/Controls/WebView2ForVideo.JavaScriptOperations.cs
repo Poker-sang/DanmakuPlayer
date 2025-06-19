@@ -184,27 +184,23 @@ public partial class WebView2ForVideo
         {
             _ = await video.EvaluateAsync(
                 """
-                v = () => {
+                v => {
                     function injectStyles(rule, id) {
                         removeStyle(id);
-                        const style = document.createElement('style');
-                        style.id = id;
-                        style.textContent = rule;
-                        document.head.appendChild(style);
+                        const tempStyle = document.createElement('style');
+                        tempStyle.id = id;
+                        tempStyle.innerHTML = rule;
+                        document.head.appendChild(tempStyle);
                     }
-                    
                     function removeStyle(id) {
-                        const existing = document.getElementById(id);
-                        if (existing) existing.remove();
+                        document.getElementById(id)?.remove();
                     }
-                    
-                    const css = `video::-webkit-media-controls-panel {
+                    injectStyles(`video::-webkit-media-controls-panel
+                    {
                         display: none !important;
                         opacity: 0 !important;
-                    }`;
-                    
-                    injectStyles(css, 'd');
-                };
+                    }`, 'danmakuPlayerNoControlStyle');
+                }
                 """);
         }
 
@@ -212,15 +208,12 @@ public partial class WebView2ForVideo
         {
             _ = await video.EvaluateAsync(
                 """
-                v = () => {
+                v => {
                     function removeStyle(id) {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            element.remove();
-                        }
+                        document.getElementById(id)?.remove();
                     }
-                    removeStyle('d');
-                };
+                    removeStyle('danmakuPlayerNoControlStyle');
+                }
                 """);
         }
 
