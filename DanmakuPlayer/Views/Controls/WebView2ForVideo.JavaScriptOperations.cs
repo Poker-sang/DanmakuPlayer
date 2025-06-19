@@ -212,12 +212,15 @@ public partial class WebView2ForVideo
         {
             _ = await video.EvaluateAsync(
                 """
-                v => {
+                v = () => {
                     function removeStyle(id) {
-                        $('#'+id).remove();
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.remove();
+                        }
                     }
                     removeStyle('d');
-                }
+                };
                 """);
         }
 
