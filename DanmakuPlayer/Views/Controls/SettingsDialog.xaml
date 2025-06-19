@@ -323,6 +323,9 @@
                         <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard" HeaderIcon="{fluent:SymbolIcon Symbol=SlideTextSparkle}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" />
                         </controls:SettingsCard>
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountSubtitleEnableCard" HeaderIcon="{fluent:SymbolIcon Symbol=Subtitles}">
+                            <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountSubtitleEnable, Mode=TwoWay}" />
+                        </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
 

@@ -177,6 +177,12 @@ public partial record AppConfig()
     public bool DanmakuCountM7Enable { get; set; } = true;
 
     /// <summary>
+    /// 允许字幕弹幕
+    /// </summary>
+    /// <remarks>default: <see langword="true"/></remarks>
+    public bool DanmakuCountSubtitleEnable { get; set; } = true;
+
+    /// <summary>
     /// B站Cookie
     /// </summary>
     /// <remarks>default: []</remarks>

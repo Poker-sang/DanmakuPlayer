@@ -47,6 +47,28 @@ public partial record Danmaku
     public bool RenderInit(DanmakuContext context, CreatorProvider provider)
     {
         NeedRender = false;
+        switch (Pool)
+        {
+            case DanmakuPool.Normal:
+                break;
+            case DanmakuPool.Subtitle when provider.AppConfig.DanmakuCountSubtitleEnable:
+                return NeedRender = true;
+            case DanmakuPool.Advanced when Mode is DanmakuMode.Advanced && provider.AppConfig.DanmakuCountM7Enable:
+            {
+                try
+                {
+                    AdvancedInfo = AdvancedDanmaku.Parse(Text);
+                }
+                catch
+                {
+                    return false;
+                }
+
+                return NeedRender = true;
+            }
+            default:
+                return false;
+        }
 
         // 是否超过弹幕数量限制
         if (Mode switch
@@ -55,25 +77,9 @@ public partial record Danmaku
             DanmakuMode.Bottom => provider.AppConfig.DanmakuCountBottomEnableLimit && CountReachLimit(context.Bottom!, provider.AppConfig.DanmakuCountBottomLimit),
             DanmakuMode.Top => provider.AppConfig.DanmakuCountTopEnableLimit && CountReachLimit(context.Top!, provider.AppConfig.DanmakuCountTopLimit),
             DanmakuMode.Inverse => provider.AppConfig.DanmakuCountInverseEnableLimit && CountReachLimit(context.Inverse!, provider.AppConfig.DanmakuCountInverseLimit),
-            DanmakuMode.Advanced => !provider.AppConfig.DanmakuCountM7Enable,
             _ => true
         })
             return false;
-
-        if (Mode is DanmakuMode.Advanced)
-        {
-            try
-            {
-                AdvancedInfo = AdvancedDanmaku.Parse(Text);
-            }
-            catch
-            {
-                return false;
-            }
-
-            NeedRender = true;
-            return true;
-        }
 
         var layoutExists = provider.Layouts.TryGetValue(ToString(), out var layout);
         if (!layoutExists)
@@ -124,8 +130,7 @@ public partial record Danmaku
                 context.Inverse?.Enqueue(this);
                 break;
         }
-        NeedRender = true;
-        return true;
+        return NeedRender = true;
 
         // 达到限制数返回true，否则false
         bool CountReachLimit(Queue<Danmaku> queue, int limit)
