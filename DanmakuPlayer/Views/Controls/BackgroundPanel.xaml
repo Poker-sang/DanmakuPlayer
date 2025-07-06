@@ -32,8 +32,10 @@
         x:FieldModifier="public"
         IsHitTestVisible="{x:Bind local:C.Negation(Vm.LockWebView2), Mode=OneWay}"
         KeyboardAcceleratorPlacementMode="Hidden"
+        Url="{x:Bind Vm.Url, Mode=TwoWay}"
         VideoLoaded="WebViewOnPageLoaded"
-        Visibility="{x:Bind local:C.ToVisibility(Vm.EnableWebView2), Mode=OneWay}" />
+        Visibility="{x:Bind local:C.ToVisibility(Vm.EnableWebView2), Mode=OneWay}"
+        Duration="{x:Bind Vm.Duration, Mode=TwoWay}" />
     <!--  留1px距离防止WebView2不渲染  -->
     <xaml:CanvasAnimatedControl
         x:Name="DanmakuCanvas"
@@ -76,23 +78,9 @@
                     Icon="{fluent:SymbolIcon Symbol=Code}"
                     Tapped="FileTapped" />
                 <AppBarButton
-                    Icon="{fluent:SymbolIcon Symbol=PeopleLink}">
-                    <Button.Flyout>
-                        <Flyout Placement="BottomEdgeAlignedLeft">
-                            <StackPanel Width="256" Spacing="12">
-                                <AutoSuggestBox 
-                                    Header="WebSocket服务器地址" 
-                                    PlaceholderText="wss://(或ws://)"
-                                    QueryIcon="Paste"/>
-                                <StackPanel Spacing="12" Orientation="Horizontal">
-                                    <Button Content="连接" Style="{ThemeResource AccentButtonStyle}"/>
-                                    <Button Content="同步进度"/>
-                                    <Button Content="断开连接"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                </AppBarButton>
+                    x:Uid="/MainPanel/OpenLocalButton"
+                    Icon="{fluent:SymbolIcon Symbol=PeopleLink}"
+                    Tapped="RemoteTapped" />
             </CommandBar>
             <Grid
                 Grid.Row="0"
@@ -382,5 +370,6 @@
     </local:CollapsibleArea>
     <local:SettingsDialog x:Name="DialogSetting" Grid.Row="0" />
     <local:InputDialog x:Name="DialogInput" Grid.Row="0" />
+    <local:RemoteDialog x:Name="DialogRemote" Grid.Row="0" />
     <TeachingTip x:Name="RootTeachingTip" Grid.Row="0" />
 </Grid>

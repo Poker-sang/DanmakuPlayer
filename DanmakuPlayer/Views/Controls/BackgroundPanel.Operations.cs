@@ -28,19 +28,9 @@ public partial class BackgroundPanel
     private TimeOnly _lastPressTime;
     private bool _needResume;
 
-    private ulong CId
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-            field = value;
-            OnCIdChanged();
-        }
-    }
+    private bool IsRemoteUpdating { get; set; }
 
-    private async void OnCIdChanged()
+    private async Task OnCIdChangedAsync()
     {
         try
         {
@@ -57,12 +47,12 @@ public partial class BackgroundPanel
                 {
                     try
                     {
-                        if (await GetDanmakuAsync(tempPool, CId, i, token, BiliApis.GetWebDanmakuAsync))
+                        if (await GetDanmakuAsync(tempPool, Vm.CId, i, token, BiliApis.GetWebDanmakuAsync))
                             break;
                     }
                     catch
                     {
-                        if (await GetDanmakuAsync(tempPool, CId, i, token, BiliApis.GetMobileDanmaku))
+                        if (await GetDanmakuAsync(tempPool, Vm.CId, i, token, BiliApis.GetMobileDanmaku))
                             break;
                     }
 
@@ -317,37 +307,54 @@ public partial class BackgroundPanel
         Vm.Volume = volume;
     }
 
+    private async Task StatusChangedAsync()
+    {
+        if (!RemoteService.IsCurrentConnected)
+            return;
+
+        await RemoteService.Current.SendStatusAsync(Status);
+    }
+
     public RemoteStatus Status
     {
         get => new()
         {
             IsPlaying = Vm.IsPlaying,
-            CurrentTime = Vm.Time,
-            DanmakuCId = CId,
-            VideoDuration = WebView.Duration,
+            CurrentTime = DateTime.UtcNow,
+            VideoTime = Vm.Time,
+            DanmakuCId = Vm.CId,
+            VideoDuration = Vm.Duration,
             PlaybackRate = Vm.PlaybackRate,
             DanmakuDelayTime = Vm.DanmakuDelayTime,
-            VideoTime = Vm.TotalTime,
-            WebUri = WebView.Url
+            WebUri = Vm.Url
         };
         set
         {
-            Vm.IsPlaying = value.IsPlaying;
-            Vm.Time = value.CurrentTime;
-            Vm.TotalTime = value.VideoTime;
-            Vm.PlaybackRate = value.PlaybackRate;
-            Vm.DanmakuDelayTime = value.DanmakuDelayTime;
-            CId = value.DanmakuCId;
-            if (!Vm.EnableWebView2)
-                return;
-            WebView.Url = value.WebUri;
-            if (WebView.Videos.FirstOrDefault(t => Math.Abs(t.Duration - value.VideoDuration) < 0.1) is { } video)
-                WebView.CurrentVideo = video;
-            if (WebView.HasVideo)
+            IsRemoteUpdating = true;
+            try
             {
-                _ = WebView.LockOperationsAsync(async operations =>
-                    await operations.SetCurrentTimeAsync(value.CurrentTime.TotalSeconds));
-                TrySetPlaybackRate();
+                var videoTime = DateTime.UtcNow - value.CurrentTime + value.VideoTime;
+                Vm.IsPlaying = value.IsPlaying;
+                Vm.Time = videoTime;
+                Vm.TotalTime = value.VideoTime;
+                Vm.PlaybackRate = value.PlaybackRate;
+                Vm.DanmakuDelayTime = value.DanmakuDelayTime;
+                Vm.CId = value.DanmakuCId;
+                if (!Vm.EnableWebView2)
+                    return;
+                Vm.Url = value.WebUri;
+                if (WebView.Videos.FirstOrDefault(t => Math.Abs(t.Duration - value.VideoDuration) < 0.1) is { } video)
+                    WebView.CurrentVideo = video;
+                if (WebView.HasVideo)
+                {
+                    _ = WebView.LockOperationsAsync(async operations =>
+                        await operations.SetCurrentTimeAsync(videoTime.TotalSeconds));
+                    TrySetPlaybackRate();
+                }
+            }
+            finally
+            {
+                IsRemoteUpdating = false;
             }
         }
     }

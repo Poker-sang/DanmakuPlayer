@@ -1,50 +1,49 @@
 using System;
-using System.Net.Sockets;
+using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using CommunityToolkit.WinUI.Animations;
 
 namespace DanmakuPlayer.Services;
 
-public class RemoteService
+public class RemoteService : IAsyncDisposable
 {
+    public RemoteService(string serverUrl)
+    {
+        Current = this;
+        _serverUrl = serverUrl;
+    }
 
-    private readonly ClientWebSocket _webSocket;
+    [MemberNotNullWhen(true, nameof(Current))]
+    public static bool IsCurrentConnected => Current?.IsConnected is true;
+
+    public static RemoteService? Current { get; private set; }
+
+    private readonly ClientWebSocket _webSocket = new();
+
+    private const int ReceiveBufferSize = 4096;
+
+    private CancellationTokenSource _cts = new();
 
     private readonly string _serverUrl;
 
     public event EventHandler? Connected;
+
     public event EventHandler? Disconnected;
+
     public event EventHandler<RemoteStatus>? MessageReceived;
-    private const int ReceiveBufferSize = 4096;
-    private CancellationTokenSource _cts = new();
 
-    public bool IsConnected => _webSocket?.State == WebSocketState.Open;
+    public bool IsConnected => _webSocket?.State is WebSocketState.Open;
 
-    protected RemoteService(string serverUrl)
-    {
-        _serverUrl = serverUrl;
-        _webSocket = new ClientWebSocket();
-    }
-
-    private async Task HandleConnection()
-    {
-        while (_webSocket.State == WebSocketState.Open)
-        {
-            await ReceiveStatusAsync(_cts.Token);
-        }
-    }
-
-    private async Task ConnectAsync(CancellationToken ct)
+    public async Task ConnectAsync(CancellationToken token = default)
     {
         try
         {
-            await _webSocket.ConnectAsync(new Uri(_serverUrl), ct);
+            await _webSocket.ConnectAsync(new(_serverUrl), token);
             Connected?.Invoke(this, EventArgs.Empty);
-            await HandleConnection();
+            _ = ReceiveStatusAsync(_cts.Token);
         }
         catch (WebSocketException ex)
         {
@@ -52,17 +51,20 @@ public class RemoteService
         }
     }
 
-    public async Task DisconnectAsync()
+    public async ValueTask DisposeAsync()
     {
-        if (_webSocket.State == WebSocketState.Open)
+        GC.SuppressFinalize(this);
+        if (IsConnected)
         {
             try
             {
                 await _cts.CancelAsync();
+                _cts.Dispose();
                 await _webSocket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
                     "Service disconnecting",
                     CancellationToken.None);
+                _webSocket.Dispose();
             }
             catch (Exception ex)
             {
@@ -71,25 +73,22 @@ public class RemoteService
         }
 
         Disconnected?.Invoke(this, EventArgs.Empty);
-        _cts = new CancellationTokenSource();
+        _cts = new();
     }
 
-    public async Task SendStatusAsync(RemoteStatus status)
+    public async Task SendStatusAsync(RemoteStatus status, CancellationToken token = default)
     {
         if (!IsConnected)
-        {
             return;
-        }
 
         try
         {
-            var buffer = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(status));
+            var buffer = JsonSerializer.SerializeToUtf8Bytes(status);
             await _webSocket.SendAsync(
-                new ArraySegment<byte>(buffer),
+                buffer,
                 WebSocketMessageType.Text,
                 true,
-                CancellationToken.None);
-
+                token);
         }
         catch (WebSocketException ex)
         {
@@ -97,26 +96,21 @@ public class RemoteService
         }
     }
 
-    private async Task ReceiveStatusAsync(CancellationToken ct)
+    private async Task ReceiveStatusAsync(CancellationToken token = default)
     {
-        var buffer = new byte[ReceiveBufferSize];
+        var buffer = ArrayPool<byte>.Shared.Rent(ReceiveBufferSize);
 
         try
         {
-            while (IsConnected && !ct.IsCancellationRequested)
+            while (IsConnected && !token.IsCancellationRequested)
             {
-                var result = await _webSocket.ReceiveAsync(
-                    new ArraySegment<byte>(buffer), ct);
+                var result = await _webSocket.ReceiveAsync(buffer, token);
 
-                if (result.MessageType == WebSocketMessageType.Close)
-                {
+                if (result.MessageType is WebSocketMessageType.Close)
                     return;
-                }
 
-                var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                var status = JsonSerializer.Deserialize<RemoteStatus>(message);
+                var status = JsonSerializer.Deserialize<RemoteStatus>(new ReadOnlySpan<byte>(buffer, 0, result.Count));
 
-                // Process message
                 MessageReceived?.Invoke(this, status);
             }
         }
@@ -131,7 +125,7 @@ public struct RemoteStatus
 {
     public bool IsPlaying { get; set; }
 
-    public TimeSpan CurrentTime { get; set; }
+    public DateTime CurrentTime { get; set; }
 
     public TimeSpan VideoTime { get; set; }
 

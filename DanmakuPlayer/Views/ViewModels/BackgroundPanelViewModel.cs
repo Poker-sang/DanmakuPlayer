@@ -36,6 +36,15 @@ public partial class BackgroundPanelViewModel : ObservableObject
     [ObservableProperty]
     public partial TimeSpan DanmakuDelayTime { get; set; }
 
+    [ObservableProperty]
+    public partial ulong CId { get; set; }
+
+    [ObservableProperty]
+    public partial string Url { get; set; } = "";
+
+    [ObservableProperty]
+    public partial double Duration { get; set; }
+
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
     public bool LockWebView2

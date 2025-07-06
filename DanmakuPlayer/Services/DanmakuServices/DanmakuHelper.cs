@@ -12,7 +12,7 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuHelper
 {
-    private static int _renderCount;
+    private static int _RenderCount;
 
     /// <summary>
     /// 弹幕池
@@ -54,7 +54,7 @@ public static class DanmakuHelper
             else
                 Current.ClearLayouts();
 
-            _renderCount = count;
+            _RenderCount = count;
             RenderType &= ~RenderMode.RenderInit;
         }
 
@@ -91,7 +91,7 @@ public static class DanmakuHelper
     {
         RenderType = renderType;
         await WaitForRenderAsync(canvas, token);
-        return _renderCount;
+        return _RenderCount;
     }
 
     private static async Task WaitForRenderAsync(CanvasAnimatedControl canvas, CancellationToken token)

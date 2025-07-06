@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
-using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
@@ -32,7 +27,7 @@ public sealed partial class BackgroundPanel : Grid
     {
         try
         {
-            Vm.PropertyChanged += (_, e) =>
+            Vm.PropertyChanged += (o, e) =>
             {
                 switch (e.PropertyName)
                 {
@@ -41,6 +36,15 @@ public sealed partial class BackgroundPanel : Grid
                         break;
                     case nameof(Vm.PlaybackRate):
                         TrySetPlaybackRate();
+                        goto case nameof(Vm.Time);
+                    case nameof(Vm.CId):
+                        _ = OnCIdChangedAsync();
+                        goto case nameof(Vm.Time);
+                    case nameof(Vm.Time):
+                    case nameof(Vm.IsPlaying):
+                    case nameof(Vm.Duration):
+                    case nameof(Vm.Url):
+                        _ = StatusChangedAsync();
                         break;
                 }
             };
@@ -135,7 +139,7 @@ public sealed partial class BackgroundPanel : Grid
             if (await DialogInput.ShowAsync() is not { } cId)
                 return;
 
-            CId = cId;
+            Vm.CId = cId;
         }
         catch (Exception ex)
         {
@@ -168,6 +172,10 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
+    private async void RemoteTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await DialogRemote.ShowAsync(this);
+    }
 
     #endregion
 
