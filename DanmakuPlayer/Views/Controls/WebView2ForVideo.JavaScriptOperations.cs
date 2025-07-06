@@ -23,7 +23,7 @@ public partial class WebView2ForVideo
 
         public async Task<double> CurrentTimeAsync()
         {
-            var currentTime = await video.EvaluateAsync("video => video.currentTime")!;
+            var currentTime = await video.EvaluateAsync("video => video.currentTime");
             return currentTime!.Value.GetDouble();
         }
 

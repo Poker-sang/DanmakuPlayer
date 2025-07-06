@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
+using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Input;
 using Windows.System;
@@ -24,6 +28,78 @@ public partial class BackgroundPanel
     private TimeOnly _lastPressTime;
     private bool _needResume;
 
+    private ulong CId
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+            field = value;
+            OnCIdChanged();
+        }
+    }
+
+    private async void OnCIdChanged()
+    {
+        try
+        {
+            Vm.LoadingDanmaku = true;
+
+            RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
+
+            await LoadDanmakuAsync(async token =>
+            {
+                var tempPool = new List<Danmaku>();
+                var danmakuCount = 0;
+                var testCount = 0;
+                for (var i = 0; ; ++i)
+                {
+                    try
+                    {
+                        if (await GetDanmakuAsync(tempPool, CId, i, token, BiliApis.GetWebDanmakuAsync))
+                            break;
+                    }
+                    catch
+                    {
+                        if (await GetDanmakuAsync(tempPool, CId, i, token, BiliApis.GetMobileDanmaku))
+                            break;
+                    }
+
+                    // 连续5次获取不到新弹幕（30min）也结束
+                    if (tempPool.Count == danmakuCount)
+                        testCount += 1;
+                    if (testCount >= 5)
+                        break;
+                    danmakuCount = tempPool.Count;
+                }
+
+                return tempPool;
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            RootTeachingTip.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, TeachingTipSeverity.Error, ex.Message);
+        }
+        finally
+        {
+            Vm.LoadingDanmaku = false;
+        }
+
+        return;
+
+        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, ulong cId, int i, CancellationToken token, Func<ulong, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
+        {
+            await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
+            if (danmaku is null)
+                return true;
+            var reply = DmSegMobileReply.Parser.ParseFrom(danmaku);
+            tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
+            return false;
+        }
+    }
+
     /// <summary>
     /// 加载弹幕操作
     /// </summary>
@@ -41,6 +117,7 @@ public partial class BackgroundPanel
             Vm.TotalTime = TimeSpan.Zero;
             Vm.Time = TimeSpan.Zero;
         }
+
         DanmakuHelper.ClearPool();
 
         try
@@ -238,5 +315,40 @@ public partial class BackgroundPanel
         var volume = Math.Clamp(Vm.Volume + volumeUp, 0, 100);
         // see VolumeChanged()
         Vm.Volume = volume;
+    }
+
+    public RemoteStatus Status
+    {
+        get => new()
+        {
+            IsPlaying = Vm.IsPlaying,
+            CurrentTime = Vm.Time,
+            DanmakuCId = CId,
+            VideoDuration = WebView.Duration,
+            PlaybackRate = Vm.PlaybackRate,
+            DanmakuDelayTime = Vm.DanmakuDelayTime,
+            VideoTime = Vm.TotalTime,
+            WebUri = WebView.Url
+        };
+        set
+        {
+            Vm.IsPlaying = value.IsPlaying;
+            Vm.Time = value.CurrentTime;
+            Vm.TotalTime = value.VideoTime;
+            Vm.PlaybackRate = value.PlaybackRate;
+            Vm.DanmakuDelayTime = value.DanmakuDelayTime;
+            CId = value.DanmakuCId;
+            if (!Vm.EnableWebView2)
+                return;
+            WebView.Url = value.WebUri;
+            if (WebView.Videos.FirstOrDefault(t => Math.Abs(t.Duration - value.VideoDuration) < 0.1) is { } video)
+                WebView.CurrentVideo = video;
+            if (WebView.HasVideo)
+            {
+                _ = WebView.LockOperationsAsync(async operations =>
+                    await operations.SetCurrentTimeAsync(value.CurrentTime.TotalSeconds));
+                TrySetPlaybackRate();
+            }
+        }
     }
 }

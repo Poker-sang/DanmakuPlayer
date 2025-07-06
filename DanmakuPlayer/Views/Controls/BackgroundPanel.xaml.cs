@@ -135,36 +135,7 @@ public sealed partial class BackgroundPanel : Grid
             if (await DialogInput.ShowAsync() is not { } cId)
                 return;
 
-            RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
-
-            await LoadDanmakuAsync(async token =>
-            {
-                var tempPool = new List<Danmaku>();
-                var danmakuCount = 0;
-                var testCount = 0;
-                for (var i = 0; ; ++i)
-                {
-                    try
-                    {
-                        if (await GetDanmakuAsync(tempPool, cId, i, token, BiliApis.GetWebDanmakuAsync))
-                            break;
-                    }
-                    catch
-                    {
-                        if (await GetDanmakuAsync(tempPool, cId, i, token, BiliApis.GetMobileDanmaku))
-                            break;
-                    }
-
-                    // 连续5次获取不到新弹幕（30min）也结束
-                    if (tempPool.Count == danmakuCount)
-                        testCount += 1;
-                    if (testCount >= 5)
-                        break;
-                    danmakuCount = tempPool.Count;
-                }
-
-                return tempPool;
-            });
+            CId = cId;
         }
         catch (Exception ex)
         {
@@ -174,18 +145,6 @@ public sealed partial class BackgroundPanel : Grid
         finally
         {
             Vm.LoadingDanmaku = false;
-        }
-
-        return;
-
-        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, ulong cId, int i, CancellationToken token, Func<ulong, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
-        {
-            await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
-            if (danmaku is null)
-                return true;
-            var reply = DmSegMobileReply.Parser.ParseFrom(danmaku);
-            tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
-            return false;
         }
     }
 
@@ -207,6 +166,11 @@ public sealed partial class BackgroundPanel : Grid
         {
             Vm.LoadingDanmaku = false;
         }
+    }
+
+    private async void RemoteTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await DialogRemote.ShowAsync(this);
     }
 
     #endregion

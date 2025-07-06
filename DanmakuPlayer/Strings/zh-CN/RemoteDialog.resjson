@@ -1,0 +1,9 @@
+{
+    "RemoteDialogTitleTextBlock/Text": "远程同步",
+    "RemoteDialog/CloseButtonText": "关闭",
+    "ServerTextBlock/PlaceholderText": "服务器地址",
+    "RoomIdTextBlock/PlaceholderText": "房间ID",
+    "CreateRoomButton/Content": "作为主机创建房间",
+    "JoinRoomButton/Content": "作为观众加入房间",
+    "DisconnectButton/Content": "断开连接"
+}
