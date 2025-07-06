@@ -365,6 +365,7 @@
                 StepFrequency="0.1"
                 ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
                 UserValue="{x:Bind local:C.ToSecondDouble(Vm.Time), BindBack=SecondToTimeSpan, Mode=TwoWay}"
+                SliderManipulationCompleted="VideoSliderOnSliderManipulationCompleted"
                 UserValueChangedByManipulation="VideoSliderOnUserValueChangedByManipulation" />
         </controls:DockPanel>
     </local:CollapsibleArea>

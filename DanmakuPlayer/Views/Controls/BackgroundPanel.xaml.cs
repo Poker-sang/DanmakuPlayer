@@ -280,6 +280,9 @@ public sealed partial class BackgroundPanel : Grid
     private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e)
     {
         await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
+    }
+    private void VideoSliderOnSliderManipulationCompleted(object? sender, EventArgs e)
+    {
         _ = StatusChangedAsync();
     }
 
