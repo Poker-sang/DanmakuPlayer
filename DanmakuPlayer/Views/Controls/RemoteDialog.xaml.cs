@@ -29,10 +29,11 @@ public sealed partial class RemoteDialog : UserControl
         ProgressRing.IsActive = true;
         try
         {
-            if (RemoteService.Current is not null)
+            if (RemoteService.IsCurrentConnected)
                 await RemoteService.Current.DisposeAsync();
             // RoomIdTextBlock.Text
             var client = new RemoteService(ServerTextBlock.Text);
+            client.MessageReceived += (s, status) => _backgroundPanel.Status = status;
             await client.ConnectAsync();
             IsConnected = client.IsConnected;
         }
@@ -44,7 +45,7 @@ public sealed partial class RemoteDialog : UserControl
 
     private async void Disconnect_OnClick(object sender, RoutedEventArgs e)
     {
-        if (RemoteService.Current is not null)
+        if (RemoteService.IsCurrentConnected)
             await RemoteService.Current.DisposeAsync();
         IsConnected = false;
     }

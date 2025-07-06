@@ -36,16 +36,20 @@ public sealed partial class BackgroundPanel : Grid
                         break;
                     case nameof(Vm.PlaybackRate):
                         TrySetPlaybackRate();
-                        goto case nameof(Vm.Time);
+                        goto case nameof(Vm.IsPlaying);
                     case nameof(Vm.CId):
                         _ = OnCIdChangedAsync();
-                        goto case nameof(Vm.Time);
+                        goto case nameof(Vm.IsPlaying);
                     case nameof(Vm.Time):
+                        if (NotManipulatingTime)
+                            return;
+                        goto case nameof(Vm.IsPlaying);
                     case nameof(Vm.IsPlaying):
                     case nameof(Vm.Duration):
                     case nameof(Vm.Url):
                         _ = StatusChangedAsync();
                         break;
+                        // Vm.Time see ManipulatingTime()
                 }
             };
             Vm.ResetProvider += ResetProvider;
@@ -172,10 +176,7 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private async void RemoteTapped(object sender, TappedRoutedEventArgs e)
-    {
-        await DialogRemote.ShowAsync(this);
-    }
+    private async void RemoteTapped(object sender, TappedRoutedEventArgs e) => await DialogRemote.ShowAsync(this);
 
     #endregion
 
@@ -237,7 +238,9 @@ public sealed partial class BackgroundPanel : Grid
     {
         await WebView.LockOperationsAsync(async operations =>
         {
+            NotManipulatingTime = true;
             Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
+            NotManipulatingTime = false;
             Vm.TotalTime = TimeSpan.FromSeconds(await operations.DurationAsync());
             Vm.IsPlaying = await operations.IsPlayingAsync();
             Vm.Volume = await operations.VolumeAsync();

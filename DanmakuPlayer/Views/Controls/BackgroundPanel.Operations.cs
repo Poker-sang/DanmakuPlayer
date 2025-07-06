@@ -30,6 +30,8 @@ public partial class BackgroundPanel
 
     private bool IsRemoteUpdating { get; set; }
 
+    private bool NotManipulatingTime { get; set; }
+
     private async Task OnCIdChangedAsync()
     {
         try
@@ -184,7 +186,11 @@ public partial class BackgroundPanel
             if (Vm.Time < Vm.TotalTime)
             {
                 if (Vm.IsPlaying)
+                {
+                    NotManipulatingTime = true;
                     Vm.ActualTime += timeSpan;
+                    NotManipulatingTime = false;
+                }
             }
             else
             {
@@ -229,8 +235,10 @@ public partial class BackgroundPanel
                 {
                     _tickCount = 0;
                     var lastTime = Vm.Time;
+                    NotManipulatingTime = true;
                     await WebView.LockOperationsAsync(async operations =>
                         Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
+                    NotManipulatingTime = false;
                     if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
                         Sync();
                 }
