@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using System.Text.Json;
@@ -121,7 +122,7 @@ public class RemoteService : IAsyncDisposable
     }
 }
 
-public struct RemoteStatus
+public struct RemoteStatus()
 {
     public bool IsPlaying { get; set; }
 
@@ -131,11 +132,7 @@ public struct RemoteStatus
 
     public TimeSpan DanmakuDelayTime { get; set; }
 
-    public string WebUri { get; set; }
-
-    public double VideoDuration { get; set; }
-    
-    public ulong DanmakuCId { get; set; }
-
     public double PlaybackRate { get; set; }
+
+    public Dictionary<string, string> ChangedValues { get; set; } = [];
 }

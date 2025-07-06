@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -36,20 +37,10 @@ public sealed partial class BackgroundPanel : Grid
                         break;
                     case nameof(Vm.PlaybackRate):
                         TrySetPlaybackRate();
-                        goto case nameof(Vm.IsPlaying);
+                        break;
                     case nameof(Vm.CId):
                         _ = OnCIdChangedAsync();
-                        goto case nameof(Vm.IsPlaying);
-                    case nameof(Vm.Time):
-                        if (NotManipulatingTime)
-                            return;
-                        goto case nameof(Vm.IsPlaying);
-                    case nameof(Vm.IsPlaying):
-                    case nameof(Vm.Duration):
-                    case nameof(Vm.Url):
-                        _ = StatusChangedAsync();
                         break;
-                        // Vm.Time see ManipulatingTime()
                 }
             };
             Vm.ResetProvider += ResetProvider;
@@ -119,9 +110,11 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void AddressBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        if (string.IsNullOrEmpty(sender.Text))
+        var url = sender.Text;
+        if (string.IsNullOrEmpty(url))
             return;
-        await WebView.GotoAsync(sender.Text);
+        _ = StatusChangedAsync(nameof(Vm.Url), url);
+        await WebView.GotoAsync(url);
     }
 
     private void WebViewOnPageLoaded(WebView2ForVideo sender, EventArgs e)
@@ -144,6 +137,7 @@ public sealed partial class BackgroundPanel : Grid
                 return;
 
             Vm.CId = cId;
+            _ = StatusChangedAsync(nameof(Vm.CId), Vm.CId.ToString());
         }
         catch (Exception ex)
         {
@@ -188,6 +182,7 @@ public sealed partial class BackgroundPanel : Grid
             Pause();
         else
             Resume();
+        _ = StatusChangedAsync();
     }
 
     private void VolumeDownTapped(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(-5);
@@ -214,11 +209,23 @@ public sealed partial class BackgroundPanel : Grid
 
     private static readonly TimeSpan _SmallStep = TimeSpan.FromSeconds(5);
 
-    private void AdvanceDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+    private void AdvanceDanmakuTapped(object sender, IWinRTObject e)
+    {
+        Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+        _ = StatusChangedAsync();
+    }
 
-    private void DelayDanmakuTapped(object sender, IWinRTObject e) => Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+    private void DelayDanmakuTapped(object sender, IWinRTObject e)
+    {
+        Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
+        _ = StatusChangedAsync();
+    }
 
-    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e) => Vm.DanmakuDelayTime = TimeSpan.Zero;
+    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e)
+    {
+        Vm.DanmakuDelayTime = TimeSpan.Zero;
+        _ = StatusChangedAsync();
+    }
 
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
     private void DanmakuCanvasCreateResources(CanvasAnimatedControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
@@ -238,9 +245,7 @@ public sealed partial class BackgroundPanel : Grid
     {
         await WebView.LockOperationsAsync(async operations =>
         {
-            NotManipulatingTime = true;
             Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
-            NotManipulatingTime = false;
             Vm.TotalTime = TimeSpan.FromSeconds(await operations.DurationAsync());
             Vm.IsPlaying = await operations.IsPlayingAsync();
             Vm.Volume = await operations.VolumeAsync();
@@ -257,15 +262,26 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender) => Vm.PlaybackRate = sender.SelectedItem.To<double>();
+    private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender)
+    {
+        Vm.PlaybackRate = sender.SelectedItem.To<double>();
+        _ = StatusChangedAsync();
+    }
 
-    private void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj) => Sync();
+    private void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj)
+    {
+        Sync();
+        _ = StatusChangedAsync(nameof(Vm.Duration), Vm.Duration.ToString(CultureInfo.InvariantCulture));
+    }
 
     private async void MuteOnTapped(object sender, TappedRoutedEventArgs e) =>
         await WebView.LockOperationsAsync(async operations => Vm.Mute = await operations.MutedFlipAsync());
 
-    private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
+    private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e)
+    {
         await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
+        _ = StatusChangedAsync();
+    }
 
     private async void VolumeChanged() =>
         await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
@@ -317,6 +333,7 @@ public sealed partial class BackgroundPanel : Grid
                 _ => 1
             }));
             _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
+            _ = StatusChangedAsync();
         }
 
         Vm.EditingTime = false;
@@ -334,8 +351,5 @@ public sealed partial class BackgroundPanel : Grid
 
     #endregion
 
-    public void SecondToTimeSpan(double d)
-    {
-        Vm.Time = TimeSpan.FromSeconds(d);
-    }
+    private void SecondToTimeSpan(double d) => Vm.Time = TimeSpan.FromSeconds(d);
 }
