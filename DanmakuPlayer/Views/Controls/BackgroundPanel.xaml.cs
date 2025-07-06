@@ -168,10 +168,6 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private async void RemoteTapped(object sender, TappedRoutedEventArgs e)
-    {
-        await DialogRemote.ShowAsync(this);
-    }
 
     #endregion
 

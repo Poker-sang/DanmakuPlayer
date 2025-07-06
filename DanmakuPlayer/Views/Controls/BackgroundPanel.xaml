@@ -76,9 +76,23 @@
                     Icon="{fluent:SymbolIcon Symbol=Code}"
                     Tapped="FileTapped" />
                 <AppBarButton
-                    x:Uid="/MainPanel/OpenLocalButton"
-                    Icon="{fluent:SymbolIcon Symbol=PeopleLink}"
-                    Tapped="RemoteTapped" />
+                    Icon="{fluent:SymbolIcon Symbol=PeopleLink}">
+                    <Button.Flyout>
+                        <Flyout Placement="BottomEdgeAlignedLeft">
+                            <StackPanel Width="256" Spacing="12">
+                                <AutoSuggestBox 
+                                    Header="WebSocket服务器地址" 
+                                    PlaceholderText="wss://(或ws://)"
+                                    QueryIcon="Paste"/>
+                                <StackPanel Spacing="12" Orientation="Horizontal">
+                                    <Button Content="连接" Style="{ThemeResource AccentButtonStyle}"/>
+                                    <Button Content="同步进度"/>
+                                    <Button Content="断开连接"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </AppBarButton>
             </CommandBar>
             <Grid
                 Grid.Row="0"
@@ -368,6 +382,5 @@
     </local:CollapsibleArea>
     <local:SettingsDialog x:Name="DialogSetting" Grid.Row="0" />
     <local:InputDialog x:Name="DialogInput" Grid.Row="0" />
-    <local:RemoteDialog x:Name="DialogRemote" Grid.Row="0" />
     <TeachingTip x:Name="RootTeachingTip" Grid.Row="0" />
 </Grid>
