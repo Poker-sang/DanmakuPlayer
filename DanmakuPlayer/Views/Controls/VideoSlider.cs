@@ -7,6 +7,9 @@ using Microsoft.UI.Xaml.Input;
 
 namespace DanmakuPlayer.Views.Controls;
 
+/// <summary>
+/// 方便追踪用户鼠标操作的<see cref="Slider"/>
+/// </summary>
 public partial class VideoSlider : Slider
 {
     [GeneratedDependencyProperty]
@@ -16,7 +19,7 @@ public partial class VideoSlider : Slider
 
     public event EventHandler? SliderManipulationStarted;
     public event EventHandler? SliderManipulationCompleted;
-    public event EventHandler? SliderManipulationMoved;
+    public event EventHandler? SliderManipulationDelta;
     public event EventHandler? UserValueChangedByManipulation;
 
     private bool IsSliderBeingManipulated => _isContainerHeld || _isThumbHeld;
@@ -75,7 +78,7 @@ public partial class VideoSlider : Slider
     private void InvokeMove()
     {
         // 此时IsSliderBeingManipulated一定为true
-        SliderManipulationMoved?.Invoke(this, EventArgs.Empty);
+        SliderManipulationDelta?.Invoke(this, EventArgs.Empty);
         UserValue = Value;
         UserValueChangedByManipulation?.Invoke(this, EventArgs.Empty);
     }
@@ -83,17 +86,13 @@ public partial class VideoSlider : Slider
     private void InvokeStateChange(bool wasBeingManipulated)
     {
         if (wasBeingManipulated != IsSliderBeingManipulated)
-        {
             if (IsSliderBeingManipulated)
-            {
                 SliderManipulationStarted?.Invoke(this, EventArgs.Empty);
-            }
             else
             {
                 SliderManipulationCompleted?.Invoke(this, EventArgs.Empty);
                 UserValue = Value;
                 UserValueChangedByManipulation?.Invoke(this, EventArgs.Empty);
             }
-        }
     }
 }

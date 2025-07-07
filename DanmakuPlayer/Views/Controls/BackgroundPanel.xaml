@@ -362,10 +362,10 @@
                 IsTabStop="False"
                 Maximum="{x:Bind Vm.TotalTime.TotalSeconds, Mode=OneWay}"
                 Minimum="0"
+                SliderManipulationCompleted="VideoSliderOnSliderManipulationCompleted"
                 StepFrequency="0.1"
                 ThumbToolTipValueConverter="{StaticResource DoubleToTimeTextConverter}"
                 UserValue="{x:Bind local:C.ToSecondDouble(Vm.Time), BindBack=SecondToTimeSpan, Mode=TwoWay}"
-                SliderManipulationCompleted="VideoSliderOnSliderManipulationCompleted"
                 UserValueChangedByManipulation="VideoSliderOnUserValueChangedByManipulation" />
         </controls:DockPanel>
     </local:CollapsibleArea>

@@ -286,14 +286,10 @@ public sealed partial class BackgroundPanel : Grid
     private async void MuteOnTapped(object sender, TappedRoutedEventArgs e) =>
         await WebView.LockOperationsAsync(async operations => Vm.Mute = await operations.MutedFlipAsync());
 
-    private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e)
-    {
+    private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
         await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
-    }
-    private void VideoSliderOnSliderManipulationCompleted(object? sender, EventArgs e)
-    {
-        StatusChanged();
-    }
+
+    private void VideoSliderOnSliderManipulationCompleted(object sender, EventArgs e) => StatusChanged();
 
     private async void VolumeChanged() =>
         await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
