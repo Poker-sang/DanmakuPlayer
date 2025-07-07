@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -194,13 +193,16 @@ public partial class BackgroundPanel
             if ((InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Right) & CoreVirtualKeyStates.Down) is 0)
             {
                 // 如果是 按下->抬起
-                if (_isRightPressing)
-                    // 之前改变了倍速，则恢复
-                    if (Vm.PlaybackRate is 3)
-                        Vm.PlaybackRate = -1;
-                    // 之前按下不超过500ms，认为是单击
-                    else
-                        FastForward(false, false);
+                // 之前按下不超过500ms，认为是单击
+                if (Vm.TempConfig.UsePlaybackRate3)
+                {
+                    // 恢复倍速
+                    Vm.TempConfig.UsePlaybackRate3 = false;
+                    TrySetPlaybackRate();
+                    StatusChanged();
+                }
+                else if (_isRightPressing)
+                    FastForward(false, false);
 
                 _isRightPressing = false;
             }
@@ -211,7 +213,10 @@ public partial class BackgroundPanel
                 {
                     // 按下超过500ms，设为3倍速
                     if ((timeNow - _lastPressTime).TotalMilliseconds > 500)
-                        Vm.PlaybackRate = 3;
+                    {
+                        Vm.TempConfig.UsePlaybackRate3 = true;
+                        TrySetPlaybackRate();
+                    }
                 }
                 // 如果是 抬起->按下
                 else
@@ -272,7 +277,7 @@ public partial class BackgroundPanel
 
     public void TrySetPlaybackRate()
     {
-        _ = WebView.LockOperationsAsync(async operations => await operations.SetPlaybackRateAsync(Vm.PlaybackRate));
+        _ = WebView.LockOperationsAsync(async operations => await operations.SetPlaybackRateAsync(Vm.ActualPlaybackRate));
     }
 
     #endregion
@@ -295,7 +300,7 @@ public partial class BackgroundPanel
             await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time.TotalSeconds));
 
         Vm.Time = time;
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private void VolumeUp(int volumeUp)
@@ -305,7 +310,7 @@ public partial class BackgroundPanel
         Vm.Volume = volume;
     }
 
-    private async Task StatusChangedAsync(string name, string value)
+    private void StatusChanged(string name, string value)
     {
         if (!RemoteService.IsCurrentConnected)
             return;
@@ -313,15 +318,15 @@ public partial class BackgroundPanel
         var current = Status;
         current.ChangedValues[name] = value;
 
-        await RemoteService.Current.SendStatusAsync(current);
+        _ = RemoteService.Current.SendStatusAsync(current);
     }
 
-    private async Task StatusChangedAsync()
+    private void StatusChanged()
     {
         if (!RemoteService.IsCurrentConnected)
             return;
 
-        await RemoteService.Current.SendStatusAsync(Status);
+        _ = RemoteService.Current.SendStatusAsync(Status);
     }
 
     public RemoteStatus Status

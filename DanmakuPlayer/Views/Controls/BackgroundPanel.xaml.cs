@@ -43,6 +43,15 @@ public sealed partial class BackgroundPanel : Grid
                         break;
                 }
             };
+            Vm.TempConfig.PropertyChanged += (o, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(Vm.TempConfig.UsePlaybackRate3):
+                        TrySetPlaybackRate();
+                        break;
+                }
+            };
             Vm.ResetProvider += ResetProvider;
 
             InitializeComponent();
@@ -113,7 +122,7 @@ public sealed partial class BackgroundPanel : Grid
         var url = sender.Text;
         if (string.IsNullOrEmpty(url))
             return;
-        _ = StatusChangedAsync(nameof(Vm.Url), url);
+        StatusChanged(nameof(Vm.Url), url);
         await WebView.GotoAsync(url);
     }
 
@@ -137,7 +146,7 @@ public sealed partial class BackgroundPanel : Grid
                 return;
 
             Vm.CId = cId;
-            _ = StatusChangedAsync(nameof(Vm.CId), Vm.CId.ToString());
+            StatusChanged(nameof(Vm.CId), Vm.CId.ToString());
         }
         catch (Exception ex)
         {
@@ -182,7 +191,7 @@ public sealed partial class BackgroundPanel : Grid
             Pause();
         else
             Resume();
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private void VolumeDownTapped(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(-5);
@@ -212,19 +221,19 @@ public sealed partial class BackgroundPanel : Grid
     private void AdvanceDanmakuTapped(object sender, IWinRTObject e)
     {
         Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private void DelayDanmakuTapped(object sender, IWinRTObject e)
     {
         Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.DanmakuDelayTime = TimeSpan.Zero;
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
@@ -234,7 +243,7 @@ public sealed partial class BackgroundPanel : Grid
     {
         DispatcherQueue.TryEnqueue(TimerTick);
        
-        DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.AppConfig);
+        DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.TempConfig, Vm.AppConfig);
     }
 
     #endregion
@@ -265,13 +274,13 @@ public sealed partial class BackgroundPanel : Grid
     private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender)
     {
         Vm.PlaybackRate = sender.SelectedItem.To<double>();
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj)
     {
         Sync();
-        _ = StatusChangedAsync(nameof(Vm.Duration), Vm.Duration.ToString(CultureInfo.InvariantCulture));
+        StatusChanged(nameof(Vm.Duration), Vm.Duration.ToString(CultureInfo.InvariantCulture));
     }
 
     private async void MuteOnTapped(object sender, TappedRoutedEventArgs e) =>
@@ -283,7 +292,7 @@ public sealed partial class BackgroundPanel : Grid
     }
     private void VideoSliderOnSliderManipulationCompleted(object? sender, EventArgs e)
     {
-        _ = StatusChangedAsync();
+        StatusChanged();
     }
 
     private async void VolumeChanged() =>
@@ -336,7 +345,7 @@ public sealed partial class BackgroundPanel : Grid
                 _ => 1
             }));
             _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(Vm.Time.TotalSeconds));
-            _ = StatusChangedAsync();
+            StatusChanged();
         }
 
         Vm.EditingTime = false;

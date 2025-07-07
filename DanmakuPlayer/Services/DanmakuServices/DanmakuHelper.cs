@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
+using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
@@ -25,7 +26,7 @@ public static class DanmakuHelper
 
     public static bool IsRendering { get; set; }
 
-    public static void Rendering(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e, TimeSpan timeSpan, AppConfig appConfig)
+    public static void Rendering(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e, TimeSpan timeSpan, TempConfig tempConfig, AppConfig appConfig)
     {
         var timeMs = (int)timeSpan.TotalMilliseconds;
         if ((RenderType & RenderMode.RenderInit) is not 0)
@@ -64,12 +65,12 @@ public static class DanmakuHelper
                 e.DrawingSession.Clear(Colors.Transparent);
 
                 if (appConfig.RenderBefore)
-                    foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                    foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
                         t.OnRender(e.DrawingSession, Current, timeMs);
                 else
                 {
                     Current.ClearLayoutRefCount();
-                    foreach (var t in DisplayingDanmaku(timeMs, appConfig))
+                    foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
                     {
                         Current.AddLayoutRef(t);
                         t.OnRender(e.DrawingSession, Current, timeMs);
@@ -102,9 +103,11 @@ public static class DanmakuHelper
             await Task.Delay(500, token);
     }
 
-    public static Danmaku[] DisplayingDanmaku(int timeMs, AppConfig appConfig)
+    public static Danmaku[] DisplayingDanmaku(int timeMs, AppConfig appConfig, TempConfig tempConfig)
     {
-        var actualDurationMs = (int) (Math.Max(10, appConfig.DanmakuDuration) * appConfig.PlaybackRate * 1000);
+        var duration = tempConfig.UsePlaybackRate3 ? appConfig.DanmakuDuration / 3 : appConfig.DanmakuDuration;
+        var playbackRate = tempConfig.UsePlaybackRate3 ? 3 : appConfig.PlaybackRate;
+        var actualDurationMs = (int) (Math.Max(10, duration) * playbackRate * 1000);
 
         var firstIndex = Array.FindIndex(Pool, t => t.TimeMs > timeMs - actualDurationMs);
         if (firstIndex is -1)

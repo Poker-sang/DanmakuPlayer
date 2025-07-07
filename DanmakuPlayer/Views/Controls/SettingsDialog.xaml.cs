@@ -59,7 +59,6 @@ public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
         var backgroundPanel = Parent.To<BackgroundPanel>();
         if (before.PlaybackRate != after.PlaybackRate)
         {
-            AppContext.SetTimerInterval();
             backgroundPanel.ResetProvider();
             backgroundPanel.TrySetPlaybackRate();
         }
