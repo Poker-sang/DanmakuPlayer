@@ -10,6 +10,9 @@ namespace DanmakuPlayer.Views.Controls;
 
 public sealed partial class RemoteDialog : UserControl
 {
+    [GeneratedDependencyProperty]
+    private partial bool IsConnected { get; set; }
+
     public RemoteDialog() => InitializeComponent();
 
     private BackgroundPanel _backgroundPanel = null!;
@@ -45,11 +48,16 @@ public sealed partial class RemoteDialog : UserControl
 
     private async void Disconnect_OnClick(object sender, RoutedEventArgs e)
     {
-        if (RemoteService.IsCurrentConnected)
-            await RemoteService.Current.DisposeAsync();
-        IsConnected = false;
+        ProgressRing.IsActive = true;
+        try
+        {
+            if (RemoteService.IsCurrentConnected)
+                await RemoteService.Current.DisposeAsync();
+            IsConnected = false;
+        }
+        finally
+        {
+            ProgressRing.IsActive = false;
+        }
     }
-
-    [GeneratedDependencyProperty]
-    private partial bool IsConnected { get; set; }
 }
