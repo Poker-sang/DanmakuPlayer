@@ -59,22 +59,26 @@ public class RemoteService : IAsyncDisposable
         {
             try
             {
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, timeoutCts.Token);
+
                 await _webSocket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
                     "Service disconnecting",
-                    CancellationToken.None);
-                await _cts.CancelAsync();
+                    combinedCts.Token);
+            }
+            catch (OperationCanceledException ex)
+            {
+                _webSocket.Abort();
+            }
+            finally
+            {
                 _cts.Dispose();
                 _webSocket.Dispose();
-            }
-            catch (Exception ex)
-            {
-                throw;
             }
         }
 
         Disconnected?.Invoke(this, EventArgs.Empty);
-        _cts = new();
     }
 
     public async Task SendStatusAsync(RemoteStatus status, CancellationToken token = default)
