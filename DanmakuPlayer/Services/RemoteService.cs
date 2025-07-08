@@ -59,12 +59,12 @@ public class RemoteService : IAsyncDisposable
         {
             try
             {
-                await _cts.CancelAsync();
-                _cts.Dispose();
                 await _webSocket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
                     "Service disconnecting",
                     CancellationToken.None);
+                await _cts.CancelAsync();
+                _cts.Dispose();
                 _webSocket.Dispose();
             }
             catch (Exception ex)
