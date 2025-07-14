@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Resources;
@@ -43,12 +44,25 @@ public sealed partial class BackgroundPanel : Grid
                         break;
                 }
             };
-            Vm.TempConfig.PropertyChanged += (o, e) =>
+            Vm.TempConfig.PropertyChanged += async (o, e) =>
             {
                 switch (e.PropertyName)
                 {
                     case nameof(Vm.TempConfig.UsePlaybackRate3):
                         TrySetPlaybackRate();
+                        break;
+                    case nameof(Vm.TempConfig.IsPlaying):
+                        if (o.To<TempConfig>().IsPlaying)
+                        {
+                            DanmakuHelper.RenderType = RenderMode.RenderAlways;
+                            await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
+                        }
+                        else
+                        {
+                            DanmakuHelper.RenderType = RenderMode.RenderOnce;
+                            await WebView.LockOperationsAsync(async operations => await operations.PauseAsync());
+                        }
+
                         break;
                 }
             };
@@ -185,12 +199,9 @@ public sealed partial class BackgroundPanel : Grid
 
     #region Control区事件
 
-    private void PauseResumeTapped(object sender, IWinRTObject e)
+    private async void PauseResumeTapped(object sender, IWinRTObject e)
     {
-        if (Vm.IsPlaying)
-            Pause();
-        else
-            Resume();
+        await (Vm.IsPlaying ? PauseAsync() : ResumeAsync());
         StatusChanged();
     }
 
@@ -250,7 +261,7 @@ public sealed partial class BackgroundPanel : Grid
 
     #region WebView视频控制
 
-    private async void Sync()
+    private async Task SyncAsync()
     {
         await WebView.LockOperationsAsync(async operations =>
         {
@@ -277,9 +288,9 @@ public sealed partial class BackgroundPanel : Grid
         StatusChanged();
     }
 
-    private void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj)
+    private async void CurrentVideoOnSelectionChanged(RadioMenuFlyout obj)
     {
-        Sync();
+        await SyncAsync();
         StatusChanged(nameof(Vm.Duration), Vm.Duration.ToString(CultureInfo.InvariantCulture));
     }
 
@@ -297,7 +308,7 @@ public sealed partial class BackgroundPanel : Grid
     private async void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e)
     {
         await WebView.LoadVideoAsync();
-        Sync();
+        await SyncAsync();
     }
 
     private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e) => Vm.LockWebView2 = !Vm.LockWebView2;

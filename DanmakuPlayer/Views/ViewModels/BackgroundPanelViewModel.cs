@@ -22,9 +22,6 @@ public partial class BackgroundPanelViewModel : ObservableObject
     public partial bool Mute { get; set; }
 
     [ObservableProperty]
-    public partial bool StartPlaying { get; set; }
-
-    [ObservableProperty]
     public partial TimeSpan TotalTime { get; set; }
 
     [ObservableProperty]
@@ -129,6 +126,8 @@ public partial class BackgroundPanelViewModel : ObservableObject
             }
         }
     }
+
+    public bool ActualIsPlaying => IsPlaying && TempConfig.IsPlaying;
 
 #pragma warning disable CA1822
     // ReSharper disable once MemberCanBeMadeStatic.Global

@@ -26,7 +26,6 @@ public partial class BackgroundPanel
     private int _tickCount;
     private bool _isRightPressing;
     private TimeOnly _lastPressTime;
-    private bool _needResume;
 
     private async Task OnCIdChangedAsync()
     {
@@ -94,7 +93,7 @@ public partial class BackgroundPanel
     /// <param name="action"></param>
     private async Task LoadDanmakuAsync(Func<CancellationToken, Task<List<Danmaku>>> action)
     {
-        Pause();
+        Vm.TempConfig.IsPlaying = false;
 
         await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
@@ -137,7 +136,7 @@ public partial class BackgroundPanel
             RootTeachingTip.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, TeachingTipSeverity.Error, e.Message);
         }
 
-        Vm.StartPlaying = true;
+        Vm.TempConfig.IsPlaying = true;
     }
 
     public async void ReloadDanmaku(RenderMode renderType)
@@ -145,7 +144,7 @@ public partial class BackgroundPanel
         if (DanmakuHelper.Pool.Length is 0)
             return;
 
-        TryPause();
+        Vm.TempConfig.IsPlaying = false;
 
         await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
@@ -160,7 +159,7 @@ public partial class BackgroundPanel
             return;
         }
 
-        TryResume();
+        Vm.TempConfig.IsPlaying = true;
     }
 
     public void ResetProvider() => ReloadDanmaku(RenderMode.ReloadProvider);
@@ -181,12 +180,12 @@ public partial class BackgroundPanel
 
             if (Vm.Time < Vm.TotalTime)
             {
-                if (Vm.IsPlaying)
+                if (Vm.ActualIsPlaying)
                     Vm.ActualTime += timeSpan;
             }
             else
             {
-                Pause();
+                _ = PauseAsync();
                 Vm.Time = TimeSpan.Zero;
             }
 
@@ -236,7 +235,7 @@ public partial class BackgroundPanel
                     await WebView.LockOperationsAsync(async operations =>
                         Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
                     if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
-                        Sync();
+                        _ = SyncAsync();
                 }
             }
         }
@@ -246,33 +245,23 @@ public partial class BackgroundPanel
         }
     }
 
-    private void TryPause()
-    {
-        _needResume = Vm.IsPlaying;
-        Pause();
-    }
-
-    private void TryResume()
-    {
-        if (_needResume)
-            Resume();
-        _needResume = false;
-    }
-
-    private async void Resume()
+    private async Task ResumeAsync()
     {
         DanmakuHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
         await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
-        Sync();
+        // 傻逼WebView的视频播放后一段时间内IsPlaying仍然为false
+        await Task.Delay(500);
+        await SyncAsync();
     }
 
-    private async void Pause()
+    private async Task PauseAsync()
     {
         DanmakuHelper.RenderType = RenderMode.RenderOnce;
         Vm.IsPlaying = false;
         await WebView.LockOperationsAsync(async operations => await operations.PauseAsync());
-        Sync();
+        await Task.Delay(500);
+        await SyncAsync();
     }
 
     public void TrySetPlaybackRate()
@@ -342,11 +331,7 @@ public partial class BackgroundPanel
         set
         {
             var videoTime = DateTime.UtcNow - value.CurrentTime + value.VideoTime;
-            Vm.IsPlaying = value.IsPlaying;
-            if (Vm.IsPlaying)
-                Resume();
-            else
-                Pause();
+            _ = value.IsPlaying ? ResumeAsync() : PauseAsync();
             Vm.Time = videoTime;
             Vm.PlaybackRate = value.PlaybackRate;
             Vm.DanmakuDelayTime = value.DanmakuDelayTime;
