@@ -248,6 +248,15 @@ public partial record AppConfig()
     public bool ClearStyleWhenFullScreen { get; set; } = true;
 
     #endregion
+
+    #region 同步设置
+
+    /// <summary>
+    /// 同步服务器地址
+    /// </summary>
+    public string SyncUrl { get; set; } = string.Empty;
+
+    #endregion
 }
 
 [JsonSerializable(typeof(string[]))]

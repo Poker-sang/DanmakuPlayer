@@ -13,7 +13,11 @@ public sealed partial class RemoteDialog : UserControl
     [GeneratedDependencyProperty]
     private partial bool IsConnected { get; set; }
 
-    public RemoteDialog() => InitializeComponent();
+    public RemoteDialog()
+    {
+        InitializeComponent();
+        ServerTextBlock.Text = AppContext.AppConfig.SyncUrl;
+    }
 
     private BackgroundPanel _backgroundPanel = null!;
 
@@ -39,6 +43,8 @@ public sealed partial class RemoteDialog : UserControl
             client.MessageReceived += (s, status) => _backgroundPanel.Status = status;
             await client.ConnectAsync();
             IsConnected = client.IsConnected;
+            AppContext.AppConfig.SyncUrl = ServerTextBlock.Text;
+            AppContext.SaveConfiguration(AppContext.AppConfig);
         }
         finally
         {
