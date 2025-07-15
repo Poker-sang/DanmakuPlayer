@@ -77,6 +77,7 @@ public partial class VideoSlider : Slider
 
     private void InvokeMove()
     {
+        // 拖动过程中触发
         // 此时IsSliderBeingManipulated一定为true
         SliderManipulationDelta?.Invoke(this, EventArgs.Empty);
         UserValue = Value;
@@ -87,11 +88,13 @@ public partial class VideoSlider : Slider
     {
         if (wasBeingManipulated != IsSliderBeingManipulated)
             if (IsSliderBeingManipulated)
+                // 点击进度条时触发
                 SliderManipulationStarted?.Invoke(this, EventArgs.Empty);
             else
             {
-                SliderManipulationCompleted?.Invoke(this, EventArgs.Empty);
+                // 松开时触发
                 UserValue = Value;
+                SliderManipulationCompleted?.Invoke(this, EventArgs.Empty);
                 UserValueChangedByManipulation?.Invoke(this, EventArgs.Empty);
             }
     }
