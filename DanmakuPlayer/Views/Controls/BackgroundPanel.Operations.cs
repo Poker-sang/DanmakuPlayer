@@ -14,6 +14,7 @@ using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Input;
 using Windows.System;
 using Windows.UI.Core;
+using DanmakuPlayer.Models.Remote;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;

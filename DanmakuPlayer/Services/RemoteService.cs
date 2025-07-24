@@ -5,6 +5,8 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DanmakuPlayer.Models;
+using DanmakuPlayer.Models.Remote;
 
 namespace DanmakuPlayer.Services;
 
@@ -33,7 +35,7 @@ public class RemoteService : IAsyncDisposable
 
     public event EventHandler? Disconnected;
 
-    public event EventHandler<RemoteStatus>? MessageReceived;
+    public event EventHandler<Message>? MessageReceived;
 
     public bool IsConnected => _webSocket?.State is WebSocketState.Open;
 
@@ -113,14 +115,18 @@ public class RemoteService : IAsyncDisposable
                 if (result.MessageType is WebSocketMessageType.Close)
                     return;
 
-                var status = JsonSerializer.Deserialize<RemoteStatus>(new ReadOnlySpan<byte>(buffer, 0, result.Count));
+                var status = JsonSerializer.Deserialize<Message>(new ReadOnlySpan<byte>(buffer, 0, result.Count));
 
-                MessageReceived?.Invoke(this, status);
+                MessageReceived?.Invoke(this, status!);
             }
         }
         catch (WebSocketException ex)
         {
             throw;
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 }
