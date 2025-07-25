@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using DanmakuPlayer.Services;
 using Microsoft.UI.Windowing;
 
 namespace DanmakuPlayer.Views.ViewModels;
@@ -135,6 +138,28 @@ public partial class BackgroundPanelViewModel : ObservableObject
 #pragma warning restore CA1822
 
     public TempConfig TempConfig { get; } = new();
+
+    private CancellationTokenSource? _cts;
+
+    async partial void OnUrlChanged(string value)
+    {
+        try
+        {
+            if (_cts?.CancelAsync() is { } task)
+                await task;
+            _cts?.Dispose();
+            _cts = new();
+            var uri = new Uri(value);
+            if (!uri.Host.EndsWith("bilibili.com"))
+                return;
+            if ((await BiliHelper.String2CIdsAsync(value, _cts.Token))?.ToArray() is [{ CId: var cid }])
+                CId = cid;
+        }
+        catch
+        {
+            // ignored
+        }
+    }
 
     public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
 }

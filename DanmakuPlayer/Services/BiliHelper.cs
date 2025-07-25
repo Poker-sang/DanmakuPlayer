@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ using System.Xml.Linq;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
+using Windows.Devices.Spi;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services;
 
@@ -80,7 +83,7 @@ public static partial class BiliHelper
 
     private static bool CheckSuccess(JsonDocument jd) => jd.RootElement.GetProperty("code").GetInt32() is 0;
 
-    private static async Task<IEnumerable<VideoPage>> GetCIdsAsync(Task<JsonDocument> jd)
+    private static async Task<IEnumerable<VideoPage>?> GetCIdsAsync(Task<JsonDocument> jd)
     {
         var response = await jd;
         return CheckSuccess(response)
@@ -90,30 +93,66 @@ public static partial class BiliHelper
                     episode.GetProperty("cid").GetUInt64(),
                     episode.GetProperty("page").GetInt32().ToString(),
                     episode.GetProperty("part").GetString()!))
-            : [];
+            : null;
     }
 
-    public static Task<IEnumerable<VideoPage>> Av2CIdsAsync(ulong av, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(av, token));
+    public static async Task<IEnumerable<VideoPage>?> String2CIdsAsync(string uri, CancellationToken token)
+    {
+        var codeType = uri.Match(out var match);
+        var code = 0ul;
+        if (codeType is not CodeType.BvId and not CodeType.Error)
+            code = ulong.Parse(match);
+        switch (codeType)
+        {
+            case CodeType.Error:
+                return null;
+            case CodeType.AvId:
+                return await Av2CIdsAsync(code, token);
+            case CodeType.BvId:
+                return await Bv2CIdsAsync(match, token);
+            case CodeType.CId:
+                return [new(code, "1", "")];
+            case CodeType.MediaId:
+                if (await Md2SsAsync(code, token) is { } ss)
+                {
+                    code = ss;
+                    goto case CodeType.SeasonId;
+                }
 
-    public static Task<IEnumerable<VideoPage>> Bv2CIdsAsync(string bv, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(bv, token));
+                return null;
+            case CodeType.SeasonId:
+                return await Ss2CIdsAsync(code, token);
+            case CodeType.EpisodeId:
+                if (await Ep2CIdAsync(code, token) is { } videoPage)
+                    return [videoPage];
+                return null;
+            default:
+                return ThrowHelper.ArgumentOutOfRange<CodeType, IEnumerable<VideoPage>?>(codeType);
+        }
+    }
 
-    public static async Task<ulong?> Ep2CIdAsync(ulong episodeId, CancellationToken token)
+    public static Task<IEnumerable<VideoPage>?> Av2CIdsAsync(ulong av, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(av, token));
+
+    public static Task<IEnumerable<VideoPage>?> Bv2CIdsAsync(string bv, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(bv, token));
+
+    public static async Task<VideoPage?> Ep2CIdAsync(ulong episodeId, CancellationToken token)
     {
         var response = await BiliApis.GetBangumiEpisodeInfoAsync(episodeId, token);
-        if (CheckSuccess(response))
-            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            // Linq会多循环几遍
-            foreach (var episode in response.RootElement
-                         .GetProperty("result")
-                         .GetProperty("episodes")
-                         .EnumerateArray())
-                if (episode.GetProperty("id").GetUInt64() == episodeId)
-                    return episode.GetProperty("cid").GetUInt64();
-
-        return null;
+        return CheckSuccess(response)
+               && response.RootElement
+                       .GetProperty("result")
+                       .GetProperty("episodes")
+                       .EnumerateArray()
+                       .FirstOrDefault(t => t.GetProperty("id").GetUInt64() == episodeId) is
+                   { ValueKind : not JsonValueKind.Undefined } episode
+            ? new(
+                episode.GetProperty("cid").GetUInt64(),
+                episode.GetProperty("title").GetString()!,
+                episode.GetProperty("long_title").GetString()!)
+            : null;
     }
 
-    public static async Task<IEnumerable<VideoPage>> Ss2CIdsAsync(ulong seasonId, CancellationToken token)
+    public static async Task<IEnumerable<VideoPage>?> Ss2CIdsAsync(ulong seasonId, CancellationToken token)
     {
         var response = await BiliApis.GetBangumiEpisodeAsync(seasonId, token);
         return CheckSuccess(response)
@@ -126,7 +165,7 @@ public static partial class BiliHelper
                     episode.GetProperty("cid").GetUInt64(),
                     episode.GetProperty("title").GetString()!,
                     episode.GetProperty("long_title").GetString()!))
-            : [];
+            : null;
     }
 
     public static async Task<ulong?> Md2SsAsync(ulong mediaId, CancellationToken token)

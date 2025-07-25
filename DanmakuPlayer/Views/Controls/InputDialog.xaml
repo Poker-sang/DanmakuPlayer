@@ -37,6 +37,7 @@
                 x:Name="VideoPageView"
                 Grid.Row="2"
                 DoubleTapped="SelectClick"
+                SelectedValuePath="CId"
                 SelectionChanged="SelectionChanged"
                 SelectionMode="Single">
                 <ListView.ItemTemplate>
