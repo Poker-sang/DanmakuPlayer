@@ -5,6 +5,11 @@
     },
     "DanmakuPlayer (Unpackaged)": {
       "commandName": "Project"
+    },
+    "Remote": {
+      "commandName": "MsixPackage",
+      "remoteDebugEnabled": true,
+      "remoteDebugMachine": "LAPTOP-576M8DKG"
     }
   }
 }

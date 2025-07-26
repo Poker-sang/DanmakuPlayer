@@ -71,6 +71,8 @@ public sealed partial class BackgroundPanel : Grid
             InitializeComponent();
             AppContext.DanmakuCanvas = DanmakuCanvas;
             AppContext.SetTimerInterval();
+            _webViewSyncTimer.Tick += WebViewSyncTimerTick;
+            _webViewSyncTimer.Start();
         }
         catch (Exception e)
         {

@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
+using DanmakuPlayer.Models.Remote;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
 using Windows.System;
 using Windows.UI.Core;
-using DanmakuPlayer.Models.Remote;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -24,9 +25,12 @@ public partial class BackgroundPanel
     private readonly DanmakuFilter _filter = [DanmakuCombiner.CombineAsync, DanmakuRegex.MatchAsync];
     private CancellationTokenSource _cancellationTokenSource = new();
     private DateTime _lastTime;
-    private int _tickCount;
     private bool _isRightPressing;
     private TimeOnly _lastPressTime;
+    private readonly DispatcherTimer _webViewSyncTimer = new()
+    {
+        Interval = TimeSpan.FromSeconds(0.25)
+    };
 
     private async Task OnCIdChangedAsync()
     {
@@ -169,7 +173,22 @@ public partial class BackgroundPanel
 
     #region 播放及暂停
 
-    private async void TimerTick()
+    private async void WebViewSyncTimerTick(object? sender, object e)
+    {
+        if (!Vm.EnableWebView2 || !WebView.HasVideo)
+            return;
+
+        var lastTime = Vm.Time;
+        await WebView.LockOperationsAsync(async operations =>
+        {
+            Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
+            Vm.IsPlaying = await operations.IsPlayingAsync();
+        });
+        if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
+            await SyncAsync();
+    }
+
+    private void TimerTick()
     {
         var now = DateTime.UtcNow;
         var timeNow = TimeOnly.FromDateTime(now);
@@ -224,20 +243,6 @@ public partial class BackgroundPanel
                     _lastPressTime = timeNow;
 
                 _isRightPressing = true;
-            }
-
-            if (Vm.EnableWebView2 && WebView.HasVideo)
-            {
-                ++_tickCount;
-                if (_tickCount >= 10)
-                {
-                    _tickCount = 0;
-                    var lastTime = Vm.Time;
-                    await WebView.LockOperationsAsync(async operations =>
-                        Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync()));
-                    if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
-                        _ = SyncAsync();
-                }
             }
         }
         finally
