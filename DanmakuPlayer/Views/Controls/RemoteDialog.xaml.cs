@@ -43,26 +43,7 @@ public sealed partial class RemoteDialog : UserControl
                 await RemoteService.Current.DisposeAsync();
             // RoomIdTextBlock.Text
             var client = new RemoteService(ServerTextBlock.Text);
-            client.MessageReceived += async (s, status) =>
-            {
-                switch (status.Type)
-                {
-                    case MessageTypes.Login:
-
-                        break;
-                    case MessageTypes.StatusUpdate:
-                        _backgroundPanel.Status = JsonSerializer.Deserialize<RemoteStatus>(status.Data);
-                        break;
-                    case MessageTypes.SendCurrentStatus:
-                        await Task.Delay(500);
-                        var newStatus = _backgroundPanel.Status;
-                        newStatus.ChangedValues["Url"] = _backgroundPanel.Vm.Url;
-                        await RemoteService.Current!.SendStatusAsync(newStatus);
-                        break;
-                    default:
-                        break;
-                }
-            };
+            client.MessageReceived += _backgroundPanel.OnMessageReceived;
             await client.ConnectAsync();
             IsConnected = client.IsConnected;
             AppContext.AppConfig.SyncUrl = ServerTextBlock.Text;

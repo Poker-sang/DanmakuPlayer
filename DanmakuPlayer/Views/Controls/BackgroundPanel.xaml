@@ -373,4 +373,19 @@
     <local:InputDialog x:Name="DialogInput" Grid.Row="0" />
     <local:RemoteDialog x:Name="DialogRemote" Grid.Row="0" />
     <TeachingTip x:Name="RootTeachingTip" Grid.Row="0" />
+    <StackPanel
+        x:Name="InfoBarContainer"
+        Grid.Row="0"
+        Grid.RowSpan="2"
+        MinWidth="192"
+        MaxWidth="320"
+        Margin="32,64"
+        HorizontalAlignment="Left"
+        Spacing="4">
+        <StackPanel.ChildrenTransitions>
+            <TransitionCollection>
+                <AddDeleteThemeTransition />
+            </TransitionCollection>
+        </StackPanel.ChildrenTransitions>
+    </StackPanel>
 </Grid>

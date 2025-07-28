@@ -337,6 +337,14 @@ public partial class BackgroundPanel
         set
         {
             var videoTime = DateTime.UtcNow - value.CurrentTime + value.VideoTime;
+            if(value.IsPlaying != Vm.IsPlaying)
+            {
+                if(value.IsPlaying)
+                    _infoBarService.Success("继续");
+                else
+                    _infoBarService.Warning("暂停");
+            }
+
             _ = value.IsPlaying ? ResumeAsync() : PauseAsync();
             Vm.Time = videoTime;
             Vm.PlaybackRate = value.PlaybackRate;
@@ -345,11 +353,13 @@ public partial class BackgroundPanel
                 switch (name)
                 {
                     case nameof(Vm.CId):
+                        _infoBarService.Success("加载弹幕", changedValue);
                         Vm.CId = ulong.Parse(changedValue);
                         break;
                     case nameof(Vm.Url):
                         if (!Vm.EnableWebView2)
                             break;
+                        _infoBarService.Success("更新URL", changedValue);
                         _ = WebView.GotoAsync(changedValue);
                         break;
                     case nameof(Vm.Duration):

@@ -4,9 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DanmakuPlayer.Enums;
+using DanmakuPlayer.Models.Remote;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
@@ -80,11 +82,17 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
+    private IInfoBarService _infoBarService = null!;
+    
     public BackgroundPanelViewModel Vm { get; } = new();
 
     #region Grid事件
 
-    private void RootLoaded(object sender, RoutedEventArgs e) => App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
+    private void RootLoaded(object sender, RoutedEventArgs e)
+    {
+        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
+        _infoBarService = new InfoBarService(InfoBarContainer);
+    }
 
     private void MaximizeRestoreTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
 
@@ -263,6 +271,26 @@ public sealed partial class BackgroundPanel : Grid
 
     #region WebView视频控制
 
+    public async void OnMessageReceived(object? sender, Message message)
+    {
+        switch (message.Type)
+        {
+            case MessageTypes.Login:
+                _infoBarService.Warning("有用户进入房间");
+                break;
+            case MessageTypes.StatusUpdate:
+                Status = JsonSerializer.Deserialize<RemoteStatus>(message.Data);
+                break;
+            case MessageTypes.SendCurrentStatus:
+                await Task.Delay(500);
+                var newStatus = Status;
+                newStatus.ChangedValues["Url"] = Vm.Url;
+                await RemoteService.Current!.SendStatusAsync(newStatus);
+                break;
+            default:
+                break;
+        }
+    }
     private async Task SyncAsync()
     {
         await WebView.LockOperationsAsync(async operations =>
