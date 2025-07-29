@@ -339,9 +339,9 @@ public partial class BackgroundPanel
             if(value.IsPlaying != Vm.IsPlaying)
             {
                 if(value.IsPlaying)
-                    _infoBarService.Success("继续");
+                    _infoBarService.Success(MainPanelResources.Play);
                 else
-                    _infoBarService.Warning("暂停");
+                    _infoBarService.Warning(MainPanelResources.Pause);
             }
 
             _ = value.IsPlaying ? ResumeAsync() : PauseAsync();
@@ -352,13 +352,13 @@ public partial class BackgroundPanel
                 switch (name)
                 {
                     case nameof(Vm.CId):
-                        _infoBarService.Success("加载弹幕", changedValue);
+                        _infoBarService.Success(MainPanelResources.RemoteLoadingDanmaku, changedValue);
                         Vm.CId = ulong.Parse(changedValue);
                         break;
                     case nameof(Vm.Url):
                         if (!Vm.EnableWebView2)
                             break;
-                        _infoBarService.Success("更新URL", changedValue);
+                        _infoBarService.Success(MainPanelResources.RemoteUpdateUrl, changedValue);
                         _ = WebView.GotoAsync(changedValue);
                         break;
                     case nameof(Vm.Duration):

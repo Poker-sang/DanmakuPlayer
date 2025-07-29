@@ -275,7 +275,14 @@ public sealed partial class BackgroundPanel : Grid
         switch (message.Type)
         {
             case MessageTypes.Login:
-                _infoBarService.Info("有用户进入房间");
+                var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
+                DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
+                _infoBarService.Info(Emoticon.Okay, MainPanelResources.RemoteUserLogin);
+                break;
+            case MessageTypes.Exit:
+                var exitInfo = JsonSerializer.Deserialize<LoginInfo>(message.Data);
+                DialogRemote.ConnectedCount = exitInfo!.Current.TotalConnectedClients;
+                _infoBarService.Info(Emoticon.Depressed, MainPanelResources.RemoteUserExit);
                 break;
             case MessageTypes.StatusUpdate:
                 Status = JsonSerializer.Deserialize<RemoteStatus>(message.Data);

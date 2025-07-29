@@ -29,5 +29,11 @@
   "MuteButton/ToolTipService/ToolTip": "静音",
   "SyncButton/ToolTipService/ToolTip": "同步网页视频",
   "LockWebView2Button/ToolTipService/ToolTip": "禁止鼠标键盘输入到WebView中",
-  "FullScreenButton/ToolTipService/ToolTip": "页面视频全屏"
+  "FullScreenButton/ToolTipService/ToolTip": "页面视频全屏",
+  "RemoteUserLogin": "有用户进入房间",
+  "RemoteUserExit": "有用户离开房间",
+  "RemoteLoadingDanmaku": "加载弹幕",
+  "RemoteUpdateUrl": "更新Url",
+  "Play": "继续",
+  "Pause": "暂停"
 }
