@@ -321,7 +321,10 @@ public sealed partial class BackgroundPanel : Grid
 
     private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender)
     {
-        Vm.PlaybackRate = sender.SelectedItem.To<double>();
+        var value = sender.SelectedItem.To<double>();
+        if (value <= 0)
+            return;
+        Vm.PlaybackRate = value;
         StatusChanged();
     }
 
