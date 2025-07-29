@@ -1,10 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
-using DanmakuPlayer.Models.Remote;
 using DanmakuPlayer.Services;
-using Grpc.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinUI3Utilities;
@@ -14,7 +11,10 @@ namespace DanmakuPlayer.Views.Controls;
 public sealed partial class RemoteDialog : UserControl
 {
     [GeneratedDependencyProperty]
-    private partial bool IsConnected { get; set; }
+    public partial bool IsConnected { get; set; }
+
+    [GeneratedDependencyProperty]
+    public partial int ConnectedCount { get; set; }
 
     public RemoteDialog()
     {
@@ -44,6 +44,7 @@ public sealed partial class RemoteDialog : UserControl
             // RoomIdTextBlock.Text
             var client = new RemoteService(ServerTextBlock.Text);
             client.MessageReceived += _backgroundPanel.OnMessageReceived;
+            client.Disconnected += Disconnected;
             await client.ConnectAsync();
             IsConnected = client.IsConnected;
             AppContext.AppConfig.SyncUrl = ServerTextBlock.Text;
@@ -62,7 +63,6 @@ public sealed partial class RemoteDialog : UserControl
         {
             if (RemoteService.IsCurrentConnected)
                 await RemoteService.Current.DisposeAsync();
-            IsConnected = false;
         }
         finally
         {
@@ -70,5 +70,9 @@ public sealed partial class RemoteDialog : UserControl
         }
     }
 
-
+    private void Disconnected(object? sender, EventArgs e)
+    {
+        IsConnected = false;
+        ConnectedCount = 0;
+    }
 }

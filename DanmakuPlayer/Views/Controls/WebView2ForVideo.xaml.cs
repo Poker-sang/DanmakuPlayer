@@ -142,10 +142,10 @@ public sealed partial class WebView2ForVideo : UserControl
 
     private async void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        WebView2.Close();
         if (Browser is { } browser)
             await browser.DisposeAsync();
         Pw?.Dispose();
-        WebView2.Close();
     }
 
     public IAsyncOperation<IReadOnlyList<CoreWebView2Cookie>> GetBiliCookieAsync() => WebView2.CoreWebView2.CookieManager.GetCookiesAsync("https://bilibili.com");

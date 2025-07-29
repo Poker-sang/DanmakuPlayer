@@ -16,7 +16,6 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Windows.System;
 using Windows.UI.Core;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -38,7 +37,7 @@ public partial class BackgroundPanel
         {
             Vm.LoadingDanmaku = true;
 
-            RootTeachingTip.ShowAndHide(MainPanelResources.DanmakuLoading, TeachingTipSeverity.Information, Emoticon.Okay);
+            _infoBarService.Info(MainPanelResources.DanmakuLoading, Emoticon.Okay);
 
             await LoadDanmakuAsync(async token =>
             {
@@ -72,7 +71,7 @@ public partial class BackgroundPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            RootTeachingTip.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, TeachingTipSeverity.Error, ex.Message);
+            _infoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
         }
         finally
         {
@@ -116,12 +115,12 @@ public partial class BackgroundPanel
         {
             var tempPool = await action(_cancellationTokenSource.Token);
 
-            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), TeachingTipSeverity.Information, Emoticon.Okay);
+            _infoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
             DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), TeachingTipSeverity.Information, Emoticon.Okay);
+            _infoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), Emoticon.Okay);
 
             var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
@@ -129,7 +128,7 @@ public partial class BackgroundPanel
             if (!Vm.EnableWebView2 || !WebView.HasVideo)
                 Vm.TotalTime = TimeSpan.FromMilliseconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
-            RootTeachingTip.ShowAndHide(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), TeachingTipSeverity.Ok, Emoticon.Okay);
+            _infoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), Emoticon.Okay);
         }
         catch (TaskCanceledException)
         {
@@ -138,7 +137,7 @@ public partial class BackgroundPanel
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            RootTeachingTip.ShowAndHide(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, TeachingTipSeverity.Error, e.Message);
+            _infoBarService.Error(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, e.Message);
         }
 
         Vm.TempConfig.IsPlaying = true;

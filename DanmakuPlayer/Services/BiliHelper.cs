@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +11,6 @@ using System.Xml.Linq;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
-using Windows.Devices.Spi;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services;

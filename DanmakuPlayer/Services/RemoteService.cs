@@ -5,7 +5,6 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DanmakuPlayer.Models;
 using DanmakuPlayer.Models.Remote;
 
 namespace DanmakuPlayer.Services;
@@ -27,7 +26,7 @@ public class RemoteService : IAsyncDisposable
 
     private const int ReceiveBufferSize = 4096;
 
-    private CancellationTokenSource _cts = new();
+    private readonly CancellationTokenSource _cts = new();
 
     private readonly string _serverUrl;
 
@@ -41,16 +40,9 @@ public class RemoteService : IAsyncDisposable
 
     public async Task ConnectAsync(CancellationToken token = default)
     {
-        try
-        {
-            await _webSocket.ConnectAsync(new(_serverUrl), token);
-            Connected?.Invoke(this, EventArgs.Empty);
-            _ = ReceiveStatusAsync(_cts.Token);
-        }
-        catch (WebSocketException ex)
-        {
-            throw;
-        }
+        await _webSocket.ConnectAsync(new(_serverUrl), token);
+        Connected?.Invoke(this, EventArgs.Empty);
+        _ = ReceiveStatusAsync(_cts.Token);
     }
 
     public async ValueTask DisposeAsync()
@@ -67,6 +59,8 @@ public class RemoteService : IAsyncDisposable
                     WebSocketCloseStatus.NormalClosure,
                     "Service disconnecting",
                     combinedCts.Token);
+
+                Disconnected?.Invoke(this, EventArgs.Empty);
             }
             catch (OperationCanceledException ex)
             {
@@ -78,8 +72,6 @@ public class RemoteService : IAsyncDisposable
                 _webSocket.Dispose();
             }
         }
-
-        Disconnected?.Invoke(this, EventArgs.Empty);
     }
 
     public async Task SendStatusAsync(RemoteStatus status, CancellationToken token = default)
@@ -87,19 +79,12 @@ public class RemoteService : IAsyncDisposable
         if (!IsConnected)
             return;
 
-        try
-        {
-            var buffer = JsonSerializer.SerializeToUtf8Bytes(status);
-            await _webSocket.SendAsync(
-                buffer,
-                WebSocketMessageType.Text,
-                true,
-                token);
-        }
-        catch (WebSocketException ex)
-        {
-            throw;
-        }
+        var buffer = JsonSerializer.SerializeToUtf8Bytes(status);
+        await _webSocket.SendAsync(
+            buffer,
+            WebSocketMessageType.Text,
+            true,
+            token);
     }
 
     private async Task ReceiveStatusAsync(CancellationToken token = default)
@@ -122,6 +107,7 @@ public class RemoteService : IAsyncDisposable
         }
         catch (WebSocketException ex)
         {
+            Disconnected?.Invoke(this, EventArgs.Empty);
             throw;
         }
         finally

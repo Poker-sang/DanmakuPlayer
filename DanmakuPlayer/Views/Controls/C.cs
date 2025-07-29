@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using Windows.UI.Text;
+using FluentIcons.Common;
 using WinUI3Utilities;
 using Symbol = FluentIcons.Common.Symbol;
 
@@ -47,9 +48,6 @@ public static class C
 
     public static Visibility IsNotEmptyToVisibility(ICollection value) => value.Count is 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    public static Symbol SymbolSelector(bool value, Symbol trueValue, Symbol falseValue) =>
-        value ? trueValue : falseValue;
-
     public static string SecondToTime(double sec)
     {
         var time = TimeSpan.FromSeconds(sec);
@@ -86,6 +84,9 @@ public static class C
 
     public static string StringFormatter(object value, string formatter) => string.Format(formatter, value);
 
+    public static Symbol SymbolSelector(bool value, Symbol trueValue, Symbol falseValue) =>
+        value ? trueValue : falseValue;
+
     public static Symbol PlaybackRateSymbolSelector(double playbackRate) => playbackRate switch
     {
         2 => Symbol.Multiplier2x,
@@ -104,6 +105,8 @@ public static class C
             > 0 => Symbol.Speaker1,
             _ => Symbol.Speaker0
         };
+
+    public static IconVariant ColorIconSelector(bool value) => value ? IconVariant.Color : IconVariant.Regular;
 
     public static string CultureDateTimeDateFormatter(DateTime value, CultureInfo culture) =>
         value.ToString(culture.DateTimeFormat.ShortDatePattern);
@@ -141,6 +144,9 @@ public static class C
 
     public static CommandBarLabelPosition LabelIsNullToVisibility(string? value) =>
         value is null ? CommandBarLabelPosition.Collapsed : CommandBarLabelPosition.Default;
+
+    public static CommandBarLabelPosition BoolToLabelVisibility(bool value) =>
+        value ? CommandBarLabelPosition.Default : CommandBarLabelPosition.Collapsed;
 
     public static ItemsViewSelectionMode ToSelectionMode(bool value) =>
         value ? ItemsViewSelectionMode.Multiple : ItemsViewSelectionMode.None;

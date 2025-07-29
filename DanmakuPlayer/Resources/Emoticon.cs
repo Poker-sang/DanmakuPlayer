@@ -1,21 +1,21 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace DanmakuPlayer.Resources;
 
 public static class Emoticon
 {
-    public static readonly string[] ShockedEmoticons =
+    public static readonly ImmutableArray<string> ShockedEmoticons =
     [
         "━━Σ(ﾟДﾟ川)━"
     ];
 
-    public static readonly string[] DepressedEmoticons =
+    public static readonly ImmutableArray<string> DepressedEmoticons =
     [
         "( ´･_･)ﾉ(._.`)"
     ];
 
-    public static readonly string[] OkayEmoticons =
+    public static readonly ImmutableArray<string> OkayEmoticons =
     [
         "(｀・ω・´)",
         "✧(≖ ◡ ≖✿)",
@@ -31,5 +31,5 @@ public static class Emoticon
 
     public static string Okay => OkayEmoticons.RandomGet();
 
-    private static T RandomGet<T>(this IReadOnlyList<T> arr) => arr[Random.Shared.Next(arr.Count)];
+    private static T RandomGet<T>(this ImmutableArray<T> arr) => arr[Random.Shared.Next(arr.Length)];
 }

@@ -91,7 +91,7 @@ public sealed partial class BackgroundPanel : Grid
     private void RootLoaded(object sender, RoutedEventArgs e)
     {
         App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
-        _infoBarService = new InfoBarService(InfoBarContainer);
+        _infoBarService = IInfoBarService.Create(InfoBarContainer);
     }
 
     private void MaximizeRestoreTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
@@ -124,9 +124,8 @@ public sealed partial class BackgroundPanel : Grid
     private void TopMostTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.TopMost = !App.OverlappedPresenter.IsAlwaysOnTop;
-        RootTeachingTip.ShowAndHide(
+        _infoBarService.Info(
             Vm.TopMost ? MainPanelResources.TopMostOn : MainPanelResources.TopMostOff,
-            TeachingTipSeverity.Information,
             Emoticon.Okay);
     }
 
@@ -175,7 +174,7 @@ public sealed partial class BackgroundPanel : Grid
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            RootTeachingTip.ShowAndHide(Emoticon.Shocked + " " + MainPanelResources.UnknownException, TeachingTipSeverity.Error, ex.Message);
+            _infoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
         }
         finally
         {
@@ -276,7 +275,7 @@ public sealed partial class BackgroundPanel : Grid
         switch (message.Type)
         {
             case MessageTypes.Login:
-                _infoBarService.Warning("有用户进入房间");
+                _infoBarService.Info("有用户进入房间");
                 break;
             case MessageTypes.StatusUpdate:
                 Status = JsonSerializer.Deserialize<RemoteStatus>(message.Data);
@@ -291,6 +290,7 @@ public sealed partial class BackgroundPanel : Grid
                 break;
         }
     }
+
     private async Task SyncAsync()
     {
         await WebView.LockOperationsAsync(async operations =>
