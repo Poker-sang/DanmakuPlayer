@@ -37,7 +37,7 @@ public partial class BackgroundPanel
         {
             Vm.LoadingDanmaku = true;
 
-            _infoBarService.Info(MainPanelResources.DanmakuLoading, Emoticon.Okay);
+            InfoBarService.Info(MainPanelResources.DanmakuLoading, Emoticon.Okay);
 
             await LoadDanmakuAsync(async token =>
             {
@@ -71,7 +71,7 @@ public partial class BackgroundPanel
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            _infoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
+            InfoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
         }
         finally
         {
@@ -115,12 +115,12 @@ public partial class BackgroundPanel
         {
             var tempPool = await action(_cancellationTokenSource.Token);
 
-            _infoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
+            InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
             DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
-            _infoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), Emoticon.Okay);
+            InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), Emoticon.Okay);
 
             var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
@@ -128,7 +128,7 @@ public partial class BackgroundPanel
             if (!Vm.EnableWebView2 || !WebView.HasVideo)
                 Vm.TotalTime = TimeSpan.FromMilliseconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
-            _infoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), Emoticon.Okay);
+            InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), Emoticon.Okay);
         }
         catch (TaskCanceledException)
         {
@@ -137,7 +137,7 @@ public partial class BackgroundPanel
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            _infoBarService.Error(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, e.Message);
+            InfoBarService.Error(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, e.Message);
         }
 
         Vm.TempConfig.IsPlaying = true;
@@ -336,13 +336,11 @@ public partial class BackgroundPanel
         set
         {
             var videoTime = DateTime.UtcNow - value.CurrentTime + value.VideoTime;
-            if(value.IsPlaying != Vm.IsPlaying)
-            {
-                if(value.IsPlaying)
-                    _infoBarService.Success(MainPanelResources.Play);
+            if (value.IsPlaying != Vm.IsPlaying)
+                if (value.IsPlaying)
+                    InfoBarService.Success(MainPanelResources.Play);
                 else
-                    _infoBarService.Warning(MainPanelResources.Pause);
-            }
+                    InfoBarService.Warning(MainPanelResources.Pause);
 
             _ = value.IsPlaying ? ResumeAsync() : PauseAsync();
             Vm.Time = videoTime;
@@ -352,13 +350,13 @@ public partial class BackgroundPanel
                 switch (name)
                 {
                     case nameof(Vm.CId):
-                        _infoBarService.Success(MainPanelResources.RemoteLoadingDanmaku, changedValue);
+                        InfoBarService.Success(MainPanelResources.RemoteLoadingDanmaku, changedValue);
                         Vm.CId = ulong.Parse(changedValue);
                         break;
                     case nameof(Vm.Url):
                         if (!Vm.EnableWebView2)
                             break;
-                        _infoBarService.Success(MainPanelResources.RemoteUpdateUrl, changedValue);
+                        InfoBarService.Success(MainPanelResources.RemoteUpdateUrl, changedValue);
                         _ = WebView.GotoAsync(changedValue);
                         break;
                     case nameof(Vm.Duration):
@@ -369,6 +367,7 @@ public partial class BackgroundPanel
                             WebView.CurrentVideo = video;
                         break;
                 }
+
             if (WebView.HasVideo)
             {
                 _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(videoTime.TotalSeconds));

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
+using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -50,6 +51,10 @@ public sealed partial class RemoteDialog : UserControl
             AppContext.AppConfig.SyncUrl = ServerTextBlock.Text;
             AppContext.SaveConfiguration(AppContext.AppConfig);
         }
+        catch (Exception ex)
+        {
+            _backgroundPanel.InfoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.ExceptionThrown, ex.Message);
+        }
         finally
         {
             ProgressRing.IsActive = false;
@@ -63,6 +68,10 @@ public sealed partial class RemoteDialog : UserControl
         {
             if (RemoteService.IsCurrentConnected)
                 await RemoteService.Current.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            _backgroundPanel.InfoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.ExceptionThrown, ex.Message);
         }
         finally
         {

@@ -82,7 +82,7 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private IInfoBarService _infoBarService = null!;
+    public IInfoBarService InfoBarService { get; private set; } = null!;
     
     public BackgroundPanelViewModel Vm { get; } = new();
 
@@ -91,7 +91,7 @@ public sealed partial class BackgroundPanel : Grid
     private void RootLoaded(object sender, RoutedEventArgs e)
     {
         App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
-        _infoBarService = IInfoBarService.Create(InfoBarContainer);
+        InfoBarService = IInfoBarService.Create(InfoBarContainer);
     }
 
     private void MaximizeRestoreTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
@@ -124,7 +124,7 @@ public sealed partial class BackgroundPanel : Grid
     private void TopMostTapped(object sender, TappedRoutedEventArgs e)
     {
         Vm.TopMost = !App.OverlappedPresenter.IsAlwaysOnTop;
-        _infoBarService.Info(
+        InfoBarService.Info(
             Vm.TopMost ? MainPanelResources.TopMostOn : MainPanelResources.TopMostOff,
             Emoticon.Okay);
     }
@@ -174,7 +174,7 @@ public sealed partial class BackgroundPanel : Grid
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            _infoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
+            InfoBarService.Error(Emoticon.Shocked + " " + MainPanelResources.UnknownException, ex.Message);
         }
         finally
         {
@@ -275,24 +275,33 @@ public sealed partial class BackgroundPanel : Grid
         switch (message.Type)
         {
             case MessageTypes.Login:
+            {
                 var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
                 DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
-                _infoBarService.Info(Emoticon.Okay, MainPanelResources.RemoteUserLogin);
+                InfoBarService.Info(string.Format(MainPanelResources.RemoteUserLogin, info.UserName), Emoticon.Okay);
                 break;
+            }
             case MessageTypes.Exit:
-                var exitInfo = JsonSerializer.Deserialize<LoginInfo>(message.Data);
-                DialogRemote.ConnectedCount = exitInfo!.Current.TotalConnectedClients;
-                _infoBarService.Info(Emoticon.Depressed, MainPanelResources.RemoteUserExit);
+            {
+                var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
+                DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
+                InfoBarService.Info(string.Format(MainPanelResources.RemoteUserExit, info.UserName),
+                    Emoticon.Depressed);
                 break;
+            }
             case MessageTypes.StatusUpdate:
+            {
                 Status = JsonSerializer.Deserialize<RemoteStatus>(message.Data);
                 break;
+            }
             case MessageTypes.SendCurrentStatus:
+            {
                 await Task.Delay(500);
                 var newStatus = Status;
                 newStatus.ChangedValues["Url"] = Vm.Url;
                 await RemoteService.Current!.SendStatusAsync(newStatus);
                 break;
+            }
             default:
                 break;
         }

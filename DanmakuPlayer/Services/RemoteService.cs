@@ -40,7 +40,7 @@ public class RemoteService : IAsyncDisposable
 
     public async Task ConnectAsync(CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new(_serverUrl), token);
+        await _webSocket.ConnectAsync(new($"{_serverUrl}?userName={Environment.UserName}"), token);
         Connected?.Invoke(this, EventArgs.Empty);
         _ = ReceiveStatusAsync(_cts.Token);
     }
@@ -54,7 +54,7 @@ public class RemoteService : IAsyncDisposable
             {
                 using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, timeoutCts.Token);
-
+                
                 await _webSocket.CloseAsync(
                     WebSocketCloseStatus.NormalClosure,
                     "Service disconnecting",

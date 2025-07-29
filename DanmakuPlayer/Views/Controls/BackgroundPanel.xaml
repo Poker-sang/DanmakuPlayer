@@ -296,10 +296,12 @@
                             <AppBarButton.Flyout>
                                 <Flyout Placement="Top">
                                     <StackPanel>
+                                        <!--  IsTabStop="False"防止自动打开后获得焦点  -->
                                         <Slider
                                             MinHeight="100"
                                             HorizontalAlignment="Center"
                                             IsEnabled="{x:Bind local:C.Negation(Vm.Mute), Mode=OneWay}"
+                                            IsTabStop="False"
                                             Maximum="100"
                                             Minimum="0"
                                             Orientation="Vertical"
@@ -309,6 +311,7 @@
                                             x:Uid="/MainPanel/MuteButton"
                                             Width="40"
                                             HorizontalAlignment="Center"
+                                            IsTabStop="False"
                                             LabelPosition="Collapsed"
                                             Tapped="MuteOnTapped">
                                             <AppBarButton.Icon>

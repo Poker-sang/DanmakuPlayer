@@ -1,6 +1,7 @@
 namespace DanmakuPlayer.Models.Remote;
 
 public record Message(string Type, string Data);
+
 public static class MessageTypes
 {
     // 有用户登录时向所有客户端广播
