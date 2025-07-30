@@ -332,7 +332,7 @@ public sealed partial class BackgroundPanel : Grid
     {
         var value = sender.SelectedItem.To<double>();
         if (value <= 0)
-            return;
+            value = 1;
         Vm.PlaybackRate = value;
         StatusChanged();
     }
