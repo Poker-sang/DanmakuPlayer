@@ -1,12 +1,8 @@
-using System.Drawing.Printing;
-using System.Runtime.InteropServices;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.UI.Controls;
 using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT.Interop;
 using WinUI3Utilities;
@@ -14,7 +10,6 @@ using static Windows.Win32.PInvoke;
 using static Windows.Win32.UI.WindowsAndMessaging.LAYERED_WINDOW_ATTRIBUTES_FLAGS;
 using static Windows.Win32.UI.WindowsAndMessaging.WINDOW_EX_STYLE;
 using static Windows.Win32.UI.WindowsAndMessaging.WINDOW_LONG_PTR_INDEX;
-using static Windows.Win32.UI.WindowsAndMessaging.WINDOW_STYLE;
 
 namespace DanmakuPlayer;
 
@@ -27,13 +22,16 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         var presenter = OverlappedPresenter;
-        presenter.SetBorderAndTitleBar(true, false); 
+        presenter.PreferredMinimumHeight = 450;
+        presenter.PreferredMinimumWidth = 800;
+        presenter.SetBorderAndTitleBar(true, false);
 
         var hwnd = WindowNative.GetWindowHandle(this);
         ApplyLegacyWindowEffects((HWND)hwnd);
 
         Activate();
     }
+
     private static void ApplyLegacyWindowEffects(HWND hwnd)
     {
         // 添加 WS_EX_LAYERED 样式
@@ -52,7 +50,6 @@ public sealed partial class MainWindow : Window
             cyTopHeight = 1
         });
     }
-
 
     ~MainWindow()
     {

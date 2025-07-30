@@ -204,7 +204,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <TextBlock x:Uid="/SettingsDialog/CookieIsEmptyTextBlock" Visibility="{x:Bind local:C.IsNotEmptyToVisibility(Vm.DanmakuCookie), Mode=OneWay}" />
+                                <TextBlock x:Uid="/SettingsDialog/CookieIsEmptyTextBlock" Visibility="{x:Bind local:C.IsEmptyToVisibility(Vm.DanmakuCookie), Mode=OneWay}" />
                             </Grid>
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>

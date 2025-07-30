@@ -44,6 +44,9 @@ public sealed partial class BackgroundPanel : Grid
                     case nameof(Vm.CId):
                         _ = OnCIdChangedAsync();
                         break;
+                    case nameof(Vm.FullScreen):
+                        FullScreenChanged();
+                        break;
                 }
             };
             Vm.TempConfig.PropertyChanged += async (o, e) =>
@@ -71,6 +74,7 @@ public sealed partial class BackgroundPanel : Grid
             Vm.ResetProvider += ResetProvider;
 
             InitializeComponent();
+            FullScreenChanged();
             AppContext.DanmakuCanvas = DanmakuCanvas;
             AppContext.SetTimerInterval();
             _webViewSyncTimer.Tick += WebViewSyncTimerTick;
@@ -79,6 +83,26 @@ public sealed partial class BackgroundPanel : Grid
         catch (Exception e)
         {
             App.Logger.LogCritical("", e);
+        }
+
+        return;
+
+        void FullScreenChanged()
+        {
+            if (Vm.FullScreen)
+            {
+                TopRow.Height = new(1, GridUnitType.Star);
+                BottomRow.Height = new(1, GridUnitType.Star);
+                SetRow(WebView, 0);
+                SetRowSpan(WebView, 3);
+            }
+            else
+            {
+                TopRow.Height = GridLength.Auto;
+                BottomRow.Height = GridLength.Auto;
+                SetRow(WebView, 1);
+                SetRowSpan(WebView, 1);
+            }
         }
     }
 
@@ -90,7 +114,7 @@ public sealed partial class BackgroundPanel : Grid
 
     private void RootLoaded(object sender, RoutedEventArgs e)
     {
-        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.Both));
+        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.DragMove));
         InfoBarService = IInfoBarService.Create(InfoBarContainer);
     }
 
