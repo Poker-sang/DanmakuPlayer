@@ -18,6 +18,10 @@ public partial class BackgroundPanelViewModel : ObservableObject
     [ObservableProperty]
     public partial TimeSpan Time { get; set; }
 
+    /// <summary>
+    /// 当有WebView且其中视频没有全屏时，为false。
+    /// 当没有WebView，或有且其中视频全屏时，为true。
+    /// </summary>
     [ObservableProperty]
     public partial bool FullScreen { get; set; } = !AppContext.AppConfig.EnableWebView2;
 

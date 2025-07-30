@@ -6,8 +6,5 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <controls:BackgroundPanel
-        x:Name="RootPanel"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch" />
+    <controls:BackgroundPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 </Window>

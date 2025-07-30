@@ -46,7 +46,9 @@ public static class C
             _ => ThrowHelper.ArgumentOutOfRange<double, string>(value)
         };
 
-    public static Visibility IsNotEmptyToVisibility(ICollection value) => value.Count is 0 ? Visibility.Visible : Visibility.Collapsed;
+    public static Visibility IsMultipleToVisibility(ICollection value) => value.Count < 2 ? Visibility.Collapsed : Visibility.Visible;
+
+    public static Visibility IsEmptyToVisibility(ICollection value) => value.Count is 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public static string SecondToTime(double sec)
     {
@@ -171,13 +173,4 @@ public static class C
         10 => FontWeights.ExtraBlack,
         _ => ThrowHelper.ArgumentOutOfRange<Enum, FontWeight>(value)
     };
-
-    public static Thickness ThicknessSelector(bool value,
-        int left, int top, int right,int bottom,
-        int left2, int top2, int right2, int bottom2)
-    {
-        return value 
-            ? new Thickness(left, top, right, bottom) 
-            : new Thickness(left2, top2, right2, bottom2);
-    }
 }
