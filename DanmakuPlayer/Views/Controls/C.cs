@@ -171,4 +171,13 @@ public static class C
         10 => FontWeights.ExtraBlack,
         _ => ThrowHelper.ArgumentOutOfRange<Enum, FontWeight>(value)
     };
+
+    public static Thickness ThicknessSelector(bool value,
+        int left, int top, int right,int bottom,
+        int left2, int top2, int right2, int bottom2)
+    {
+        return value 
+            ? new Thickness(left, top, right, bottom) 
+            : new Thickness(left2, top2, right2, bottom2);
+    }
 }

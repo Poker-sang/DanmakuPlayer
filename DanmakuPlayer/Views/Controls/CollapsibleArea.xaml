@@ -11,8 +11,7 @@
                         Background="Transparent"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        Child="{TemplateBinding Content}"
-                        Opacity="0">
+                        Child="{TemplateBinding Content}">
                         <Border.OpacityTransition>
                             <ScalarTransition />
                         </Border.OpacityTransition>

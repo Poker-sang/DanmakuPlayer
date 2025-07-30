@@ -81,7 +81,17 @@ public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
         if (before.DanmakuFont != after.DanmakuFont)
             backgroundPanel.DanmakuFontChanged();
         if (before.EnableWebView2 != after.EnableWebView2)
+        {
             backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.EnableWebView2));
+            if (!after.EnableWebView2)
+            {
+                backgroundPanel.Vm.FullScreen = true;
+            }
+            else
+            {
+                backgroundPanel.Vm.FullScreen = false;
+            }
+        }
         if (before.LockWebView2 != after.LockWebView2)
             backgroundPanel.Vm.RaisePropertyChanged(nameof(AppConfig.LockWebView2));
         if (before.PlaybackRate != after.PlaybackRate)

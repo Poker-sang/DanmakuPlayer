@@ -19,7 +19,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
     public partial TimeSpan Time { get; set; }
 
     [ObservableProperty]
-    public partial bool FullScreen { get; set; }
+    public partial bool FullScreen { get; set; } = !AppContext.AppConfig.EnableWebView2;
 
     [ObservableProperty]
     public partial bool Mute { get; set; }

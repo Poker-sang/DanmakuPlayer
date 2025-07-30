@@ -21,6 +21,9 @@ public sealed partial class CollapsibleArea : ContentControl
         };
     }
 
+    [GeneratedDependencyProperty(DefaultValue = true)]
+    public partial bool Pinned { get; set; }
+
     public void OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         OnPointerEntered(e);
@@ -30,6 +33,14 @@ public sealed partial class CollapsibleArea : ContentControl
     public void OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
         OnPointerExited(e);
-        sender.To<Border>().Opacity = 0;
+        sender.To<Border>().Opacity = Pinned ? 1 : 0;
+    }
+
+    partial void OnPinnedChanged(bool newValue)
+    {
+        if (this.FindDescendant<Border>() is { } border)
+        {
+            border.Opacity = newValue ? 1 : 0;
+        }
     }
 }
