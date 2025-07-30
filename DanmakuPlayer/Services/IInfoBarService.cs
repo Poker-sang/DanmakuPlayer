@@ -87,7 +87,7 @@ public interface IInfoBarService
 
 file class InfoBarService(StackPanel container) : IInfoBarService
 {
-    public int MaxInfoBarCount { get; set; } = 1;
+    public int MaxInfoBarCount { get; set; } = 2;
 
     public void Show(string? title,
         string message,

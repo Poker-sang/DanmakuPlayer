@@ -40,7 +40,13 @@
         x:Name="InfoBarContainer"
         Width="320"
         Margin="32,64"
-        HorizontalAlignment="Left" />
+        HorizontalAlignment="Left">
+        <StackPanel.ChildrenTransitions>
+            <TransitionCollection>
+                <PaneThemeTransition Edge="Left" />
+            </TransitionCollection>
+        </StackPanel.ChildrenTransitions>
+    </StackPanel>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
