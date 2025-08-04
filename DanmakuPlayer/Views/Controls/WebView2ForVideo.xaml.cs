@@ -99,9 +99,7 @@ public sealed partial class WebView2ForVideo : UserControl
         try
         {
             if (HasVideo)
-            {
                 _ = await Task.WhenAny([task(Operations), Task.Delay(1000)]);
-            }
         }
         finally
         {
@@ -218,14 +216,13 @@ public sealed partial class WebView2ForVideo : UserControl
         {
             IsLoading = false;
         }
+
         if (HasVideo)
-        {
             await LockOperationsAsync(async operations =>
             {
                 Duration = await operations.DurationAsync();
                 await operations.PauseAsync();
             });
-        }
         else
         {
             Duration = 0;

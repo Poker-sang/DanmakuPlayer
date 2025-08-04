@@ -159,7 +159,7 @@ public partial class WebView2ForVideo
 
         public async Task<bool> FullScreenFlipAsync()
         {
-            var fullScreen = (await video.EvaluateAsync("video => window.document.fullscreenElement")).HasValue;
+            var fullScreen = await FullScreenAsync();
             if (fullScreen)
                 await ExitFullScreenAsync();
             else

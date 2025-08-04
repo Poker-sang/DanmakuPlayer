@@ -31,6 +31,8 @@ public partial class BackgroundPanel
         Interval = TimeSpan.FromSeconds(0.25)
     };
 
+    private bool HasVideo => Vm.EnableWebView2 && WebView.HasVideo;
+
     private async Task OnCIdChangedAsync()
     {
         try
@@ -106,7 +108,7 @@ public partial class BackgroundPanel
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 
-        if (!Vm.EnableWebView2 || !WebView.HasVideo)
+        if (!HasVideo)
         {
             Vm.TotalTime = TimeSpan.Zero;
             Vm.Time = TimeSpan.Zero;
@@ -128,7 +130,7 @@ public partial class BackgroundPanel
             var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
             var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
-            if (!Vm.EnableWebView2 || !WebView.HasVideo)
+            if (!HasVideo)
                 Vm.TotalTime = TimeSpan.FromMilliseconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
             InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), Emoticon.Okay);
@@ -174,21 +176,6 @@ public partial class BackgroundPanel
     public void DanmakuFontChanged() => ReloadDanmaku(RenderMode.ReloadFormats);
 
     #region 播放及暂停
-
-    private async void WebViewSyncTimerTick(object? sender, object e)
-    {
-        if (!Vm.EnableWebView2 || !WebView.HasVideo)
-            return;
-
-        var lastTime = Vm.Time;
-        await WebView.LockOperationsAsync(async operations =>
-        {
-            Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
-            Vm.IsPlaying = await operations.IsPlayingAsync();
-        });
-        if (Math.Abs((Vm.Time - lastTime).TotalSeconds) > 0.5)
-            await SyncAsync();
-    }
 
     private void TimerTick()
     {
@@ -293,7 +280,7 @@ public partial class BackgroundPanel
             (Vm.Time + fastForwardTime).Ticks,
             0,
             Vm.TotalTime.Ticks));
-        if (Vm.EnableWebView2 && WebView.HasVideo) 
+        if (HasVideo) 
             await WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(time.TotalSeconds));
 
         Vm.Time = time;
@@ -371,7 +358,7 @@ public partial class BackgroundPanel
                         break;
                 }
 
-            if (WebView.HasVideo)
+            if (HasVideo)
             {
                 _ = WebView.LockOperationsAsync(async operations => await operations.SetCurrentTimeAsync(videoTime.TotalSeconds));
                 TrySetPlaybackRate();

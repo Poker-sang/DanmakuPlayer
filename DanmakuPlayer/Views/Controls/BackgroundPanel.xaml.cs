@@ -77,7 +77,7 @@ public sealed partial class BackgroundPanel : Grid
             FullScreenChanged();
             AppContext.DanmakuCanvas = DanmakuCanvas;
             AppContext.SetTimerInterval();
-            _webViewSyncTimer.Tick += WebViewSyncTimerTick;
+            _webViewSyncTimer.Tick += async (_, _) => await SyncAsync();
             _webViewSyncTimer.Start();
         }
         catch (Exception e)
@@ -333,18 +333,22 @@ public sealed partial class BackgroundPanel : Grid
 
     private async Task SyncAsync()
     {
-        await WebView.LockOperationsAsync(async operations =>
+        if (!Vm.EnableWebView2)
+            return;
+        if (WebView.HasVideo)
         {
-            Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
-            Vm.TotalTime = TimeSpan.FromSeconds(await operations.DurationAsync());
-            Vm.IsPlaying = await operations.IsPlayingAsync();
-            Vm.Volume = await operations.VolumeAsync();
-            Vm.Mute = await operations.MutedAsync();
-            Vm.FullScreen = await operations.FullScreenAsync();
-        });
-        TrySetPlaybackRate();
-
-        if (Vm.EnableWebView2 && !WebView.HasVideo)
+            await WebView.LockOperationsAsync(async operations =>
+            {
+                Vm.Time = TimeSpan.FromSeconds(await operations.CurrentTimeAsync());
+                Vm.TotalTime = TimeSpan.FromSeconds(await operations.DurationAsync());
+                Vm.IsPlaying = await operations.IsPlayingAsync();
+                Vm.Volume = await operations.VolumeAsync();
+                Vm.Mute = await operations.MutedAsync();
+                Vm.FullScreen = await operations.FullScreenAsync();
+            });
+            TrySetPlaybackRate();
+        }
+        else
         {
             Vm.Volume = 0;
             Vm.TotalTime = Vm.Time = TimeSpan.Zero;
