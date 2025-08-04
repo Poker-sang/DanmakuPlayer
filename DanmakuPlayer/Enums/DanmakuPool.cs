@@ -16,7 +16,7 @@ public enum DanmakuPool
     Subtitle,
 
     /// <summary>
-    /// 高级池
+    /// 特殊池（代码/BAS弹幕）
     /// </summary>
     Advanced
 }

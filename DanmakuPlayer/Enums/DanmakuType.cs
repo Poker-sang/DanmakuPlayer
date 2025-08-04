@@ -8,7 +8,7 @@ namespace DanmakuPlayer.Enums;
 public enum DanmakuMode
 {
     /// <summary>
-    /// 滚动弹幕
+    /// 1-3 普通滚动弹幕
     /// </summary>
     Roll = 1,
 
@@ -39,7 +39,7 @@ public enum DanmakuMode
     Code = 8,
 
     /// <summary>
-    /// Bilibili Animation Script
+    /// Bilibili Animation Script（必须为<see cref="DanmakuPool.Advanced"/>）
     /// </summary>
     Bas = 9
 }

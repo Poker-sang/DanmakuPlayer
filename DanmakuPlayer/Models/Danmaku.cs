@@ -12,22 +12,15 @@ namespace DanmakuPlayer.Models;
 /// <param name="Id">Used to sort danmaku with the same StartMs</param>
 /// <param name="TimeMs">出现时间</param>
 /// <param name="Mode">模式</param>
-/// <param name="Size">大小</param>
+/// <param name="Size">字号</param>
 /// <param name="Color">颜色</param>
-/// <param name="UnixTimeStamp">发送时间戳</param>
-/// <param name="Pool">所属弹幕池</param>
-/// <param name="UserHash">用户ID</param>
 public partial record Danmaku(
     string Text,
     ulong Id,
     int TimeMs,
     DanmakuMode Mode,
     int Size,
-    uint Color,
-    bool Colorful,
-    ulong UnixTimeStamp,
-    DanmakuPool Pool,
-    string UserHash) : IDanmakuWidth
+    uint Color) : IDanmakuWidth
 {
     public override string ToString() => $"{Text},{Color},{Size}";
 
@@ -39,11 +32,14 @@ public partial record Danmaku(
             elem.Progress,
             (DanmakuMode)elem.Mode,
             elem.Fontsize,
-            elem.Color,
-            elem.Colorful is DmColorfulType.VipGradualColor,
-            (ulong)elem.Ctime,
-            (DanmakuPool)elem.Pool,
-            elem.MidHash);
+            elem.Color)
+        {
+            UserHash = elem.MidHash,
+            Colorful = elem.Colorful is DmColorfulType.VipGradualColor,
+            UnixTimeStamp = (ulong)elem.Ctime,
+            Attribute = (DanmakuAttribute)elem.Attr,
+            Pool = (DanmakuPool) elem.Pool
+        };
     }
 
     public static Danmaku Parse(XElement xElement, bool isNewFormat)
@@ -56,21 +52,48 @@ public partial record Danmaku(
                 int.Parse(tempInfo[2]),
                 Enum.Parse<DanmakuMode>(tempInfo[3]),
                 int.Parse(tempInfo[4]),
-                uint.Parse(tempInfo[5]),
-                false,
-                ulong.Parse(tempInfo[4]),
-                Enum.Parse<DanmakuPool>(tempInfo[5]),
-                tempInfo[6])
+                uint.Parse(tempInfo[5]))
+            {
+                UserHash = tempInfo[6],
+                UnixTimeStamp = ulong.Parse(tempInfo[4]),
+                Pool = Enum.Parse<DanmakuPool>(tempInfo[5])
+            }
             : new(
                 xElement.Value,
                 0,
                 (int) (double.Parse(tempInfo[0]) * 1000),
                 Enum.Parse<DanmakuMode>(tempInfo[1]),
                 int.Parse(tempInfo[2]),
-                uint.Parse(tempInfo[3]),
-                false,
-                ulong.Parse(tempInfo[4]),
-                Enum.Parse<DanmakuPool>(tempInfo[5]),
-                tempInfo[6]);
+                uint.Parse(tempInfo[3]))
+            {
+                UserHash = tempInfo[6],
+                UnixTimeStamp = ulong.Parse(tempInfo[4]),
+                Pool = Enum.Parse<DanmakuPool>(tempInfo[5])
+            };
     }
+
+    /// <summary>
+    /// 属性位值
+    /// </summary>
+    public DanmakuAttribute Attribute { get; init; }
+
+    /// <summary>
+    /// 用户ID
+    /// </summary>
+    public string UserHash { get; init; } = "";
+
+    /// <summary>
+    /// 大会员专属颜色
+    /// </summary>
+    public bool Colorful { get; init; }
+
+    /// <summary>
+    /// 发送时间戳
+    /// </summary>
+    public ulong UnixTimeStamp { get; init; }
+
+    /// <summary>
+    /// 所属弹幕池
+    /// </summary>
+    public DanmakuPool Pool { get; init; }
 }

@@ -30,7 +30,7 @@ public static class BiliApis
 
     public static Task<Stream?> GetWebDanmakuAsync(ulong cid, int segment, CancellationToken token) => $"{WebDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
 
-    public static Task<Stream?> GetMobileDanmaku(ulong cid, int segment, CancellationToken token) => $"{MobileDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
+    public static Task<Stream?> GetMobileDanmakuAsync(ulong cid, int segment, CancellationToken token) => $"{MobileDanmakuFromCid}oid={cid}&segment_index={segment}".TryDownloadStreamAsync(token);
 
     public static Task<JsonDocument> GetBangumiInfoAsync(ulong mediaId, CancellationToken token) => $"{BangumiInfo}media_id={mediaId}".DownloadJsonAsync(token);
 

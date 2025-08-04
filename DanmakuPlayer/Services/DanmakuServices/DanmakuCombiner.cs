@@ -132,7 +132,11 @@ public static class DanmakuCombiner
                 var ret = new List<Danmaku>();
 
                 foreach (var danmaku in pool)
-                    if (danmaku.Mode is DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom)
+                    if (danmaku is
+                        {
+                            Pool: DanmakuPool.Normal,
+                            Mode: DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom
+                        })
                     {
                         var text = danmaku.Text;
 
@@ -197,11 +201,7 @@ public static class DanmakuCombiner
                         (int) peers.Average(t => t.TimeMs),
                         mode,
                         (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
-                        (uint)peers.Average(t => t.Color),
-                        false,
-                        0,
-                        DanmakuPool.Normal,
-                        ""
+                        (uint)peers.Average(t => t.Color)
                     );
                     ret.Add(represent);
                 }

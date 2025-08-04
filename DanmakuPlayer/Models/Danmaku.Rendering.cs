@@ -49,11 +49,9 @@ public partial record Danmaku
         NeedRender = false;
         switch (Pool)
         {
-            case DanmakuPool.Normal:
-                break;
             case DanmakuPool.Subtitle when provider.AppConfig.DanmakuCountSubtitleEnable:
                 return NeedRender = true;
-            case DanmakuPool.Advanced when Mode is DanmakuMode.Advanced && provider.AppConfig.DanmakuCountM7Enable:
+            case DanmakuPool.Normal when Mode is DanmakuMode.Advanced && provider.AppConfig.DanmakuCountM7Enable:
             {
                 try
                 {
@@ -66,6 +64,9 @@ public partial record Danmaku
 
                 return NeedRender = true;
             }
+            case DanmakuPool.Normal:
+                break;
+            case DanmakuPool.Advanced:
             default:
                 return false;
         }

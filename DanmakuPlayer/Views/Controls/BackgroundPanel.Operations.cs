@@ -48,12 +48,16 @@ public partial class BackgroundPanel
                 {
                     try
                     {
-                        if (await GetDanmakuAsync(tempPool, Vm.CId, i, token, BiliApis.GetWebDanmakuAsync))
+                        if (await GetDanmakuAsync(Vm.CId, i, token, BiliApis.GetWebDanmakuAsync) is { } danmaku)
+                            tempPool.AddRange(danmaku);
+                        else
                             break;
                     }
                     catch
                     {
-                        if (await GetDanmakuAsync(tempPool, Vm.CId, i, token, BiliApis.GetMobileDanmaku))
+                        if (await GetDanmakuAsync(Vm.CId, i, token, BiliApis.GetMobileDanmakuAsync) is { } danmaku)
+                            tempPool.AddRange(danmaku);
+                        else
                             break;
                     }
 
@@ -80,14 +84,13 @@ public partial class BackgroundPanel
 
         return;
 
-        static async Task<bool> GetDanmakuAsync(List<Danmaku> tempPool, ulong cId, int i, CancellationToken token, Func<ulong, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
+        static async Task<IEnumerable<Danmaku>?> GetDanmakuAsync(ulong cId, int i, CancellationToken token, Func<ulong, int, CancellationToken, Task<Stream?>> getDanmakuAsync)
         {
             await using var danmaku = await getDanmakuAsync(cId, i + 1, token);
             if (danmaku is null)
-                return true;
+                return null;
             var reply = DmSegMobileReply.Parser.ParseFrom(danmaku);
-            tempPool.AddRange(BiliHelper.ToDanmaku(reply.Elems));
-            return false;
+            return BiliHelper.ToDanmaku(reply.Elems);
         }
     }
 
@@ -95,7 +98,7 @@ public partial class BackgroundPanel
     /// 加载弹幕操作
     /// </summary>
     /// <param name="action"></param>
-    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<List<Danmaku>>> action)
+    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<IReadOnlyCollection<Danmaku>>> action)
     {
         Vm.TempConfig.IsPlaying = false;
 
@@ -117,7 +120,7 @@ public partial class BackgroundPanel
 
             InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
-            DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token);
+            DanmakuHelper.Pool = [.. await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token)];
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
 
             InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), Emoticon.Okay);

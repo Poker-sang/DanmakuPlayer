@@ -26,23 +26,22 @@ public sealed partial class MainWindow : Window
         presenter.PreferredMinimumWidth = 800;
         presenter.SetBorderAndTitleBar(true, false);
 
-        var hwnd = WindowNative.GetWindowHandle(this);
-        ApplyLegacyWindowEffects((HWND)hwnd);
+        ApplyLegacyWindowEffects((HWND) WindowNative.GetWindowHandle(this));
 
         Activate();
     }
 
-    private static void ApplyLegacyWindowEffects(HWND hwnd)
+    private static void ApplyLegacyWindowEffects(HWND hWnd)
     {
         // 添加 WS_EX_LAYERED 样式
-        var exStyle = (WINDOW_EX_STYLE) GetWindowLong(hwnd, GWL_EXSTYLE);
-        SetWindowLong(hwnd, GWL_EXSTYLE, (int) (exStyle | WS_EX_LAYERED));
+        var exStyle = (WINDOW_EX_STYLE) GetWindowLong(hWnd, GWL_EXSTYLE);
+        SetWindowLong(hWnd, GWL_EXSTYLE, (int) (exStyle | WS_EX_LAYERED));
 
         // 设置窗口透明度
-        SetLayeredWindowAttributes(hwnd, default, 255, LWA_ALPHA);
+        SetLayeredWindowAttributes(hWnd, default, 255, LWA_ALPHA);
 
         // 扩展 DWM 边框
-        DwmExtendFrameIntoClientArea(hwnd, new()
+        DwmExtendFrameIntoClientArea(hWnd, new()
         {
             cxLeftWidth = 1,
             cxRightWidth = 1,
