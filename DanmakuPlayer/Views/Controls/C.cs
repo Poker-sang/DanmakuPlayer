@@ -50,7 +50,7 @@ public static class C
 
     public static Visibility IsEmptyToVisibility(ICollection value) => value.Count is 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    public static Visibility IsNullOrEmptyToVisibility(string? value) => string.IsNullOrEmpty(value) ? Visibility.Visible : Visibility.Collapsed;
+    public static Visibility WelcomePageVisibility(string? value, bool enableWebView2) => string.IsNullOrEmpty(value) && enableWebView2 ? Visibility.Visible : Visibility.Collapsed;
 
     public static string SecondToTime(double sec)
     {

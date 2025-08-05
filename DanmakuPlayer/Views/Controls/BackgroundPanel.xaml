@@ -45,7 +45,7 @@
         CreateResources="DanmakuCanvasCreateResources"
         Draw="DanmakuCanvasDraw"
         IsHitTestVisible="False" />
-    <local:WelcomePage Grid.Row="1" Visibility="{x:Bind local:C.IsNullOrEmptyToVisibility(Vm.Url), Mode=OneWay}" />
+    <local:WelcomePage Grid.Row="1" Visibility="{x:Bind local:C.WelcomePageVisibility(Vm.Url, Vm.EnableWebView2), Mode=OneWay}" />
     <StackPanel
         x:Name="InfoBarContainer"
         Grid.Row="0"
