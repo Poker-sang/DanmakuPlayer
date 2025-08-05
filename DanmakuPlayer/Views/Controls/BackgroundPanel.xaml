@@ -93,12 +93,12 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 DefaultLabelPosition="Right"
-                IsEnabled="{x:Bind local:C.Negation(Vm.LoadingDanmaku), Mode=OneWay}"
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
                     x:Uid="/MainPanel/DownloadButton"
                     Click="ImportClick"
                     Icon="{fluent:SymbolIcon Symbol=ArrowDownload}"
+                    IsEnabled="{x:Bind local:C.Negation(Vm.LoadingDanmaku), Mode=OneWay}"
                     LabelPosition="Collapsed"
                     RightTapped="FileClick" />
                 <AppBarButton
@@ -153,7 +153,7 @@
                     Click="SettingClick"
                     Icon="{fluent:SymbolIcon Symbol=Settings}">
                     <AppBarButton.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="Escape" Invoked="SettingClick" />
+                        <KeyboardAccelerator Key="Escape" />
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
                 <AppBarButton x:Uid="/MainPanel/MaximizeButton" Click="MaximizeRestoreDoubleTapped">
@@ -200,7 +200,7 @@
                             Icon="{fluent:SymbolIcon Symbol=Rewind}"
                             RightTapped="RewindClick">
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Left" Invoked="RewindClick" />
+                                <KeyboardAccelerator Key="Left" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                         <AppBarButton
@@ -212,16 +212,17 @@
                                 <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.IsPlaying, common:Symbol.Pause, common:Symbol.Play), Mode=OneWay}" />
                             </AppBarButton.Icon>
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Space" Invoked="PauseResumeClick" />
+                                <KeyboardAccelerator Key="Space" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
+                        <!--  KeyboardAccelerator会自动触发Click无法区分  -->
                         <AppBarButton
                             x:Uid="/MainPanel/FastForwardButton"
                             Width="40"
                             local:TapHelper.DoubleTappedDisabled="True"
-                            Click="FastForwardClick"
                             Icon="{fluent:SymbolIcon Symbol=FastForward}"
-                            RightTapped="FastForwardClick">
+                            RightTapped="FastForwardClick"
+                            Tapped="FastForwardClick">
                             <AppBarButton.KeyboardAccelerators>
                                 <KeyboardAccelerator Key="Right" Invoked="FastForwardClick" />
                             </AppBarButton.KeyboardAccelerators>

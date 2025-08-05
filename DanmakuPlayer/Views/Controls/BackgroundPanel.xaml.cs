@@ -149,7 +149,7 @@ public sealed partial class BackgroundPanel
             Emoticon.Okay);
     }
 
-    private async void SettingClick(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();
+    private async void SettingClick(object sender, RoutedEventArgs e) => await DialogSetting.ShowAsync();
 
     #endregion
 
@@ -179,11 +179,7 @@ public sealed partial class BackgroundPanel
 
     #region Import区按钮
 
-    private async void ImportClick(object sender, RoutedEventArgs e)
-    {
-        await ImportDanmakuOnline();
-    }
-    public async Task ImportDanmakuOnline()
+    public async void ImportClick(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -206,9 +202,7 @@ public sealed partial class BackgroundPanel
         }
     }
 
-    private async void FileClick(object sender, RightTappedRoutedEventArgs e) => await ImportDanmakuFromFile();
-
-    public async Task ImportDanmakuFromFile()
+    public async void FileClick(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -228,13 +222,13 @@ public sealed partial class BackgroundPanel
         }
     }
 
-    private async void RemoteClick(object sender, RoutedEventArgs e) => await DialogRemote.ShowAsync(this);
+    public async void RemoteClick(object sender, RoutedEventArgs e) => await DialogRemote.ShowAsync(this);
 
     #endregion
 
     #region Control区事件
 
-    private async void PauseResumeClick(object sender, IWinRTObject e)
+    private async void PauseResumeClick(object sender, RoutedEventArgs e)
     {
         await (Vm.IsPlaying ? PauseAsync() : ResumeAsync());
         StatusChanged();
@@ -244,7 +238,7 @@ public sealed partial class BackgroundPanel
 
     private void VolumeUpClick(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(5);
 
-    private void RewindClick(object sender, IWinRTObject e) => FastForward(e is RightTappedRoutedEventArgs, true);
+    private void RewindClick(object sender, RoutedEventArgs e) => FastForward(e is RightTappedRoutedEventArgs, true);
 
     private void FastForwardClick(object sender, IWinRTObject e)
     {
@@ -254,7 +248,7 @@ public sealed partial class BackgroundPanel
                 FastForward(true, false);
                 break;
             case KeyboardAcceleratorInvokedEventArgs when !Vm.IsPlaying:
-            case RoutedEventArgs:
+            case TappedRoutedEventArgs:
                 FastForward(false, false);
                 break;
         }
@@ -264,13 +258,13 @@ public sealed partial class BackgroundPanel
 
     private static readonly TimeSpan _SmallStep = TimeSpan.FromSeconds(5);
 
-    private void AdvanceDanmakuClick(object sender, IWinRTObject e)
+    private void AdvanceDanmakuClick(object sender, RoutedEventArgs e)
     {
         Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
         StatusChanged();
     }
 
-    private void DelayDanmakuClick(object sender, IWinRTObject e)
+    private void DelayDanmakuClick(object sender, RoutedEventArgs e)
     {
         Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
         StatusChanged();
