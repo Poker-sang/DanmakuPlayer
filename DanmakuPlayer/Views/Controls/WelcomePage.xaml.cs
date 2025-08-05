@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using ABI.System;
 using CommunityToolkit.WinUI;
+using DanmakuPlayer.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -56,7 +57,19 @@ namespace DanmakuPlayer.Views.Controls
         private async void PasteClicked(object sender, RoutedEventArgs e)
         {
             var dataPackageView = Clipboard.GetContent();
+
+            if(!dataPackageView.Contains("AnsiText") && !dataPackageView.Contains("OEMText"))
+            {
+                _backgroundPanel.InfoBarService.Error(WelcomePageResources.IncorrectUrlFormat);
+                return;
+            }
             var url = await dataPackageView.GetTextAsync();
+            if (string.IsNullOrEmpty(url) || !url.StartsWith("http"))
+            {
+                _backgroundPanel.InfoBarService.Error(WelcomePageResources.IncorrectUrlFormat);
+                return;
+            }
+
             _backgroundPanel.Vm.Url = url;
             _backgroundPanel.StatusChanged(nameof(_backgroundPanel.Vm.Url), url);
             await _backgroundPanel.WebView.GotoAsync(url);

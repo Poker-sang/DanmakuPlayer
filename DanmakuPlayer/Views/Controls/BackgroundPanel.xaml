@@ -55,7 +55,8 @@
         Grid.RowSpan="3"
         Width="320"
         Margin="32,64"
-        HorizontalAlignment="Left">
+        HorizontalAlignment="Left"
+        Canvas.ZIndex="2">
         <StackPanel.ChildrenTransitions>
             <TransitionCollection>
                 <PaneThemeTransition Edge="Left" />

@@ -8,5 +8,6 @@
   "DanmakuImportOnlineButtonText/Text": "在线获取",
   "RemoteTitle/Text": "远程同步",
   "RemoteDescription/Text": "Link Start!! 连接至远程同步服务器以和其他人同步观看视频",
-  "RemoteButtonText/Text": "进入房间"
+  "RemoteButtonText/Text": "进入房间",
+  "IncorrectUrlFormat": "Url格式不正确"
 }
