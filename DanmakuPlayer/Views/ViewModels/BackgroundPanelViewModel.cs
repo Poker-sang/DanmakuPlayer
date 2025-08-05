@@ -49,6 +49,9 @@ public partial class BackgroundPanelViewModel : ObservableObject
     [ObservableProperty]
     public partial double Duration { get; set; }
 
+    [ObservableProperty]
+    public partial bool TurnOffDanmaku { get; set; }
+
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
     public bool LockWebView2

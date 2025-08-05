@@ -344,7 +344,7 @@ public partial class BackgroundPanel
                         Vm.CId = ulong.Parse(changedValue);
                         break;
                     case nameof(Vm.Url):
-                        if (!Vm.EnableWebView2)
+                        if (!Vm.EnableWebView2 || string.IsNullOrEmpty(changedValue))
                             break;
                         InfoBarService.Success(MainPanelResources.RemoteUpdateUrl, changedValue);
                         _ = WebView.GotoAsync(changedValue);

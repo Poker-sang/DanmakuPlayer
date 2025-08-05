@@ -15,6 +15,7 @@ using DanmakuPlayer.Services.DanmakuServices;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -23,7 +24,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class BackgroundPanel : Grid
+public sealed partial class BackgroundPanel
 {
     private readonly double[] _playbackRates = [2, 1.5, 1.25, 1, 0.75, 0.5];
 
@@ -118,7 +119,7 @@ public sealed partial class BackgroundPanel : Grid
         InfoBarService = IInfoBarService.Create(InfoBarContainer);
     }
 
-    private void MaximizeRestoreTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
+    private void MaximizeRestoreDoubleTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
     {
@@ -134,18 +135,13 @@ public sealed partial class BackgroundPanel : Grid
         _cancellationTokenSource.Dispose();
     }
 
-    /// <summary>
-    /// 阻止按钮把双击事件传递给背景
-    /// </summary>
-    private void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e) => e.Handled = true;
-
     #endregion
 
     #region Title区按钮
 
-    private void CloseTapped(object sender, TappedRoutedEventArgs e) => Application.Current.Exit();
+    private void CloseClick(object sender, RoutedEventArgs e) => Application.Current.Exit();
 
-    private void TopMostTapped(object sender, TappedRoutedEventArgs e)
+    private void TopMostClick(object sender, RoutedEventArgs e)
     {
         Vm.TopMost = !App.OverlappedPresenter.IsAlwaysOnTop;
         InfoBarService.Info(
@@ -153,18 +149,18 @@ public sealed partial class BackgroundPanel : Grid
             Emoticon.Okay);
     }
 
-    private async void SettingTapped(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();
+    private async void SettingClick(object sender, IWinRTObject e) => await DialogSetting.ShowAsync();
 
     #endregion
 
     #region 导航区按钮
 
-    private async void GoBackTapped(object sender, TappedRoutedEventArgs e)
+    private async void GoBackClick(object sender, RoutedEventArgs e)
     {
         await WebView.GoBackAsync();
     }
 
-    private async void AddressBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    private async void AddressBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e)
     {
         var url = sender.Text;
         if (string.IsNullOrEmpty(url))
@@ -183,7 +179,7 @@ public sealed partial class BackgroundPanel : Grid
 
     #region Import区按钮
 
-    private async void ImportTapped(object sender, TappedRoutedEventArgs e)
+    private async void ImportClick(object sender, RoutedEventArgs e)
     {
         await ImportDanmakuOnline();
     }
@@ -210,10 +206,7 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private async void FileTapped(object sender, TappedRoutedEventArgs e)
-    {
-        await ImportDanmakuFromFile();
-    }
+    private async void FileClick(object sender, RightTappedRoutedEventArgs e) => await ImportDanmakuFromFile();
 
     public async Task ImportDanmakuFromFile()
     {
@@ -226,7 +219,7 @@ public sealed partial class BackgroundPanel : Grid
                 await LoadDanmakuAsync(async token =>
                 {
                     await using var stream = File.OpenRead(file.Path);
-                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToList();
+                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToArray();
                 });
         }
         finally
@@ -235,25 +228,25 @@ public sealed partial class BackgroundPanel : Grid
         }
     }
 
-    private async void RemoteTapped(object sender, TappedRoutedEventArgs e) => await DialogRemote.ShowAsync(this);
+    private async void RemoteClick(object sender, RoutedEventArgs e) => await DialogRemote.ShowAsync(this);
 
     #endregion
 
     #region Control区事件
 
-    private async void PauseResumeTapped(object sender, IWinRTObject e)
+    private async void PauseResumeClick(object sender, IWinRTObject e)
     {
         await (Vm.IsPlaying ? PauseAsync() : ResumeAsync());
         StatusChanged();
     }
 
-    private void VolumeDownTapped(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(-5);
+    private void VolumeDownClick(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(-5);
 
-    private void VolumeUpTapped(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(5);
+    private void VolumeUpClick(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e) => VolumeUp(5);
 
-    private void RewindTapped(object sender, IWinRTObject e) => FastForward(e is RightTappedRoutedEventArgs, true);
+    private void RewindClick(object sender, IWinRTObject e) => FastForward(e is RightTappedRoutedEventArgs, true);
 
-    private void FastForwardTapped(object sender, IWinRTObject e)
+    private void FastForwardClick(object sender, IWinRTObject e)
     {
         switch (e)
         {
@@ -261,7 +254,7 @@ public sealed partial class BackgroundPanel : Grid
                 FastForward(true, false);
                 break;
             case KeyboardAcceleratorInvokedEventArgs when !Vm.IsPlaying:
-            case TappedRoutedEventArgs:
+            case RoutedEventArgs:
                 FastForward(false, false);
                 break;
         }
@@ -271,19 +264,19 @@ public sealed partial class BackgroundPanel : Grid
 
     private static readonly TimeSpan _SmallStep = TimeSpan.FromSeconds(5);
 
-    private void AdvanceDanmakuTapped(object sender, IWinRTObject e)
+    private void AdvanceDanmakuClick(object sender, IWinRTObject e)
     {
         Vm.DanmakuDelayTime -= e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
         StatusChanged();
     }
 
-    private void DelayDanmakuTapped(object sender, IWinRTObject e)
+    private void DelayDanmakuClick(object sender, IWinRTObject e)
     {
         Vm.DanmakuDelayTime += e is RightTappedRoutedEventArgs ? _LargeStep : _SmallStep;
         StatusChanged();
     }
 
-    private void SyncDanmakuTapped(object sender, TappedRoutedEventArgs e)
+    private void SyncDanmakuClick(object sender, RoutedEventArgs e)
     {
         Vm.DanmakuDelayTime = TimeSpan.Zero;
         StatusChanged();
@@ -295,8 +288,11 @@ public sealed partial class BackgroundPanel : Grid
     private void DanmakuCanvasDraw(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e)
     {
         DispatcherQueue.TryEnqueue(TimerTick);
-       
-        DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.TempConfig, Vm.AppConfig);
+
+        if (Vm.TurnOffDanmaku)
+            e.DrawingSession.Clear(Colors.Transparent);
+        else
+            DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.TempConfig, Vm.AppConfig);
     }
 
     #endregion
@@ -380,7 +376,7 @@ public sealed partial class BackgroundPanel : Grid
         StatusChanged(nameof(Vm.Duration), Vm.Duration.ToString(CultureInfo.InvariantCulture));
     }
 
-    private async void MuteOnTapped(object sender, TappedRoutedEventArgs e) =>
+    private async void MuteOnClick(object sender, RoutedEventArgs e) =>
         await WebView.LockOperationsAsync(async operations => Vm.Mute = await operations.MutedFlipAsync());
 
     private async void VideoSliderOnUserValueChangedByManipulation(object sender, EventArgs e) =>
@@ -391,15 +387,22 @@ public sealed partial class BackgroundPanel : Grid
     private async void VolumeChanged() =>
         await WebView.LockOperationsAsync(async operations => await operations.SetVolumeAsync(Vm.Volume));
 
-    private async void LoadSyncOnTapped(object sender, TappedRoutedEventArgs e)
+    private async void LoadSyncOnClick(object sender, RoutedEventArgs e)
     {
         await WebView.LoadVideoAsync();
         await SyncAsync();
     }
 
-    private void LockWebView2OnTapped(object sender, TappedRoutedEventArgs e) => Vm.LockWebView2 = !Vm.LockWebView2;
+    private void TurnOffDanmakuOnClick(object sender, RoutedEventArgs e)
+    {
+        Vm.TurnOffDanmaku = !Vm.TurnOffDanmaku;
+        // 在暂停时也触发清屏
+        DanmakuCanvas.Invalidate();
+    }
 
-    private async void FullScreenOnTapped(object sender, TappedRoutedEventArgs e)
+    private void LockWebView2OnClick(object sender, RoutedEventArgs e) => Vm.LockWebView2 = !Vm.LockWebView2;
+
+    private async void FullScreenOnClick(object sender, RoutedEventArgs e)
     {
         await WebView.LockOperationsAsync(async operations =>
         {

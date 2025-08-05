@@ -23,7 +23,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
+public sealed partial class SettingsDialog : INotifyPropertyChanged
 {
     private SettingsViewModel Vm
     {

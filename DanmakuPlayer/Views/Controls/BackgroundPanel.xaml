@@ -10,7 +10,7 @@
     xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
-    DoubleTapped="MaximizeRestoreTapped"
+    DoubleTapped="MaximizeRestoreDoubleTapped"
     Loaded="RootLoaded"
     PointerReleased="BackgroundPanelOnPointerPressed"
     SizeChanged="RootSizeChanged"
@@ -97,19 +97,15 @@
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
                     x:Uid="/MainPanel/DownloadButton"
+                    Click="ImportClick"
                     Icon="{fluent:SymbolIcon Symbol=ArrowDownload}"
                     LabelPosition="Collapsed"
-                    Tapped="ImportTapped" />
-                <AppBarButton
-                    x:Uid="/MainPanel/OpenLocalButton"
-                    Icon="{fluent:SymbolIcon Symbol=Code}"
-                    LabelPosition="Collapsed"
-                    Tapped="FileTapped" />
+                    RightTapped="FileClick" />
                 <AppBarButton
                     x:Uid="/MainPanel/RemoteButton"
+                    Click="RemoteClick"
                     Label="{x:Bind DialogRemote.ConnectedCount, Mode=OneWay}"
-                    LabelPosition="{x:Bind local:C.BoolToLabelVisibility(DialogRemote.IsConnected), Mode=OneWay}"
-                    Tapped="RemoteTapped">
+                    LabelPosition="{x:Bind local:C.BoolToLabelVisibility(DialogRemote.IsConnected), Mode=OneWay}">
                     <AppBarButton.Icon>
                         <fluent:SymbolIcon IconVariant="{x:Bind local:C.ColorIconSelector(DialogRemote.IsConnected), Mode=OneWay}" Symbol="LinkMultiple" />
                     </AppBarButton.Icon>
@@ -126,10 +122,10 @@
                 <CommandBar Grid.Column="0" OverflowButtonVisibility="Collapsed">
                     <AppBarButton
                         x:Uid="/MainPanel/GoBackButton"
-                        DoubleTapped="UIElement_OnDoubleTapped"
+                        local:TapHelper.DoubleTappedDisabled="True"
+                        Click="GoBackClick"
                         Icon="{fluent:SymbolIcon Symbol=ArrowLeft}"
-                        IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}"
-                        Tapped="GoBackTapped" />
+                        IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}" />
                 </CommandBar>
                 <AutoSuggestBox
                     x:Uid="/MainPanel/UriAutoSuggestBox"
@@ -146,29 +142,29 @@
                 OverflowButtonVisibility="Collapsed">
                 <AppBarButton
                     x:Uid="/MainPanel/TopmostButton"
-                    DoubleTapped="UIElement_OnDoubleTapped"
-                    Tapped="TopMostTapped">
+                    local:TapHelper.DoubleTappedDisabled="True"
+                    Click="TopMostClick">
                     <AppBarButton.Icon>
                         <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.TopMost, common:Symbol.Pin, common:Symbol.PinOff), Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
                     x:Uid="/MainPanel/SettingsButton"
-                    Icon="{fluent:SymbolIcon Symbol=Settings}"
-                    Tapped="SettingTapped">
+                    Click="SettingClick"
+                    Icon="{fluent:SymbolIcon Symbol=Settings}">
                     <AppBarButton.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="Escape" Invoked="SettingTapped" />
+                        <KeyboardAccelerator Key="Escape" Invoked="SettingClick" />
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
-                <AppBarButton x:Uid="/MainPanel/MaximizeButton" Tapped="MaximizeRestoreTapped">
+                <AppBarButton x:Uid="/MainPanel/MaximizeButton" Click="MaximizeRestoreDoubleTapped">
                     <AppBarButton.Icon>
                         <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.IsMaximized, common:Symbol.SquareMultiple, common:Symbol.Square), Mode=OneWay}" />
                     </AppBarButton.Icon>
                 </AppBarButton>
                 <AppBarButton
                     x:Uid="/MainPanel/CloseButton"
-                    Icon="{fluent:SymbolIcon Symbol=Dismiss}"
-                    Tapped="CloseTapped">
+                    Click="CloseClick"
+                    Icon="{fluent:SymbolIcon Symbol=Dismiss}">
                     <AppBarButton.Resources>
                         <!--  ReSharper disable once Xaml.RedundantResource  -->
                         <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver" Color="Red" />
@@ -199,35 +195,35 @@
                         <AppBarButton
                             x:Uid="/MainPanel/RewindButton"
                             Width="40"
-                            DoubleTapped="UIElement_OnDoubleTapped"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="RewindClick"
                             Icon="{fluent:SymbolIcon Symbol=Rewind}"
-                            RightTapped="RewindTapped"
-                            Tapped="RewindTapped">
+                            RightTapped="RewindClick">
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Left" Invoked="RewindTapped" />
+                                <KeyboardAccelerator Key="Left" Invoked="RewindClick" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                         <AppBarButton
                             x:Uid="/MainPanel/PlayPauseButton"
                             Width="40"
-                            DoubleTapped="UIElement_OnDoubleTapped"
-                            Tapped="PauseResumeTapped">
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="PauseResumeClick">
                             <AppBarButton.Icon>
                                 <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.IsPlaying, common:Symbol.Pause, common:Symbol.Play), Mode=OneWay}" />
                             </AppBarButton.Icon>
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Space" Invoked="PauseResumeTapped" />
+                                <KeyboardAccelerator Key="Space" Invoked="PauseResumeClick" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                         <AppBarButton
                             x:Uid="/MainPanel/FastForwardButton"
                             Width="40"
-                            DoubleTapped="UIElement_OnDoubleTapped"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="FastForwardClick"
                             Icon="{fluent:SymbolIcon Symbol=FastForward}"
-                            RightTapped="FastForwardTapped"
-                            Tapped="FastForwardTapped">
+                            RightTapped="FastForwardClick">
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Right" Invoked="FastForwardTapped" />
+                                <KeyboardAccelerator Key="Right" Invoked="FastForwardClick" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                     </CommandBar>
@@ -271,33 +267,42 @@
                             </TextBox.KeyboardAccelerators>
                         </TextBox>
                     </Grid>
-                    <ProgressRing controls:DockPanel.Dock="Left" IsActive="{x:Bind WebView.IsLoading, Mode=OneWay}" />
                     <CommandBar
                         controls:DockPanel.Dock="Left"
                         DefaultLabelPosition="Right"
                         OverflowButtonVisibility="Collapsed">
                         <AppBarButton
+                            x:Uid="/MainPanel/TurnOffDanmakuButton"
+                            Width="40"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="TurnOffDanmakuOnClick"
+                            LabelPosition="Collapsed">
+                            <AppBarButton.Icon>
+                                <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.TurnOffDanmaku, common:Symbol.CommentOff, common:Symbol.Comment), Mode=OneWay}" />
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton
                             x:Uid="/MainPanel/AdvanceDanmakuButton"
                             Width="40"
-                            DoubleTapped="UIElement_OnDoubleTapped"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="AdvanceDanmakuClick"
                             Icon="{fluent:SymbolIcon Symbol=ArrowReply}"
                             LabelPosition="Collapsed"
-                            RightTapped="AdvanceDanmakuTapped"
-                            Tapped="AdvanceDanmakuTapped" />
+                            RightTapped="AdvanceDanmakuClick" />
                         <AppBarButton
                             x:Uid="/MainPanel/SyncDanmakuButton"
-                            DoubleTapped="UIElement_OnDoubleTapped"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="SyncDanmakuClick"
                             Icon="{fluent:SymbolIcon Symbol=ArrowRepeatAll}"
-                            Label="{x:Bind Vm.DanmakuDelayTime.TotalSeconds, Mode=OneWay}"
-                            Tapped="SyncDanmakuTapped" />
+                            Label="{x:Bind Vm.DanmakuDelayTime.TotalSeconds, Mode=OneWay}" />
                         <AppBarButton
                             x:Uid="/MainPanel/DelayDanmakuButton"
                             Width="40"
-                            DoubleTapped="UIElement_OnDoubleTapped"
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="DelayDanmakuClick"
                             Icon="{fluent:SymbolIcon Symbol=ArrowForward}"
                             LabelPosition="Collapsed"
-                            RightTapped="DelayDanmakuTapped"
-                            Tapped="DelayDanmakuTapped" />
+                            RightTapped="DelayDanmakuClick" />
                     </CommandBar>
 
                     <CommandBar
@@ -339,9 +344,9 @@
                                             x:Uid="/MainPanel/MuteButton"
                                             Width="40"
                                             HorizontalAlignment="Center"
+                                            Click="MuteOnClick"
                                             IsTabStop="False"
-                                            LabelPosition="Collapsed"
-                                            Tapped="MuteOnTapped">
+                                            LabelPosition="Collapsed">
                                             <AppBarButton.Icon>
                                                 <fluent:SymbolIcon Symbol="{x:Bind local:C.VolumeSymbolSelector(Vm.Mute, Vm.Volume), Mode=OneWay}" />
                                             </AppBarButton.Icon>
@@ -350,27 +355,27 @@
                                 </Flyout>
                             </AppBarButton.Flyout>
                             <AppBarButton.KeyboardAccelerators>
-                                <KeyboardAccelerator Key="Down" Invoked="VolumeDownTapped" />
-                                <KeyboardAccelerator Key="Up" Invoked="VolumeUpTapped" />
+                                <KeyboardAccelerator Key="Down" Invoked="VolumeDownClick" />
+                                <KeyboardAccelerator Key="Up" Invoked="VolumeUpClick" />
                             </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                         <AppBarButton
                             x:Uid="/MainPanel/SyncButton"
-                            DoubleTapped="UIElement_OnDoubleTapped"
-                            Icon="{fluent:SymbolIcon Symbol=ArrowSync}"
-                            Tapped="LoadSyncOnTapped" />
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="LoadSyncOnClick"
+                            Icon="{fluent:SymbolIcon Symbol=ArrowSync}" />
                         <AppBarButton
                             x:Uid="/MainPanel/LockWebView2Button"
-                            DoubleTapped="UIElement_OnDoubleTapped"
-                            Tapped="LockWebView2OnTapped">
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="LockWebView2OnClick">
                             <AppBarButton.Icon>
                                 <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.LockWebView2, common:Symbol.CursorHoverOff, common:Symbol.CursorHover), Mode=OneWay}" />
                             </AppBarButton.Icon>
                         </AppBarButton>
                         <AppBarButton
                             x:Uid="/MainPanel/FullScreenButton"
-                            DoubleTapped="UIElement_OnDoubleTapped"
-                            Tapped="FullScreenOnTapped">
+                            local:TapHelper.DoubleTappedDisabled="True"
+                            Click="FullScreenOnClick">
                             <AppBarButton.Icon>
                                 <fluent:SymbolIcon Symbol="{x:Bind local:C.SymbolSelector(Vm.FullScreen, common:Symbol.ArrowMinimize, common:Symbol.ArrowMaximize), Mode=OneWay}" />
                             </AppBarButton.Icon>
@@ -394,12 +399,13 @@
                             </AppBarButton.Flyout>
                         </AppBarButton>
                     </CommandBar>
+                    <ProgressRing controls:DockPanel.Dock="Right" IsActive="{x:Bind WebView.IsLoading, Mode=OneWay}" />
                 </controls:DockPanel>
                 <local:VideoSlider
                     Margin="10,0"
                     VerticalAlignment="Center"
                     controls:DockPanel.Dock="Bottom"
-                    DoubleTapped="UIElement_OnDoubleTapped"
+                    local:TapHelper.DoubleTappedDisabled="True"
                     IsTabStop="False"
                     Maximum="{x:Bind Vm.TotalTime.TotalSeconds, Mode=OneWay}"
                     Minimum="0"

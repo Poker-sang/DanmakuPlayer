@@ -1,5 +1,6 @@
 using System;
 using CommunityToolkit.WinUI;
+using DanmakuPlayer.Resources;
 using Microsoft.UI.Xaml;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -40,18 +41,18 @@ public sealed partial class WelcomePage
 
         if (!dataPackageView.Contains("AnsiText") && !dataPackageView.Contains("OEMText"))
         {
-            _backgroundPanel.InfoBarService.Error(WelcomePageResources.IncorrectUrlFormat);
+            _backgroundPanel.InfoBarService.Error(MainPanelResources.IncorrectUrlFormat, Emoticon.Depressed);
             return;
         }
+
         var url = await dataPackageView.GetTextAsync();
 
-        if (string.IsNullOrEmpty(url) || !url.StartsWith("http"))
+        if (string.IsNullOrEmpty(url))
         {
-            _backgroundPanel.InfoBarService.Error(WelcomePageResources.IncorrectUrlFormat);
+            _backgroundPanel.InfoBarService.Error(MainPanelResources.IncorrectUrlFormat, Emoticon.Depressed);
             return;
         }
 
-        _backgroundPanel.Vm.Url = url;
         _backgroundPanel.StatusChanged(nameof(_backgroundPanel.Vm.Url), url);
         await _backgroundPanel.WebView.GotoAsync(url);
     }

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.WinUI;
+using DanmakuPlayer.Resources;
 using Microsoft.Playwright;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -13,7 +15,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Web.WebView2.Core;
 using Windows.Foundation;
-using CommunityToolkit.WinUI;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -162,6 +163,7 @@ public sealed partial class WebView2ForVideo : UserControl
         catch (PlaywrightException)
         {
             // 网址错误不跳转
+            this.FindParent<BackgroundPanel>()?.InfoBarService.Error(MainPanelResources.IncorrectUrlFormat, Emoticon.Depressed);
         }
     }
 
