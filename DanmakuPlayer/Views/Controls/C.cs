@@ -49,7 +49,8 @@ public static class C
     public static Visibility IsMultipleToVisibility(ICollection value) => value.Count < 2 ? Visibility.Collapsed : Visibility.Visible;
 
     public static Visibility IsEmptyToVisibility(ICollection value) => value.Count is 0 ? Visibility.Visible : Visibility.Collapsed;
-    public static Visibility IsEmptyToVisibility(string value) => string.IsNullOrEmpty(value) ? Visibility.Visible : Visibility.Collapsed;
+
+    public static Visibility IsNullOrEmptyToVisibility(string? value) => string.IsNullOrEmpty(value) ? Visibility.Visible : Visibility.Collapsed;
 
     public static string SecondToTime(double sec)
     {

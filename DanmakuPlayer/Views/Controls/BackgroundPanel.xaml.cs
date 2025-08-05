@@ -412,7 +412,7 @@ public sealed partial class BackgroundPanel : Grid
         });
     }
 
-    private void GridOnPointerReleased(object sender, PointerRoutedEventArgs e) => WebView.WebView2PointerReleased(sender, e);
+    private void BackgroundPanelOnPointerPressed(object sender, PointerRoutedEventArgs e) => WebView.WebView2PointerReleased(sender, e);
 
     #endregion
 
