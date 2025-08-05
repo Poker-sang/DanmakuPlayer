@@ -185,6 +185,10 @@ public sealed partial class BackgroundPanel : Grid
 
     private async void ImportTapped(object sender, TappedRoutedEventArgs e)
     {
+        await ImportDanmakuOnline();
+    }
+    public async Task ImportDanmakuOnline()
+    {
         try
         {
             Vm.LoadingDanmaku = true;
@@ -207,6 +211,11 @@ public sealed partial class BackgroundPanel : Grid
     }
 
     private async void FileTapped(object sender, TappedRoutedEventArgs e)
+    {
+        await ImportDanmakuFromFile();
+    }
+
+    public async Task ImportDanmakuFromFile()
     {
         try
         {

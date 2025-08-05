@@ -294,7 +294,7 @@ public partial class BackgroundPanel
         Vm.Volume = volume;
     }
 
-    private void StatusChanged(string name, string value)
+    public void StatusChanged(string name, string value)
     {
         if (!RemoteService.IsCurrentConnected)
             return;

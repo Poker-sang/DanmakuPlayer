@@ -25,6 +25,10 @@
         <RowDefinition Height="4*" />
         <RowDefinition x:Name="BottomRow" Height="*" />
     </Grid.RowDefinitions>
+    <local:WelcomePage
+        Grid.RowSpan="3"
+        Canvas.ZIndex="1"
+        Visibility="{x:Bind local:C.IsEmptyToVisibility(Vm.Url), Mode=OneWay}" />
     <local:WebView2ForVideo
         x:Name="WebView"
         Grid.Row="0"
@@ -58,7 +62,10 @@
             </TransitionCollection>
         </StackPanel.ChildrenTransitions>
     </StackPanel>
-    <local:CollapsibleArea Grid.Row="0" IsActive="{x:Bind Vm.FullScreen, Mode=OneWay}">
+    <local:CollapsibleArea
+        Grid.Row="0"
+        Canvas.ZIndex="2"
+        IsActive="{x:Bind Vm.FullScreen, Mode=OneWay}">
         <Grid>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,0.8">
@@ -175,7 +182,10 @@
             </CommandBar>
         </Grid>
     </local:CollapsibleArea>
-    <local:CollapsibleArea Grid.Row="2" IsActive="{x:Bind Vm.FullScreen, Mode=OneWay}">
+    <local:CollapsibleArea
+        Grid.Row="2"
+        Canvas.ZIndex="2"
+        IsActive="{x:Bind Vm.FullScreen, Mode=OneWay}">
         <Grid>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -406,5 +416,8 @@
     </local:CollapsibleArea>
     <local:SettingsDialog x:Name="DialogSetting" Grid.Row="0" />
     <local:InputDialog x:Name="DialogInput" Grid.Row="0" />
-    <local:RemoteDialog x:Name="DialogRemote" Grid.Row="0" />
+    <local:RemoteDialog
+        x:Name="DialogRemote"
+        Grid.Row="0"
+        x:FieldModifier="public" />
 </Grid>
