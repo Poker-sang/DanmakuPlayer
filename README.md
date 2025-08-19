@@ -10,6 +10,8 @@
 
 * 支持 [bilibili](bilibili.com) xml格式和protobuf直接下载的弹幕文件的透明弹幕播放器
 
+* 支持通过 [远程服务器](https://github.com/zxbmmmmmmmmm/DanmakuPlayer.Server) 与他人远程同乐、共享进度
+
 * UI使用WinUI3框架，上个WPF版本 [链接](https://github.com/Poker-sang/DanmakuPlayerWpf)
 
 * 获取弹幕依赖 [gRPC](https://github.com/grpc/grpc-dotnet) 库
@@ -134,6 +136,8 @@ B站视频[【炮姐/AMV】我永远都会守护在你的身边！](https://www.
 * [x] 优化项目结构
 
 * [x] 逐步加载弹幕以降低占用
+
+* [x] 远程服务器共享进度
 
 * [ ] ⚠️ 正则高亮与错误提示
 
