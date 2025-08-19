@@ -42,11 +42,10 @@ public sealed partial class RemoteDialog : UserControl
         {
             if (RemoteService.IsCurrentConnected)
                 await RemoteService.Current.DisposeAsync();
-            // RoomIdTextBlock.Text
             var client = new RemoteService(ServerTextBlock.Text);
             client.MessageReceived += _backgroundPanel.OnMessageReceived;
             client.Disconnected += Disconnected;
-            await client.ConnectAsync();
+            await client.ConnectAsync(RoomIdTextBlock.Text);
             IsConnected = client.IsConnected;
             AppContext.AppConfig.SyncUrl = ServerTextBlock.Text;
             AppContext.SaveConfiguration(AppContext.AppConfig);

@@ -2,9 +2,7 @@ using System;
 
 namespace DanmakuPlayer.Models.Remote;
 
-public record LoginInfo
-(
+public record LoginInfo(
     string UserName,
     DateTimeOffset Time,
-    CurrentStatus Current
-);
+    CurrentStatus Current);

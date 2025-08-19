@@ -38,9 +38,9 @@ public class RemoteService : IAsyncDisposable
 
     public bool IsConnected => _webSocket?.State is WebSocketState.Open;
 
-    public async Task ConnectAsync(CancellationToken token = default)
+    public async Task ConnectAsync(string roomId, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new($"{_serverUrl}?userName={Environment.UserName}"), token);
+        await _webSocket.ConnectAsync(new($"{_serverUrl}?userName={Environment.UserName}&{nameof(roomId)}={roomId}"), token);
         Connected?.Invoke(this, EventArgs.Empty);
         _ = ReceiveStatusAsync(_cts.Token);
     }
