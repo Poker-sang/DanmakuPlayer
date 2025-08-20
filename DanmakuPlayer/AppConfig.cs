@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using DanmakuPlayer.Resources;
 using WinUI3Utilities.Attributes;
 
@@ -221,7 +223,20 @@ public partial record AppConfig()
     /// </summary>
     /// <remarks>default: []</remarks>
     [AttributeIgnore(typeof(SettingsViewModelAttribute<>))]
-    public string[] RegexPatterns { get; set; } = [];
+    public string[] RegexPatterns
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+            field = value;
+            Regexes = [.. field.Select(p => new Regex(p, RegexOptions.Compiled))];
+        }
+    } = [];
+
+    [AttributeIgnore(typeof(SettingsViewModelAttribute<>), typeof(GenerateConstructorAttribute), typeof(AppContextAttribute<>))]
+    public IReadOnlyList<Regex> Regexes { get; private set; } = [];
 
     #endregion
 
@@ -254,7 +269,8 @@ public partial record AppConfig()
     /// <summary>
     /// 同步服务器地址
     /// </summary>
-    public string SyncUrl { get; set; } = string.Empty;
+    /// <remarks>default: ""</remarks>
+    public string SyncUrl { get; set; } = "";
 
     #endregion
 }
