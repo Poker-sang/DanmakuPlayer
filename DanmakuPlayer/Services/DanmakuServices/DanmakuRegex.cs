@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DanmakuPlayer.Models;
@@ -8,10 +9,17 @@ namespace DanmakuPlayer.Services.DanmakuServices;
 
 public static class DanmakuRegex
 {
-    public static async Task<IEnumerable<Danmaku>> MatchAsync(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    public static async IAsyncEnumerable<Danmaku> MatchAsync(IAsyncEnumerable<Danmaku> pool, AppConfig appConfig, [EnumeratorCancellation] CancellationToken token)
     {
-        return !appConfig.DanmakuEnableRegex
-            ? pool
-            : await Task.Run(() => appConfig.Regexes.Aggregate(pool, (current, pattern) => current.Where(d => !pattern.IsMatch(d.Text))), token);
+        if (!appConfig.DanmakuEnableRegex)
+        {
+            await foreach (var danmaku in pool.WithCancellation(token))
+                yield return danmaku;
+            yield break;
+        }
+
+        await foreach (var danmaku in pool.WithCancellation(token))
+            if (!appConfig.Regexes.Any(regex => regex.IsMatch(danmaku.Text)))
+                yield return danmaku;
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
+using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services.DanmakuServices;
 
@@ -18,7 +20,7 @@ public static class DanmakuHelper
     /// <summary>
     /// 弹幕池
     /// </summary>
-    public static Danmaku[] Pool { get; set; } = [];
+    public static IReadOnlyList<Danmaku> Pool { get; set; } = [];
 
     public static CreatorProvider Current { get; set; } = null!;
 
@@ -103,21 +105,27 @@ public static class DanmakuHelper
             await Task.Delay(500, token);
     }
 
-    public static Danmaku[] DisplayingDanmaku(int timeMs, AppConfig appConfig, TempConfig tempConfig)
+    public static IReadOnlyList<Danmaku> DisplayingDanmaku(int timeMs, AppConfig appConfig, TempConfig tempConfig)
     {
+        if (Pool is [])
+            return [];
+
         var duration = tempConfig.UsePlaybackRate3 ? appConfig.DanmakuDuration / 3 : appConfig.DanmakuDuration;
         var playbackRate = tempConfig.UsePlaybackRate3 ? 3 : appConfig.PlaybackRate;
         var actualDurationMs = (int) (Math.Max(10, duration) * playbackRate * 1000);
 
-        var firstIndex = Array.FindIndex(Pool, t => t.TimeMs > timeMs - actualDurationMs);
+        if (Pool is not List<Danmaku> list)
+            return ThrowHelper.NotSupported<Danmaku[]>(nameof(Pool));
+
+        var firstIndex = list.FindIndex(t => t.TimeMs > timeMs - actualDurationMs);
         if (firstIndex is -1)
             return [];
-        var lastIndex = Array.FindLastIndex(Pool, t => t.TimeMs <= timeMs);
+        var lastIndex = list.FindLastIndex(t => t.TimeMs <= timeMs);
 #pragma warning disable IDE0046 // 转换为条件表达式
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (lastIndex < firstIndex)
             return [];
-        return Pool[firstIndex..(lastIndex + 1)];
+        return list[firstIndex..(lastIndex + 1)];
 #pragma warning restore IDE0046 // 转换为条件表达式
     }
 }

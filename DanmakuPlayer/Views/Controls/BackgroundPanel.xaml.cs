@@ -123,7 +123,7 @@ public sealed partial class BackgroundPanel
 
     private void RootSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (DanmakuHelper.Pool.Length is 0)
+        if (DanmakuHelper.Pool.Count is 0)
             return;
 
         ReloadDanmaku(RenderMode.ReloadProvider);

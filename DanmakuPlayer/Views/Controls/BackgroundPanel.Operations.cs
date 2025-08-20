@@ -99,8 +99,8 @@ public partial class BackgroundPanel
     /// <summary>
     /// 加载弹幕操作
     /// </summary>
-    /// <param name="action"></param>
-    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<IReadOnlyCollection<Danmaku>>> action)
+    /// <param name="getDanmakuAsync"></param>
+    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<IReadOnlyList<Danmaku>>> getDanmakuAsync)
     {
         Vm.TempConfig.IsPlaying = false;
 
@@ -118,22 +118,24 @@ public partial class BackgroundPanel
 
         try
         {
-            var tempPool = await action(_cancellationTokenSource.Token);
+            var tempPool = await getDanmakuAsync(_cancellationTokenSource.Token);
+
+            if (!HasVideo)
+                Vm.TotalTime = TimeSpan.FromMilliseconds((tempPool.Count is 0 ? 0 : tempPool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
             InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
-            DanmakuHelper.Pool = [.. await _filter.FiltrateAsync(tempPool, Vm.AppConfig, _cancellationTokenSource.Token)];
-            var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Length * 100 / tempPool.Count;
+            DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool.ToAsyncEnumerable(), Vm.AppConfig, _cancellationTokenSource.Token).ToListAsync();
 
-            InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Length, filtrateRate), Emoticon.Okay);
+            var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Count * 100 / tempPool.Count;
+
+            InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Count, filtrateRate), Emoticon.Okay);
 
             var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
-            var renderRate = DanmakuHelper.Pool.Length is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Length;
+            var renderRate = DanmakuHelper.Pool.Count is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Count;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
-            if (!HasVideo)
-                Vm.TotalTime = TimeSpan.FromMilliseconds((DanmakuHelper.Pool.Length is 0 ? 0 : DanmakuHelper.Pool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
-            InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Length, filtrateRate, renderRate, totalRate), Emoticon.Okay);
+            InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Count, filtrateRate, renderRate, totalRate), Emoticon.Okay);
         }
         catch (TaskCanceledException)
         {
@@ -150,7 +152,7 @@ public partial class BackgroundPanel
 
     public async void ReloadDanmaku(RenderMode renderType)
     {
-        if (DanmakuHelper.Pool.Length is 0)
+        if (DanmakuHelper.Pool.Count is 0)
             return;
 
         Vm.TempConfig.IsPlaying = false;

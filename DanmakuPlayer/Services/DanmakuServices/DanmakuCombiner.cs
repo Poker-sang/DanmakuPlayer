@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -121,94 +123,127 @@ public static class DanmakuCombiner
         return false;
     }
 
-    public static async Task<IEnumerable<Danmaku>> CombineAsync(IEnumerable<Danmaku> pool, AppConfig appConfig, CancellationToken token)
+    public static async IAsyncEnumerable<Danmaku> CombineAsync(
+        IAsyncEnumerable<Danmaku> pool,
+        AppConfig appConfig,
+        [EnumeratorCancellation] CancellationToken token)
     {
-        return !appConfig.DanmakuEnableMerge
-            ? pool
-            : await Task.Run(() =>
+        if (!appConfig.DanmakuEnableMerge)
+        {
+            await foreach (var danmaku in pool.WithCancellation(token))
+                yield return danmaku;
+            yield break;
+        }
+
+        var channel = Channel.CreateUnbounded<Danmaku>();
+        var task = Task.Run(async () =>
+        {
+            var timeSpan = appConfig.DanmakuMergeTimeSpan * 1000;
+            // 当前正在合并的弹幕
+            var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
+            // 弹幕池中合并后的弹幕
+            var outDanmaku = new SortedSet<Danmaku>(_DanmakuComparer);
+
+            await foreach (var danmaku in pool.WithCancellation(token))
             {
-                var danmakuChunk = new Queue<(DanmakuString Str, List<Danmaku> Peers)>();
-                var outDanmaku = new List<List<Danmaku>>();
-                var ret = new List<Danmaku>();
-
-                foreach (var danmaku in pool)
-                    if (danmaku is
-                        {
-                            Pool: DanmakuPool.Normal,
-                            Mode: DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom
-                        })
+                if (danmaku is not
                     {
-                        var text = danmaku.Text;
-
-                        if (text is "")
-                            continue;
-
-                        for (var i = 0; i < FullAngleChars.Length; ++i)
-                            text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
-
-                        var pinyin = "";
-                        foreach (var c in danmaku.Text)
-                            if (ChineseChar.IsValidChar(c))
-                                pinyin += new ChineseChar(c).Pinyins[0];
-                            else
-                                pinyin += c;
-
-                        var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
-                        while (danmakuChunk.Count > 0 &&
-                               danmaku.TimeMs - danmakuChunk.Peek().Peers[0].TimeMs > appConfig.DanmakuMergeTimeSpan * 1000)
-                            outDanmaku.Add(danmakuChunk.Dequeue().Peers);
-
-                        var addNew = true;
-                        foreach (var (_, peers) in danmakuChunk
-                                     .Where(chunk => appConfig.DanmakuMergeCrossMode || danmaku.Mode == chunk.Peers[0].Mode)
-                                     .Where(chunk => Similarity(str, chunk.Str, appConfig)))
-                        {
-                            peers.Add(danmaku);
-                            addNew = false;
-                            break;
-                        }
-
-                        if (addNew)
-                            danmakuChunk.Enqueue((str, [danmaku]));
-                    }
-                    else
-                        ret.Add(danmaku);
-
-                while (danmakuChunk.Count > 0)
-                    outDanmaku.Add(danmakuChunk.Dequeue().Peers);
-
-                foreach (var peers in outDanmaku)
+                        Pool: DanmakuPool.Normal,
+                        Mode: DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom
+                    })
                 {
-                    if (peers.Count is 1)
-                    {
-                        ret.Add(peers[0]);
-                        continue;
-                    }
-
-                    var mode = DanmakuMode.Bottom;
-                    foreach (var danmaku in peers)
-                        switch (danmaku.Mode)
-                        {
-                            case DanmakuMode.Roll:
-                            case DanmakuMode.Top when mode is DanmakuMode.Bottom:
-                                mode = danmaku.Mode;
-                                break;
-                        }
-
-                    var represent = new Danmaku(
-                        (peers.Count > 4 ? $"₍{ToSubscript((uint)peers.Count)}₎" : "") + peers[0].Text,
-                        0,
-                        (int) peers.Average(t => t.TimeMs),
-                        mode,
-                        (int)(25 * (peers.Count <= 5 ? 1 : Math.Log(peers.Count, 5))),
-                        (uint)peers.Average(t => t.Color)
-                    );
-                    ret.Add(represent);
+                    outDanmaku.Add(danmaku);
+                    continue;
                 }
 
-                ret.Sort((d1, d2) => d1.TimeMs.CompareTo(d2.TimeMs));
-                return ret;
-            }, token);
+                var text = danmaku.Text;
+
+                if (text is "")
+                    continue;
+
+                var currentTime = danmaku.TimeMs;
+
+                while (danmakuChunk.Count > 0 &&
+                       currentTime - danmakuChunk.Peek().Peers[0].TimeMs > timeSpan)
+                    outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
+
+                while (outDanmaku.Min is { } oldestDanmaku &&
+                       currentTime - oldestDanmaku.TimeMs > timeSpan)
+                {
+                    _ = outDanmaku.Remove(oldestDanmaku);
+                    _ = channel.Writer.TryWrite(oldestDanmaku);
+                }
+
+                for (var i = 0; i < FullAngleChars.Length; ++i)
+                    text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
+
+                var pinyin = "";
+                foreach (var c in danmaku.Text)
+                    if (ChineseChar.IsValidChar(c))
+                        pinyin += new ChineseChar(c).Pinyins[0];
+                    else
+                        pinyin += c;
+
+                var str = new DanmakuString(text, text.Length, pinyin, Gen2GramArray(text));
+
+                var addNew = true;
+                foreach (var (_, peers) in danmakuChunk
+                             .Where(chunk =>
+                                 appConfig.DanmakuMergeCrossMode || danmaku.Mode == chunk.Peers[0].Mode)
+                             .Where(chunk => Similarity(str, chunk.Str, appConfig)))
+                {
+                    peers.Add(danmaku);
+                    addNew = false;
+                    break;
+                }
+
+                if (addNew)
+                    danmakuChunk.Enqueue((str, [danmaku]));
+            }
+
+            while (danmakuChunk.Count > 0)
+                outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
+
+            while (outDanmaku.Min is { } oldestDanmaku)
+            {
+                _ = outDanmaku.Remove(oldestDanmaku);
+                _ = channel.Writer.TryWrite(oldestDanmaku);
+            }
+
+            _ = channel.Writer.TryComplete();
+        }, token);
+
+        await foreach (var danmaku in channel.Reader.ReadAllAsync(token))
+            yield return danmaku;
+        await task;
+    }
+
+    private static readonly Comparer<Danmaku> _DanmakuComparer = Comparer<Danmaku>.Create((x, y) => x.TimeMs.CompareTo(y.TimeMs));
+
+    private static Danmaku Compress(IReadOnlyList<Danmaku> danmakuList)
+    {
+        if (danmakuList is [{ } first])
+            return first;
+
+        var mode = DanmakuMode.Bottom;
+        foreach (var danmaku in danmakuList)
+            switch (danmaku.Mode)
+            {
+                case DanmakuMode.Roll:
+                case DanmakuMode.Top when mode is DanmakuMode.Bottom:
+                    mode = danmaku.Mode;
+                    break;
+            }
+
+        var represent = new Danmaku(
+            (danmakuList.Count > 4 ? $"₍{ToSubscript((uint) danmakuList.Count)}₎" : "") + danmakuList[0].Text,
+            0,
+            (int) danmakuList.Average(t => t.TimeMs),
+            mode,
+            (int) (25 * (danmakuList.Count <= 5 ? 1 : Math.Log(danmakuList.Count, 5))),
+            (uint) danmakuList.Average(t => t.Color)
+        );
+        return represent;
     }
 
     private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
