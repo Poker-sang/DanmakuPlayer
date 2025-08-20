@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Models;
@@ -46,7 +47,7 @@ public static partial class BiliHelper
     public static unsafe string Av2Bv(long av)
     {
         if (av is < MinAid or > MaxAid)
-            throw new InvalidDataException("av must be in range [1, 2251799813685248]");
+            throw new InvalidDataException($"av must be in range [{MinAid}, {MaxAid}]");
         var data = (MaxAid | av) ^ Xor;
         Span<byte> arr = stackalloc byte[BvLen];
         arr[0] = (byte)'B';
@@ -81,22 +82,34 @@ public static partial class BiliHelper
 
     private static bool CheckSuccess(JsonDocument jd) => jd.RootElement.GetProperty("code").GetInt32() is 0;
 
-    private static async Task<IEnumerable<VideoPage>?> GetCIdsAsync(Task<JsonDocument> jd)
+    private static async Task<IReadOnlyList<VideoPage>?> GetCIdsAsync(Task<JsonDocument> jd)
     {
         var response = await jd;
         return CheckSuccess(response)
-            ? response.RootElement.GetProperty("data")
-                .EnumerateArray()
-                .Select(episode => new VideoPage(
-                    episode.GetProperty("cid").GetUInt64(),
-                    episode.GetProperty("page").GetInt32().ToString(),
-                    episode.GetProperty("part").GetString()!))
+            ?
+            [
+                ..response.RootElement.GetProperty("data")
+                    .EnumerateArray()
+                    .Select(episode => new VideoPage(
+                        episode.GetProperty("cid").GetUInt64(),
+                        episode.GetProperty("page").GetInt32().ToString(),
+                        episode.GetProperty("part").GetString()!))
+            ]
             : null;
     }
 
     public static async Task<IEnumerable<VideoPage>?> String2CIdsAsync(string uri, CancellationToken token)
     {
         var codeType = uri.Match(out var match);
+        var p = -1;
+        if (Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var result))
+        {
+            var queries = HttpUtility.ParseQueryString(result.Query);
+            if (queries["p"] is { } pStr && int.TryParse(pStr, out p))
+                --p;
+            else
+                p = 0;
+        }
         var code = 0ul;
         if (codeType is not CodeType.BvId and not CodeType.Error)
             code = ulong.Parse(match);
@@ -105,9 +118,15 @@ public static partial class BiliHelper
             case CodeType.Error:
                 return null;
             case CodeType.AvId:
-                return await Av2CIdsAsync(code, token);
+            {
+                var pages = await Av2CIdsAsync(code, token);
+                return pages is null || p is -1 || p > pages.Count ? pages : [pages[p]];
+            }
             case CodeType.BvId:
-                return await Bv2CIdsAsync(match, token);
+            {
+                var pages = await Bv2CIdsAsync(match, token);
+                return pages is null || p is -1 || p > pages.Count ? pages : [pages[p]];
+            }
             case CodeType.CId:
                 return [new(code, "1", "")];
             case CodeType.MediaId:
@@ -129,9 +148,9 @@ public static partial class BiliHelper
         }
     }
 
-    public static Task<IEnumerable<VideoPage>?> Av2CIdsAsync(ulong av, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(av, token));
+    public static Task<IReadOnlyList<VideoPage>?> Av2CIdsAsync(ulong av, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(av, token));
 
-    public static Task<IEnumerable<VideoPage>?> Bv2CIdsAsync(string bv, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(bv, token));
+    public static Task<IReadOnlyList<VideoPage>?> Bv2CIdsAsync(string bv, CancellationToken token) => GetCIdsAsync(BiliApis.GetVideoPageListAsync(bv, token));
 
     public static async Task<VideoPage?> Ep2CIdAsync(ulong episodeId, CancellationToken token)
     {
