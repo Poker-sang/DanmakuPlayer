@@ -21,7 +21,6 @@ namespace DanmakuPlayer.Views.Controls;
 
 public partial class BackgroundPanel
 {
-    private readonly DanmakuFilter _filter = [DanmakuCombiner.CombineAsync, DanmakuRegex.MatchAsync];
     private CancellationTokenSource _cancellationTokenSource = new();
     private DateTime _lastTime;
     private bool _isRightPressing;
@@ -125,7 +124,7 @@ public partial class BackgroundPanel
 
             InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
-            DanmakuHelper.Pool = await _filter.FiltrateAsync(tempPool.ToAsyncEnumerable(), Vm.AppConfig, _cancellationTokenSource.Token).ToListAsync();
+            DanmakuHelper.Pool = await tempPool.ToAsyncEnumerable().FiltrateAsync(Vm.AppConfig, _cancellationTokenSource.Token).ToListAsync();
 
             var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Count * 100 / tempPool.Count;
 

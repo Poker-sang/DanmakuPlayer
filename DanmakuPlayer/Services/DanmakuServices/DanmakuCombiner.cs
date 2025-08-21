@@ -11,8 +11,12 @@ using Microsoft.International.Converters.PinYinConverter;
 
 namespace DanmakuPlayer.Services.DanmakuServices;
 
-public static class DanmakuCombiner
+public class DanmakuCombiner : IDanmakuFilter
 {
+    public static IDanmakuFilter Instance { get; } = new DanmakuCombiner();
+
+    public bool IsEnabled(AppConfig appConfig) => appConfig.DanmakuEnableMerge;
+
     /// <summary>
     /// 全角字符和部分英文标点
     /// </summary>
@@ -123,18 +127,11 @@ public static class DanmakuCombiner
         return false;
     }
 
-    public static async IAsyncEnumerable<Danmaku> CombineAsync(
+    public async IAsyncEnumerable<Danmaku> FiltrateCoreAsync(
         IAsyncEnumerable<Danmaku> pool,
         AppConfig appConfig,
         [EnumeratorCancellation] CancellationToken token)
     {
-        if (!appConfig.DanmakuEnableMerge)
-        {
-            await foreach (var danmaku in pool.WithCancellation(token))
-                yield return danmaku;
-            yield break;
-        }
-
         var channel = Channel.CreateUnbounded<Danmaku>();
         var task = Task.Run(async () =>
         {
@@ -152,7 +149,7 @@ public static class DanmakuCombiner
                         Mode: DanmakuMode.Roll or DanmakuMode.Top or DanmakuMode.Bottom
                     })
                 {
-                    outDanmaku.Add(danmaku);
+                    _ = outDanmaku.Add(danmaku);
                     continue;
                 }
 
@@ -165,7 +162,7 @@ public static class DanmakuCombiner
 
                 while (danmakuChunk.Count > 0 &&
                        currentTime - danmakuChunk.Peek().Peers[0].TimeMs > timeSpan)
-                    outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
+                    _ = outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
 
                 while (outDanmaku.Min is { } oldestDanmaku &&
                        currentTime - oldestDanmaku.TimeMs > timeSpan)
@@ -202,7 +199,7 @@ public static class DanmakuCombiner
             }
 
             while (danmakuChunk.Count > 0)
-                outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
+                _ = outDanmaku.Add(Compress(danmakuChunk.Dequeue().Peers));
 
             while (outDanmaku.Min is { } oldestDanmaku)
             {
