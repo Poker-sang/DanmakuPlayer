@@ -64,9 +64,8 @@
             <Grid Grid.Row="2" ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button
                     x:Name="RefreshRooms"
@@ -82,13 +81,8 @@
                     HorizontalAlignment="Stretch"
                     Click="CreateRoom_OnClick" />
                 <Button
-                    x:Uid="/RemoteDialog/JoinRoomButton"
-                    Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    Click="JoinRoom_OnClick" />
-                <Button
                     x:Uid="/RemoteDialog/DisconnectButton"
-                    Grid.Column="3"
+                    Grid.Column="2"
                     HorizontalAlignment="Stretch"
                     Click="Disconnect_OnClick"
                     IsEnabled="{x:Bind IsConnected, Mode=OneWay}" />

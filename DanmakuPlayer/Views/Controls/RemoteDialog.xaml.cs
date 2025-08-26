@@ -72,11 +72,6 @@ public sealed partial class RemoteDialog : UserControl
             ProgressRing.IsActive = false;
         }
     }
-
-    private async void JoinRoom_OnClick(object sender, RoutedEventArgs e)
-    {
-    }
-
     private async void Disconnect_OnClick(object sender, RoutedEventArgs e)
     {
         ProgressRing.IsActive = true;
