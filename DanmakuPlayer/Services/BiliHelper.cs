@@ -68,7 +68,7 @@ public static partial class BiliHelper
     public static long Bv2Av(string bv)
     {
         Span<byte> arr = stackalloc byte[BvLen - 3];
-        _ = Encoding.ASCII.GetBytes(bv.ToCharArray(3, BvLen - 3), arr);
+        _ = Encoding.ASCII.GetBytes(bv.AsSpan(3, BvLen - 3), arr);
         Swap(arr, 0, 6);
         Swap(arr, 1, 4);
         long avData = 0;

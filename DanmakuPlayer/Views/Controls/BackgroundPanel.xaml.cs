@@ -308,8 +308,7 @@ public sealed partial class BackgroundPanel
             {
                 var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
                 DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
-                InfoBarService.Info(string.Format(MainPanelResources.RemoteUserExit, info.UserName),
-                    Emoticon.Depressed);
+                InfoBarService.Info(string.Format(MainPanelResources.RemoteUserExit, info.UserName), Emoticon.Depressed);
                 break;
             }
             case MessageTypes.StatusUpdate:

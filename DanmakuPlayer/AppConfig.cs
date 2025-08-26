@@ -270,7 +270,7 @@ public partial record AppConfig()
     /// 同步服务器地址
     /// </summary>
     /// <remarks>default: ""</remarks>
-    public string SyncUrl { get; set; } = "";
+    public string ServerUrl { get; set; } = "";
 
     #endregion
 }

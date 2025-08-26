@@ -2,8 +2,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -17,7 +15,7 @@ public class RemoteService : IAsyncDisposable
     public RemoteService(string serverUrl)
     {
         Current = this;
-        _serverUrl = serverUrl;
+        _serverUrl = new Uri(serverUrl);
     }
 
     [MemberNotNullWhen(true, nameof(Current))]
@@ -31,7 +29,7 @@ public class RemoteService : IAsyncDisposable
 
     private readonly CancellationTokenSource _cts = new();
 
-    private readonly string _serverUrl;
+    private readonly Uri _serverUrl;
 
     public event EventHandler? Connected;
 
@@ -41,23 +39,22 @@ public class RemoteService : IAsyncDisposable
 
     public bool IsConnected => _webSocket?.State is WebSocketState.Open;
 
-    public async Task<List<RoomInfo>?> GetRoomsAsync()
+    public async Task<IList<RoomInfo>> GetRoomsAsync(CancellationToken token = default)
     {
-        using var httpClient = new HttpClient();
-        var rooms = await httpClient.GetFromJsonAsync<List<RoomInfo>>(new Uri($"{_serverUrl}/rooms"));
-        return rooms;
+        var rooms = await new Uri(_serverUrl, "rooms").DownloadStreamAsync(token);
+        return (IList<RoomInfo>) (await JsonSerializer.DeserializeAsync(rooms, typeof(IList<RoomInfo>), RemoteSerializerContext.Default, token))!;
     }
 
     public async Task CreateRoomAsync(string roomName, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new($"{_serverUrl}/create?roomName={roomName}&userName={Environment.UserName}"), token);
+        await _webSocket.ConnectAsync(new(_serverUrl, $"create?roomName={roomName}&userName={Environment.UserName}"), token);
         Connected?.Invoke(this, EventArgs.Empty);
         _ = ReceiveStatusAsync(_cts.Token);
     }
 
     public async Task ConnectAsync(string roomId, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new($"{_serverUrl}/{roomId}/join?userName={Environment.UserName}"),token);
+        await _webSocket.ConnectAsync(new(_serverUrl, $"{roomId}/join?userName={Environment.UserName}"), token);
         Connected?.Invoke(this, EventArgs.Empty);
         _ = ReceiveStatusAsync(_cts.Token);
     }
@@ -97,7 +94,7 @@ public class RemoteService : IAsyncDisposable
         if (!IsConnected)
             return;
 
-        var buffer = JsonSerializer.SerializeToUtf8Bytes(status);
+        var buffer = JsonSerializer.SerializeToUtf8Bytes(status, typeof(RemoteStatus), RemoteSerializerContext.Default);
         await _webSocket.SendAsync(
             buffer,
             WebSocketMessageType.Text,
@@ -118,9 +115,10 @@ public class RemoteService : IAsyncDisposable
                 if (result.MessageType is WebSocketMessageType.Close)
                     return;
 
-                var status = JsonSerializer.Deserialize<Message>(new ReadOnlySpan<byte>(buffer, 0, result.Count));
+                var status = (Message) JsonSerializer.Deserialize(new ReadOnlySpan<byte>(buffer, 0, result.Count),
+                    typeof(Message), RemoteSerializerContext.Default)!;
 
-                MessageReceived?.Invoke(this, status!);
+                MessageReceived?.Invoke(this, status);
             }
         }
         catch (WebSocketException ex)

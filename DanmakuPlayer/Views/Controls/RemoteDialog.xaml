@@ -5,8 +5,8 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:fluent="using:FluentIcons.WinUI"
+    xmlns:local="using:DanmakuPlayer.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:DanmakuPlayer.Models"
     xmlns:remote="using:DanmakuPlayer.Models.Remote"
     mc:Ignorable="d">
     <ContentDialog x:Uid="/RemoteDialog/RemoteDialog" DefaultButton="Close">
@@ -37,20 +37,26 @@
                 SelectionMode="None">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="remote:RoomInfo">
-                        <Grid Padding="4,12">
-                            <StackPanel Spacing="8">
+                        <Grid Padding="4,12" RowSpacing="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="{x:Bind Name}" />
+                            <StackPanel
+                                Grid.Row="1"
+                                Orientation="Horizontal"
+                                Spacing="4">
+                                <fluent:FluentIcon Icon="People" Visibility="{x:Bind local:C.ToVisibilityNegation(IsDefault)}" />
+                                <TextBlock Text="{x:Bind Users.Count}" Visibility="{x:Bind local:C.ToVisibilityNegation(IsDefault)}" />
                                 <TextBlock
-                                    FontSize="16"
-                                    FontWeight="SemiBold"
-                                    Text="{x:Bind Name}" />
-                                <StackPanel Orientation="Horizontal">
-                                    <fluent:FluentIcon Icon="People" />
-                                    <TextBlock Margin="4,0,0,0" Text="{x:Bind Users.Count}" />
-                                    <TextBlock
-                                        Margin="8,0,0,0"
-                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                        Text="{x:Bind CreatedAt.DateTime.ToShortTimeString()}" />
-                                </StackPanel>
+                                    Margin="4,0"
+                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                    Text="{x:Bind CreatedAt.DateTime.ToShortTimeString()}" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -63,26 +69,17 @@
             </ListView>
             <Grid Grid.Row="2" ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button
-                    x:Name="RefreshRooms"
-                    Grid.Row="0"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Click="RefreshRooms_Click">
-                    <fluent:FluentIcon Icon="ArrowSync" />
-                </Button>
-                <Button
-                    x:Uid="/RemoteDialog/CreateRoomButton"
-                    Grid.Column="1"
+                    x:Uid="/RemoteDialog/RefreshButton"
+                    Grid.Column="0"
                     HorizontalAlignment="Stretch"
-                    Click="CreateRoom_OnClick" />
+                    Click="RefreshRooms_Click" />
                 <Button
                     x:Uid="/RemoteDialog/DisconnectButton"
-                    Grid.Column="2"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="Disconnect_OnClick"
                     IsEnabled="{x:Bind IsConnected, Mode=OneWay}" />

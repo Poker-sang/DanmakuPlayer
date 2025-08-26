@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -59,7 +60,19 @@ public static class HttpClientHelper
         return Client.InitializeHeader(header).GetStringAsync(uri, token);
     }
 
+    public static Task<string> DownloadStringAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
+    {
+        Debug.WriteLine("Requesting uri: " + uri);
+        return Client.InitializeHeader(header).GetStringAsync(uri, token);
+    }
+
     public static Task<Stream> DownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
+    {
+        Debug.WriteLine("Requesting uri: " + uri);
+        return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+    }
+
+    public static Task<Stream> DownloadStreamAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
         return Client.InitializeHeader(header).GetStreamAsync(uri, token);
