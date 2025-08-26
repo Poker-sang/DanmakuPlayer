@@ -1,6 +1,9 @@
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -38,9 +41,23 @@ public class RemoteService : IAsyncDisposable
 
     public bool IsConnected => _webSocket?.State is WebSocketState.Open;
 
+    public async Task<List<RoomInfo>?> GetRoomsAsync()
+    {
+        using var httpClient = new HttpClient();
+        var rooms = await httpClient.GetFromJsonAsync<List<RoomInfo>>(new Uri($"{_serverUrl}/rooms"));
+        return rooms;
+    }
+
+    public async Task CreateRoomAsync(string roomName, CancellationToken token = default)
+    {
+        await _webSocket.ConnectAsync(new($"{_serverUrl}/create?roomName={roomName}&userName={Environment.UserName}"), token);
+        Connected?.Invoke(this, EventArgs.Empty);
+        _ = ReceiveStatusAsync(_cts.Token);
+    }
+
     public async Task ConnectAsync(string roomId, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new($"{_serverUrl}?userName={Environment.UserName}&{nameof(roomId)}={roomId}"), token);
+        await _webSocket.ConnectAsync(new($"{_serverUrl}/{roomId}/join?userName={Environment.UserName}"),token);
         Connected?.Invoke(this, EventArgs.Empty);
         _ = ReceiveStatusAsync(_cts.Token);
     }
@@ -72,6 +89,7 @@ public class RemoteService : IAsyncDisposable
                 _webSocket.Dispose();
             }
         }
+        Current = null;
     }
 
     public async Task SendStatusAsync(RemoteStatus status, CancellationToken token = default)
