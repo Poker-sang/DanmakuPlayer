@@ -2,6 +2,7 @@
     x:Class="DanmakuPlayer.Views.Controls.RemoteDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:fluent="using:FluentIcons.WinUI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,36 +20,24 @@
             </StackPanel>
         </ContentDialog.Title>
         <Grid RowSpacing="8">
-
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <TextBox
                 x:Name="ServerTextBlock"
                 x:Uid="/RemoteDialog/ServerTextBlock"
                 Grid.Row="0" />
-            <Button
-                x:Name="RefreshRooms"
-                Grid.Row="2"
-                Background="Transparent"
-                BorderBrush="Transparent"
-                Click="RefreshRooms_Click">
-                <fluent:FluentIcon Icon="ArrowSync" />
-            </Button>
-            <GridView
-                Grid.Row="3"
+            <ListView
+                Grid.Row="1"
                 IsItemClickEnabled="True"
                 ItemClick="GridView_ItemClick"
                 ItemsSource="{x:Bind Rooms, Mode=OneWay}"
                 SelectionMode="None">
-                <GridView.ItemTemplate>
+                <ListView.ItemTemplate>
                     <DataTemplate x:DataType="remote:RoomInfo">
-                        <Grid Padding="12">
+                        <Grid Padding="4,12">
                             <StackPanel Spacing="8">
                                 <TextBlock
                                     FontSize="16"
@@ -65,27 +54,41 @@
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
-                </GridView.ItemTemplate>
-            </GridView>
-            <Grid Grid.Row="4" ColumnSpacing="8">
+                </ListView.ItemTemplate>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <controls:UniformGrid RowSpacing="12" Rows="1" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+            </ListView>
+            <Grid Grid.Row="2" ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button
+                    x:Name="RefreshRooms"
+                    Grid.Row="0"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="RefreshRooms_Click">
+                    <fluent:FluentIcon Icon="ArrowSync" />
+                </Button>
+                <Button
                     x:Uid="/RemoteDialog/CreateRoomButton"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="CreateRoom_OnClick" />
                 <Button
                     x:Uid="/RemoteDialog/JoinRoomButton"
-                    Grid.Column="1"
+                    Grid.Column="2"
                     HorizontalAlignment="Stretch"
                     Click="JoinRoom_OnClick" />
                 <Button
                     x:Uid="/RemoteDialog/DisconnectButton"
-                    Grid.Column="2"
+                    Grid.Column="3"
                     HorizontalAlignment="Stretch"
                     Click="Disconnect_OnClick"
                     IsEnabled="{x:Bind IsConnected, Mode=OneWay}" />
