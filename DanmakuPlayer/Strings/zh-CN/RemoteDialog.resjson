@@ -4,6 +4,7 @@
   "ServerTextBlock/PlaceholderText": "服务器地址",
   "RefreshButton/Content": "刷新房间列表",
   "DisconnectButton/Content": "断开连接",
+  "CreateRoomTextBlock/Text": "创建房间",
   "CreateRoomNameFormatted": "作为主机创建 {0} 的房间",
   "RoomDefaultNameFormatted": "{0} 的房间"
 }

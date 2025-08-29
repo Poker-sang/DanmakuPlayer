@@ -74,15 +74,7 @@ public sealed partial class RemoteDialog : UserControl
 
     private async void GridView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (RemoteService.Current is { IsConnected: true })
-            return;
 
-        var room = (RoomInfo)e.ClickedItem;
-        if (room.IsDefault)
-            await CreateRoomAsync(string.Format(RemoteDialogResources.RoomDefaultNameFormatted, Environment.UserName));
-        else
-            await JoinRoomAsync(room.Id);
-        await RefreshRoomsAsync();
     }
 
     private async Task RefreshRoomsAsync()
@@ -168,5 +160,34 @@ public sealed partial class RemoteDialog : UserControl
     {
         AppContext.AppConfig.ServerUrl = serverUrl;
         AppContext.SaveConfiguration(AppContext.AppConfig);
+    }
+
+    private async void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args)
+    {
+        if (RemoteService.Current is { IsConnected: true })
+            return;
+
+        var room = (RoomInfo) args.InvokedItem;
+        if (room.IsDefault)
+            await CreateRoomAsync(string.Format(RemoteDialogResources.RoomDefaultNameFormatted, Environment.UserName));
+        else
+            await JoinRoomAsync(room.Id);
+        await RefreshRoomsAsync();
+    }
+}
+
+internal class RoomInfoDataTemplateSelector : DataTemplateSelector
+{
+    public DataTemplate? Normal { get; set; }
+    public DataTemplate? New { get; set; }
+
+    protected override DataTemplate? SelectTemplateCore(object item)
+    {
+        return item is RoomInfo { IsDefault : true } ? New : Normal;
+    }
+
+    protected override DataTemplate? SelectTemplateCore(object item, DependencyObject container)
+    {
+        return item is RoomInfo { IsDefault: true } ? New : Normal;
     }
 }
