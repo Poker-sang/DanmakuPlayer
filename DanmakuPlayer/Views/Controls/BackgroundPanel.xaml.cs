@@ -299,21 +299,21 @@ public sealed partial class BackgroundPanel
         {
             case MessageTypes.Login:
             {
-                var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
+                var info = (LoginInfo) JsonSerializer.Deserialize(message.Data, typeof(LoginInfo), RemoteSerializerContext.Default)!;
                 DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
                 InfoBarService.Info(string.Format(MainPanelResources.RemoteUserLogin, info.UserName), Emoticon.Okay);
                 break;
             }
             case MessageTypes.Exit:
             {
-                var info = JsonSerializer.Deserialize<LoginInfo>(message.Data);
-                DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
+                var info = (LoginInfo) JsonSerializer.Deserialize(message.Data, typeof(LoginInfo), RemoteSerializerContext.Default)!;
+                DialogRemote.ConnectedCount = info.Current.TotalConnectedClients;
                 InfoBarService.Info(string.Format(MainPanelResources.RemoteUserExit, info.UserName), Emoticon.Depressed);
                 break;
             }
             case MessageTypes.StatusUpdate:
             {
-                Status = JsonSerializer.Deserialize<RemoteStatus>(message.Data);
+                Status = (RemoteStatus) JsonSerializer.Deserialize(message.Data, typeof(RemoteStatus), RemoteSerializerContext.Default)!;
                 break;
             }
             case MessageTypes.SendCurrentStatus:
