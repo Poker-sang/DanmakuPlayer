@@ -300,7 +300,7 @@ public sealed partial class BackgroundPanel
             case MessageTypes.Login:
             {
                 var info = (LoginInfo) JsonSerializer.Deserialize(message.Data, typeof(LoginInfo), RemoteSerializerContext.Default)!;
-                DialogRemote.ConnectedCount = info!.Current.TotalConnectedClients;
+                DialogRemote.ConnectedCount = info.Current.TotalConnectedClients;
                 InfoBarService.Info(string.Format(MainPanelResources.RemoteUserLogin, info.UserName), Emoticon.Okay);
                 break;
             }

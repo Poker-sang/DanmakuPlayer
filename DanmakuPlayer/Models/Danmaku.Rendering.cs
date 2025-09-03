@@ -47,23 +47,27 @@ public partial record Danmaku
     public bool RenderInit(DanmakuContext context, CreatorProvider provider)
     {
         NeedRender = false;
+
+        // 可能有Mode为Advanced，但Pool是Subtitle的弹幕
+        if (Mode is DanmakuMode.Advanced)
+        {
+            if (!provider.AppConfig.DanmakuCountM7Enable)
+                return false;
+            try
+            {
+                AdvancedInfo = AdvancedDanmaku.Parse(Text);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         switch (Pool)
         {
             case DanmakuPool.Subtitle when provider.AppConfig.DanmakuCountSubtitleEnable:
+            case DanmakuPool.Normal when Mode is DanmakuMode.Advanced:
                 return NeedRender = true;
-            case DanmakuPool.Normal when Mode is DanmakuMode.Advanced && provider.AppConfig.DanmakuCountM7Enable:
-            {
-                try
-                {
-                    AdvancedInfo = AdvancedDanmaku.Parse(Text);
-                }
-                catch
-                {
-                    return false;
-                }
-
-                return NeedRender = true;
-            }
             case DanmakuPool.Normal:
                 break;
             case DanmakuPool.Advanced:
