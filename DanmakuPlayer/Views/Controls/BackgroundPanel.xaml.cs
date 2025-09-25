@@ -19,6 +19,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.Windows.Storage.Pickers;
 using WinRT;
 using WinUI3Utilities;
 
@@ -208,7 +209,7 @@ public sealed partial class BackgroundPanel
         {
             Vm.LoadingDanmaku = true;
 
-            var file = await App.Window.PickSingleFileAsync();
+            var file = await new FileOpenPicker(App.Window.AppWindow.Id).PickSingleFileAsync();
             if (file is not null)
                 await LoadDanmakuAsync(async token =>
                 {

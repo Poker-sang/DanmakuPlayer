@@ -308,10 +308,8 @@ public partial class BackgroundPanel
 
     private void StatusChanged()
     {
-        if (!RemoteService.IsCurrentConnected)
-            return;
-
-        _ = RemoteService.Current.SendStatusAsync(Status);
+        if (RemoteService.IsCurrentConnected)
+            _ = RemoteService.Current.SendStatusAsync(Status);
     }
 
     public RemoteStatus Status

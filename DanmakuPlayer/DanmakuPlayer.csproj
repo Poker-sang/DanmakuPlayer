@@ -34,21 +34,21 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
-		<PackageReference Include="FluentIcons.WinUI" Version="1.1.303" />
+		<PackageReference Include="FluentIcons.WinUI" Version="1.1.310" />
 		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.2" />
-		<PackageReference Include="Microsoft.Playwright" Version="1.54.0" />
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+		<PackageReference Include="Microsoft.Playwright" Version="1.55.0" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.8" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.9" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2" />
 		<PackageReference Include="WinUI3Utilities" Version="1.1.7.18" />
 		<PackageReference Include="PinYinConverterCore" Version="1.0.2" />
-		<PackageReference Include="WinUIEx" Version="2.6.0" />
+		<PackageReference Include="WinUIEx" Version="2.8.0" />
 		<Manifest Include="$(ApplicationManifest)" />
 
 		<ProjectReference Include="..\DanmakuPlayer.Proto\DanmakuPlayer.Proto.csproj" />

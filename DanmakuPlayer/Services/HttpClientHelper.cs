@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -57,43 +58,118 @@ public static class HttpClientHelper
     public static Task<string> DownloadStringAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
-        return Client.InitializeHeader(header).GetStringAsync(uri, token);
+        try
+        {
+            return Client.InitializeHeader(header).GetStringAsync(uri, token);
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static Task<string> DownloadStringAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
-        return Client.InitializeHeader(header).GetStringAsync(uri, token);
+        try
+        {
+            return Client.InitializeHeader(header).GetStringAsync(uri, token);
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static Task<Stream> DownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
-        return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+        try
+        {
+            return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static Task<Stream> DownloadStreamAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
-        return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+        try
+        {
+            return Client.InitializeHeader(header).GetStreamAsync(uri, token);
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static async Task<Stream?> TryDownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
         Debug.WriteLine("Requesting uri: " + uri);
-        var response = await Client.InitializeHeader(header).GetAsync(uri, token);
-        return response.IsSuccessStatusCode ? await Client.InitializeHeader(header).GetStreamAsync(uri, token) : null;
+        try
+        {
+            var response = await Client.InitializeHeader(header).GetAsync(uri, token);
+            return response.IsSuccessStatusCode ? await Client.InitializeHeader(header).GetStreamAsync(uri, token) : null;
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static Task<byte[]> DownloadBytesAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
-        return Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
+        Debug.WriteLine("Requesting uri: " + uri);
+        try
+        {
+            return Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
+        }
+        catch (Exception e)
+        {
+            HttpClient.DefaultProxy = CurrentSystemProxy;
+            throw;
+        }
     }
 
     public static async Task<JsonDocument> DownloadJsonAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
     {
-        Debug.WriteLine("Requesting uri: " + uri);
         await using var download = await uri.DownloadStreamAsync(token, header);
         return await JsonDocument.ParseAsync(download, default, token);
     }
+
+    [DynamicDependency("ConstructSystemProxy", "SystemProxyInfo", "System.Net.Http")]
+    static HttpClientHelper()
+    {
+        var type = typeof(HttpClient).Assembly.GetType("System.Net.Http.SystemProxyInfo");
+        var method = type?.GetMethod("ConstructSystemProxy");
+        var @delegate = method?.CreateDelegate<Func<IWebProxy>>();
+
+        _GetCurrentSystemProxy = @delegate ?? throw new MissingMethodException("Unable to find proxy functions");
+        HttpClient.DefaultProxy = _GetCurrentSystemProxy();
+    }
+
+    private static readonly Func<IWebProxy> _GetCurrentSystemProxy;
+
+    public static IWebProxy CurrentSystemProxy
+    {
+        get
+        {
+            var now = DateTime.UtcNow;
+            if (now < CoolDown)
+                return HttpClient.DefaultProxy;
+            CoolDown = now.AddSeconds(2);
+            return _GetCurrentSystemProxy();
+        }
+    }
+
+    private static DateTime CoolDown { get; set; } = DateTime.UtcNow.AddSeconds(2);
 }

@@ -35,7 +35,6 @@ public sealed partial class RemoteDialog : UserControl
     {
         _backgroundPanel = backgroundPanel;
 
-
         if (ServerTextBlock.Text is not "")
             _ = RefreshRoomsAsync();
 
@@ -60,7 +59,7 @@ public sealed partial class RemoteDialog : UserControl
         }
     }
 
-    private async void Disconnected(object? sender, EventArgs e)
+    private async void Disconnected(object? sender, Exception? e)
     {
         IsConnected = false;
         ConnectedCount = 0;
@@ -70,11 +69,6 @@ public sealed partial class RemoteDialog : UserControl
     private async void RefreshRooms_Click(object sender, RoutedEventArgs e)
     {
         await RefreshRoomsAsync();
-    }
-
-    private async void GridView_ItemClick(object sender, ItemClickEventArgs e)
-    {
-
     }
 
     private async Task RefreshRoomsAsync()
@@ -98,10 +92,8 @@ public sealed partial class RemoteDialog : UserControl
         ProgressRing.IsActive = true;
         try
         {
-            if (RemoteService.IsCurrentConnected)
-                await RemoteService.Current.DisposeAsync();
             var serverUrl = ServerTextBlock.Text;
-            var client = new RemoteService(serverUrl);
+            var client = await GetRemoteServiceAsync(serverUrl);
             client.MessageReceived += _backgroundPanel.OnMessageReceived;
             client.Disconnected += Disconnected;
             await client.CreateRoomAsync(name);
@@ -123,23 +115,8 @@ public sealed partial class RemoteDialog : UserControl
         ProgressRing.IsActive = true;
         try
         {
-            RemoteService client;
             var serverUrl = ServerTextBlock.Text;
-            if (RemoteService.Current is not null)
-            {
-                if (RemoteService.IsCurrentConnected)
-                {
-                    await RemoteService.Current.DisposeAsync();                  
-                    client = new(serverUrl);
-                }
-                else
-                    client = RemoteService.Current;
-            }
-            else
-            {
-                client = new(serverUrl);
-            }
-
+            var client = await GetRemoteServiceAsync(serverUrl);
             client.MessageReceived += _backgroundPanel.OnMessageReceived;
             client.Disconnected += Disconnected;
             await client.ConnectAsync(id);
@@ -174,9 +151,25 @@ public sealed partial class RemoteDialog : UserControl
             await JoinRoomAsync(room.Id);
         await RefreshRoomsAsync();
     }
+
+    private static async ValueTask<RemoteService> GetRemoteServiceAsync(string serverUrl)
+    {
+        if (RemoteService.Current is not null)
+        {
+            if (RemoteService.IsCurrentConnected)
+            {
+                await RemoteService.Current.DisposeAsync();
+                return new(serverUrl);
+            }
+
+            return RemoteService.Current;
+        }
+
+        return new(serverUrl);
+    }
 }
 
-internal class RoomInfoDataTemplateSelector : DataTemplateSelector
+internal partial class RoomInfoDataTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? Normal { get; set; }
     public DataTemplate? New { get; set; }

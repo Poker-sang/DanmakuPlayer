@@ -23,7 +23,7 @@ public class RemoteService : IAsyncDisposable
 
     public static RemoteService? Current { get; private set; }
 
-    private readonly ClientWebSocket _webSocket = new();
+    private readonly ClientWebSocket _webSocket = new() { Options = { Proxy = HttpClientHelper.CurrentSystemProxy } };
 
     private const int ReceiveBufferSize = 4096;
 
@@ -33,34 +33,64 @@ public class RemoteService : IAsyncDisposable
 
     public event EventHandler? Connected;
 
-    public event EventHandler? Disconnected;
+    public event EventHandler<Exception?>? Disconnected;
 
     public event EventHandler<Message>? MessageReceived;
 
-    public bool IsConnected => _webSocket?.State is WebSocketState.Open;
+    public bool IsConnected => !IsDisposed && _webSocket?.State is WebSocketState.Open;
+
+    private bool IsDisposed { get; set; }
 
     public async Task<IList<RoomInfo>> GetRoomsAsync(CancellationToken token = default)
     {
-        var rooms = await new Uri(_serverUrl, "rooms").DownloadStreamAsync(token);
-        return (IList<RoomInfo>) (await JsonSerializer.DeserializeAsync(rooms, typeof(IList<RoomInfo>), RemoteSerializerContext.Default, token))!;
+        if (IsDisposed)
+            return [];
+        try
+        {
+            var rooms = await new Uri(_serverUrl, "rooms").DownloadStreamAsync(token);
+            return (IList<RoomInfo>) (await JsonSerializer.DeserializeAsync(rooms, typeof(IList<RoomInfo>), RemoteSerializerContext.Default, token))!;
+        }
+        catch (Exception)
+        {
+            return [];
+        }
     }
 
     public async Task CreateRoomAsync(string roomName, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new(_serverUrl, $"create?roomName={roomName}&userName={Environment.UserName}"), token);
-        Connected?.Invoke(this, EventArgs.Empty);
-        _ = ReceiveStatusAsync(_cts.Token);
+        if (IsDisposed)
+            return;
+        try
+        {
+            await _webSocket.ConnectAsync(new(_serverUrl, $"create?roomName={roomName}&userName={Environment.UserName}"), token);
+            Connected?.Invoke(this, EventArgs.Empty);
+            _ = ReceiveStatusAsync(_cts.Token);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
     }
 
     public async Task ConnectAsync(string roomId, CancellationToken token = default)
     {
-        await _webSocket.ConnectAsync(new(_serverUrl, $"{roomId}/join?userName={Environment.UserName}"), token);
-        Connected?.Invoke(this, EventArgs.Empty);
-        _ = ReceiveStatusAsync(_cts.Token);
+        if (IsDisposed)
+            return;
+        try
+        {
+            await _webSocket.ConnectAsync(new(_serverUrl, $"{roomId}/join?userName={Environment.UserName}"), token);
+            Connected?.Invoke(this, EventArgs.Empty);
+            _ = ReceiveStatusAsync(_cts.Token);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
+        IsDisposed = true;
         GC.SuppressFinalize(this);
         if (IsConnected)
         {
@@ -74,19 +104,19 @@ public class RemoteService : IAsyncDisposable
                     "Service disconnecting",
                     combinedCts.Token);
 
-                Disconnected?.Invoke(this, EventArgs.Empty);
+                Disconnected?.Invoke(this, null);
             }
-            catch (OperationCanceledException ex)
+            catch (Exception)
             {
                 _webSocket.Abort();
             }
-            finally
-            {
-                _cts.Dispose();
-                _webSocket.Dispose();
-            }
         }
-        Current = null;
+
+        _cts.Dispose();
+        _webSocket.Dispose();
+
+        if (Current == this)
+            Current = null;
     }
 
     public async Task SendStatusAsync(RemoteStatus status, CancellationToken token = default)
@@ -121,10 +151,10 @@ public class RemoteService : IAsyncDisposable
                 MessageReceived?.Invoke(this, status);
             }
         }
-        catch (WebSocketException ex)
+        catch (Exception ex)
         {
-            Disconnected?.Invoke(this, EventArgs.Empty);
-            throw;
+            await DisposeAsync();
+            Disconnected?.Invoke(this, ex);
         }
         finally
         {
