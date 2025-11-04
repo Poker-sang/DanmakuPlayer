@@ -25,7 +25,7 @@ using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class BackgroundPanel
+public sealed partial class BackgroundPanel : Grid
 {
     private readonly double[] _playbackRates = [2, 1.5, 1.25, 1, 0.75, 0.5];
 
@@ -116,7 +116,7 @@ public sealed partial class BackgroundPanel
 
     private void RootLoaded(object sender, RoutedEventArgs e)
     {
-        App.Window.SetDragMove(this, new(DragMoveAndResizeMode.DragMove));
+        App.Window.SetDragMove(this);
         InfoBarService = IInfoBarService.Create(InfoBarContainer);
     }
 

@@ -15,6 +15,7 @@ SetWindowLong
 SetLayeredWindowAttributes
 GetWindowLong
 DefSubclassProc
+GetCursorPos
 
 IDC_ARROW
 SYS_COLOR_INDEX

@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using Windows.UI;
+using Windows.UI.Text;
+using FluentIcons.Common;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
-using Windows.UI.Text;
-using FluentIcons.Common;
 using WinUI3Utilities;
 using Symbol = FluentIcons.Common.Symbol;
 

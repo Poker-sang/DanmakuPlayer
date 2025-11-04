@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Core;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -14,8 +16,6 @@ using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
-using Windows.System;
-using Windows.UI.Core;
 
 namespace DanmakuPlayer.Views.Controls;
 

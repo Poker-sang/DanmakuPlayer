@@ -8,6 +8,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
+using Windows.UI;
 using DanmakuPlayer.Services;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.UI;
@@ -16,14 +19,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.System;
-using Windows.UI;
 using WinUI3Utilities;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class SettingsDialog : INotifyPropertyChanged
+public sealed partial class SettingsDialog : UserControl, INotifyPropertyChanged
 {
     private SettingsViewModel Vm
     {

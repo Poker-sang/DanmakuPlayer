@@ -1,12 +1,13 @@
 using System;
+using Windows.ApplicationModel.DataTransfer;
 using CommunityToolkit.WinUI;
 using DanmakuPlayer.Resources;
 using Microsoft.UI.Xaml;
-using Windows.ApplicationModel.DataTransfer;
+using Microsoft.UI.Xaml.Controls;
 
 namespace DanmakuPlayer.Views.Controls;
 
-public sealed partial class WelcomePage
+public sealed partial class WelcomePage : ContentPresenter
 {
     public WelcomePage() => InitializeComponent();
 
