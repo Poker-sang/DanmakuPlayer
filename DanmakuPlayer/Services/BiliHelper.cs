@@ -100,7 +100,7 @@ public static partial class BiliHelper
 
     public static async Task<IEnumerable<VideoPage>?> String2CIdsAsync(string uri, CancellationToken token)
     {
-        var codeType = uri.Match(out var match);
+        var codeType = Match(uri, out var match);
         var p = -1;
         if (Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var result))
         {
@@ -197,14 +197,14 @@ public static partial class BiliHelper
     }
 
     [GeneratedRegex("(av|md|ss|ep)[0-9]+")]
-    private static partial Regex DigitalRegex();
+    private static partial Regex DigitalRegex { get; }
 
     [GeneratedRegex(@"(?:BV)1\w{9}")]
-    private static partial Regex BvRegex();
+    private static partial Regex BvRegex { get; }
 
-    public static CodeType Match(this string url, out string result)
+    public static CodeType Match(string url, out string result)
     {
-        if (DigitalRegex().Match(url) is { Success: true } match)
+        if (DigitalRegex.Match(url) is { Success: true } match)
         {
             result = match.Value[2..];
             return match.Value[..2] switch
@@ -217,7 +217,7 @@ public static partial class BiliHelper
             };
         }
 
-        if (BvRegex().Match(url) is { Success: true } bvMatch)
+        if (BvRegex.Match(url) is { Success: true } bvMatch)
         {
             result = bvMatch.Value;
             return CodeType.BvId;

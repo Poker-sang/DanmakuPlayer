@@ -14,13 +14,13 @@ public class Cookie
 
     public string Path { get; set; } = null!;
 
-    public string? SameSite { get; set; } = null!;
+    public string? SameSite { get; set; }
 
     public bool Secure { get; set; }
 
     public bool Session { get; set; }
 
-    public string? StoreId { get; set; } = null!;
+    public string? StoreId { get; set; }
 
     public string Value { get; set; } = null!;
 }

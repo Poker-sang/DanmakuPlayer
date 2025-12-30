@@ -18,6 +18,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
     public ICanvasResourceCreator Creator { get; } = creator;
 
 #pragma warning disable CA1822 // 将成员标记为 static
+    // ReSharper disable once MemberCanBeMadeStatic.Global
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822 // 将成员标记为 static
 

@@ -97,7 +97,7 @@ file class InfoBarService(StackPanel container) : IInfoBarService
         string? actionButtonText = null,
         Action? action = null)
     {
-        _ = container.DispatcherQueue.TryEnqueue(async () =>
+        _ = container.DispatcherQueue.TryEnqueue(() =>
         {
             if (MaxInfoBarCount > 0 && container.Children.Count >= MaxInfoBarCount)
                 if (container.Children is [InfoBar oldestInfoBar, ..])
@@ -127,12 +127,14 @@ file class InfoBarService(StackPanel container) : IInfoBarService
             // 小于等于0则不自动关闭
             if (delay <= 0)
                 return;
-            await Task.Delay(delay);
-            // 因超出容量限制被提前关闭
-            if (infoBar.IsOpen is false)
-                return;
-            infoBar.IsOpen = false;
-            container.Children.Remove(infoBar);
+            _ = Task.Delay(delay).ContinueWith(_ =>
+            {
+                // 因超出容量限制被提前关闭
+                if (!infoBar.IsOpen)
+                    return;
+                infoBar.IsOpen = false;
+                container.Children.Remove(infoBar);
+            });
         });
     }
 }

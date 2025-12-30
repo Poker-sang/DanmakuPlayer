@@ -94,11 +94,11 @@ public static class C
     public static Symbol PlaybackRateSymbolSelector(double playbackRate) => playbackRate switch
     {
         2 => Symbol.Multiplier2x,
-        >= 1.75 => Symbol.Multiplier18x,
-        >= 1.5 => Symbol.Multiplier15x,
-        >= 1.25 => Symbol.Multiplier12x,
+        >= 1.75 => Symbol.Multiplier1_8x,
+        >= 1.5 => Symbol.Multiplier1_5x,
+        >= 1.25 => Symbol.Multiplier1_2x,
         >= 1 => Symbol.Multiplier1x,
-        _ => Symbol.Multiplier5x
+        _ => Symbol.Multiplier_5x
     };
 
     public static Symbol VolumeSymbolSelector(bool isMute, double volume) => isMute

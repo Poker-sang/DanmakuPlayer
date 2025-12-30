@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:fluent="using:FluentIcons.WinUI"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
+    xmlns:markup="using:FluentIcons.WinUI.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.Graphics.Canvas.UI.Xaml"
     DoubleTapped="MaximizeRestoreDoubleTapped"
@@ -97,7 +98,7 @@
                 <AppBarButton
                     x:Uid="/MainPanel/DownloadButton"
                     Click="ImportClick"
-                    Icon="{fluent:SymbolIcon Symbol=ArrowDownload}"
+                    Icon="{markup:SymbolIcon Symbol=ArrowDownload}"
                     IsEnabled="{x:Bind local:C.Negation(Vm.LoadingDanmaku), Mode=OneWay}"
                     LabelPosition="Collapsed"
                     RightTapped="FileClick" />
@@ -124,14 +125,14 @@
                         x:Uid="/MainPanel/GoBackButton"
                         local:TapHelper.DoubleTappedDisabled="True"
                         Click="GoBackClick"
-                        Icon="{fluent:SymbolIcon Symbol=ArrowLeft}"
+                        Icon="{markup:SymbolIcon Symbol=ArrowLeft}"
                         IsEnabled="{x:Bind WebView.CanGoBack, Mode=OneWay}" />
                 </CommandBar>
                 <AutoSuggestBox
                     x:Uid="/MainPanel/UriAutoSuggestBox"
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    QueryIcon="{fluent:SymbolIcon Symbol=Search,
+                    QueryIcon="{markup:SymbolIcon Symbol=Search,
                                                   FontSize=16}"
                     QuerySubmitted="AddressBoxOnQuerySubmitted"
                     Text="{x:Bind WebView.Url, Mode=OneWay}" />
@@ -151,7 +152,7 @@
                 <AppBarButton
                     x:Uid="/MainPanel/SettingsButton"
                     Click="SettingClick"
-                    Icon="{fluent:SymbolIcon Symbol=Settings}">
+                    Icon="{markup:SymbolIcon Symbol=Settings}">
                     <AppBarButton.KeyboardAccelerators>
                         <KeyboardAccelerator Key="Escape" />
                     </AppBarButton.KeyboardAccelerators>
@@ -164,7 +165,7 @@
                 <AppBarButton
                     x:Uid="/MainPanel/CloseButton"
                     Click="CloseClick"
-                    Icon="{fluent:SymbolIcon Symbol=Dismiss}">
+                    Icon="{markup:SymbolIcon Symbol=Dismiss}">
                     <AppBarButton.Resources>
                         <!--  ReSharper disable once Xaml.RedundantResource  -->
                         <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver" Color="Red" />
@@ -197,7 +198,7 @@
                             Width="40"
                             local:TapHelper.DoubleTappedDisabled="True"
                             Click="RewindClick"
-                            Icon="{fluent:SymbolIcon Symbol=Rewind}"
+                            Icon="{markup:SymbolIcon Symbol=Rewind}"
                             RightTapped="RewindClick">
                             <AppBarButton.KeyboardAccelerators>
                                 <KeyboardAccelerator Key="Left" />
@@ -220,7 +221,7 @@
                             x:Uid="/MainPanel/FastForwardButton"
                             Width="40"
                             local:TapHelper.DoubleTappedDisabled="True"
-                            Icon="{fluent:SymbolIcon Symbol=FastForward}"
+                            Icon="{markup:SymbolIcon Symbol=FastForward}"
                             RightTapped="FastForwardClick"
                             Tapped="FastForwardClick">
                             <AppBarButton.KeyboardAccelerators>
@@ -287,21 +288,21 @@
                             Width="40"
                             local:TapHelper.DoubleTappedDisabled="True"
                             Click="AdvanceDanmakuClick"
-                            Icon="{fluent:SymbolIcon Symbol=ArrowReply}"
+                            Icon="{markup:SymbolIcon Symbol=ArrowReply}"
                             LabelPosition="Collapsed"
                             RightTapped="AdvanceDanmakuClick" />
                         <AppBarButton
                             x:Uid="/MainPanel/SyncDanmakuButton"
                             local:TapHelper.DoubleTappedDisabled="True"
                             Click="SyncDanmakuClick"
-                            Icon="{fluent:SymbolIcon Symbol=ArrowRepeatAll}"
+                            Icon="{markup:SymbolIcon Symbol=ArrowRepeatAll}"
                             Label="{x:Bind Vm.DanmakuDelayTime.TotalSeconds, Mode=OneWay}" />
                         <AppBarButton
                             x:Uid="/MainPanel/DelayDanmakuButton"
                             Width="40"
                             local:TapHelper.DoubleTappedDisabled="True"
                             Click="DelayDanmakuClick"
-                            Icon="{fluent:SymbolIcon Symbol=ArrowForward}"
+                            Icon="{markup:SymbolIcon Symbol=ArrowForward}"
                             LabelPosition="Collapsed"
                             RightTapped="DelayDanmakuClick" />
                     </CommandBar>
@@ -313,7 +314,7 @@
                         Visibility="{x:Bind local:C.ToVisibility(Vm.EnableWebView2), Mode=OneWay}">
                         <AppBarButton
                             x:Uid="/MainPanel/VideosButton"
-                            Icon="{fluent:SymbolIcon Symbol=Video}"
+                            Icon="{markup:SymbolIcon Symbol=Video}"
                             Visibility="{x:Bind local:C.IsMultipleToVisibility(WebView.Videos), Mode=OneWay}">
                             <AppBarButton.Flyout>
                                 <local:RadioMenuFlyout
@@ -364,7 +365,7 @@
                             x:Uid="/MainPanel/SyncButton"
                             local:TapHelper.DoubleTappedDisabled="True"
                             Click="LoadSyncOnClick"
-                            Icon="{fluent:SymbolIcon Symbol=ArrowSync}" />
+                            Icon="{markup:SymbolIcon Symbol=ArrowSync}" />
                         <AppBarButton
                             x:Uid="/MainPanel/LockWebView2Button"
                             local:TapHelper.DoubleTappedDisabled="True"

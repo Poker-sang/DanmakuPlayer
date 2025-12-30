@@ -55,96 +55,74 @@ public static class HttpClientHelper
         return client;
     }
 
-    public static Task<string> DownloadStringAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
+    extension(Uri uri)
     {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
+        public async Task<Stream?> TryDownloadStreamAsync(CancellationToken token, Dictionary<string, string>? header = null)
         {
-            return Client.InitializeHeader(header).GetStringAsync(uri, token);
+            Debug.WriteLine("Requesting uri: " + uri);
+            try
+            {
+                var response = await GetInitializedClient(header).GetAsync(uri, token);
+                return response.IsSuccessStatusCode ? await GetInitializedClient(header).GetStreamAsync(uri, token) : null;
+            }
+            catch (Exception e)
+            {
+                HttpClient.DefaultProxy = CurrentSystemProxy;
+                throw;
+            }
         }
-        catch (Exception e)
+
+        public Task<byte[]> DownloadBytesAsync(CancellationToken token, Dictionary<string, string>? header = null)
         {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
+            Debug.WriteLine("Requesting uri: " + uri);
+            try
+            {
+                return GetInitializedClient(header).GetByteArrayAsync(uri, token);
+            }
+            catch (Exception e)
+            {
+                HttpClient.DefaultProxy = CurrentSystemProxy;
+                throw;
+            }
+        }
+
+        public async Task<JsonDocument> DownloadJsonAsync(CancellationToken token, Dictionary<string, string>? header = null)
+        {
+            await using var download = await uri.DownloadStreamAsync(token, header);
+            return await JsonDocument.ParseAsync(download, default, token);
+        }
+
+        public Task<string> DownloadStringAsync(CancellationToken token, Dictionary<string, string>? header = null)
+        {
+            Debug.WriteLine("Requesting uri: " + uri);
+            try
+            {
+                return GetInitializedClient(header).GetStringAsync(uri, token);
+            }
+            catch (Exception e)
+            {
+                HttpClient.DefaultProxy = CurrentSystemProxy;
+                throw;
+            }
+        }
+
+        public Task<Stream> DownloadStreamAsync(CancellationToken token, Dictionary<string, string>? header = null)
+        {
+            Debug.WriteLine("Requesting uri: " + uri);
+            try
+            {
+                return GetInitializedClient(header).GetStreamAsync(uri, token);
+            }
+            catch (Exception e)
+            {
+                HttpClient.DefaultProxy = CurrentSystemProxy;
+                throw;
+            }
         }
     }
 
-    public static Task<string> DownloadStringAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
-        {
-            return Client.InitializeHeader(header).GetStringAsync(uri, token);
-        }
-        catch (Exception e)
-        {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
-        }
-    }
-
-    public static Task<Stream> DownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
-        {
-            return Client.InitializeHeader(header).GetStreamAsync(uri, token);
-        }
-        catch (Exception e)
-        {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
-        }
-    }
-
-    public static Task<Stream> DownloadStreamAsync(this Uri uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
-        {
-            return Client.InitializeHeader(header).GetStreamAsync(uri, token);
-        }
-        catch (Exception e)
-        {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
-        }
-    }
-
-    public static async Task<Stream?> TryDownloadStreamAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
-        {
-            var response = await Client.InitializeHeader(header).GetAsync(uri, token);
-            return response.IsSuccessStatusCode ? await Client.InitializeHeader(header).GetStreamAsync(uri, token) : null;
-        }
-        catch (Exception e)
-        {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
-        }
-    }
-
-    public static Task<byte[]> DownloadBytesAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        Debug.WriteLine("Requesting uri: " + uri);
-        try
-        {
-            return Client.InitializeHeader(header).GetByteArrayAsync(uri, token);
-        }
-        catch (Exception e)
-        {
-            HttpClient.DefaultProxy = CurrentSystemProxy;
-            throw;
-        }
-    }
-
-    public static async Task<JsonDocument> DownloadJsonAsync(this string uri, CancellationToken token, Dictionary<string, string>? header = null)
-    {
-        await using var download = await uri.DownloadStreamAsync(token, header);
-        return await JsonDocument.ParseAsync(download, default, token);
-    }
+    private static HttpClient GetInitializedClient(Dictionary<string, string>? header = null) =>
+        Client.InitializeHeader(header);
 
     [DynamicDependency("ConstructSystemProxy", "SystemProxyInfo", "System.Net.Http")]
     static HttpClientHelper()

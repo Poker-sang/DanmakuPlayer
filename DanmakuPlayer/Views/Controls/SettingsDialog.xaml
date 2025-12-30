@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:fluent="using:FluentIcons.WinUI"
     xmlns:local="using:DanmakuPlayer.Views.Controls"
+    xmlns:markup="using:FluentIcons.WinUI.Markup"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rs="using:DanmakuPlayer.Resources"
     xmlns:services="using:DanmakuPlayer.Services"
@@ -47,7 +48,7 @@
                     x:Uid="/SettingsDialog/AppHeader"
                     Margin="1,0,0,4"
                     Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander" HeaderIcon="{fluent:SymbolIcon Symbol=PaintBrush}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/AppThemeExpander" HeaderIcon="{markup:SymbolIcon Symbol=PaintBrush}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard ContentAlignment="Left">
                             <RadioButtons SelectedIndex="{x:Bind Vm.Theme, Mode=TwoWay}" SelectionChanged="ThemeChanged">
@@ -70,24 +71,24 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{fluent:SymbolIcon Symbol=Pin}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/TopMostCard" HeaderIcon="{markup:SymbolIcon Symbol=Pin}">
                     <ToggleSwitch IsOn="{x:Bind Vm.TopMost, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <!--  渲染设置  -->
                 <TextBlock x:Uid="/SettingsDialog/RenderingHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{fluent:SymbolIcon Symbol=History}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/RenderBeforeCard" HeaderIcon="{markup:SymbolIcon Symbol=History}">
                     <ToggleSwitch IsOn="{x:Bind Vm.RenderBefore, Mode=TwoWay}" />
                 </controls:SettingsCard>
                 <!--  播放设置  -->
                 <TextBlock x:Uid="/SettingsDialog/PlayHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard" HeaderIcon="{fluent:SymbolIcon Symbol=FastForward}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFastForwardCard" HeaderIcon="{markup:SymbolIcon Symbol=FastForward}">
                     <Slider
                         Maximum="20"
                         Minimum="1"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.PlayFastForward, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard" HeaderIcon="{fluent:SymbolIcon Symbol=Multiplier2x}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlaybackRateCard" HeaderIcon="{markup:SymbolIcon Symbol=Multiplier2x}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -96,7 +97,7 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.PlaybackRate, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard" HeaderIcon="{fluent:SymbolIcon Symbol=Fps30}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/PlayFramePerSecondCard" HeaderIcon="{markup:SymbolIcon Symbol=Fps30}">
                     <Slider
                         Maximum="100"
                         Minimum="5"
@@ -106,14 +107,14 @@
                 </controls:SettingsCard>
                 <!--  弹幕设置  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{fluent:SymbolIcon Symbol=TopSpeed}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDurationCard" HeaderIcon="{markup:SymbolIcon Symbol=TopSpeed}">
                     <Slider
                         Maximum="20"
                         Minimum="5"
                         Style="{StaticResource SliderStyle}"
                         Value="{x:Bind Vm.DanmakuDuration, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{fluent:SymbolIcon Symbol=TransparencySquare}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuOpacityCard" HeaderIcon="{markup:SymbolIcon Symbol=TransparencySquare}">
                     <Slider
                         Maximum="1"
                         Minimum="0.2"
@@ -122,7 +123,7 @@
                         TickFrequency="0.2"
                         Value="{x:Bind Vm.DanmakuOpacity, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextFont}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuFontCard" HeaderIcon="{markup:SymbolIcon Symbol=TextFont}">
                     <ComboBox ItemsSource="{x:Bind rs:ConstantStrings.FontFamilies}" SelectedItem="{x:Bind Vm.DanmakuFont, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
@@ -131,7 +132,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextFontSize}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuScaleCard" HeaderIcon="{markup:SymbolIcon Symbol=TextFontSize}">
                     <Slider
                         Maximum="2"
                         Minimum="0.5"
@@ -140,10 +141,10 @@
                         TickFrequency="0.25"
                         Value="{x:Bind Vm.DanmakuScale, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{fluent:SymbolIcon Symbol=Premium}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuDisableColorfulCard" HeaderIcon="{markup:SymbolIcon Symbol=Premium}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuDisableColorful, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{fluent:SymbolIcon Symbol=TextColor}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuStrokeExpander" HeaderIcon="{markup:SymbolIcon Symbol=TextColor}">
                     <Slider
                         Maximum="5"
                         Style="{StaticResource SliderStyle}"
@@ -151,7 +152,7 @@
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuStrokeColorCard"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=Eyedropper}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=Eyedropper}"
                             IsEnabled="{x:Bind local:C.IsNotZero(Vm.DanmakuStrokeWidth), Mode=OneWay}">
                             <controls:ColorPickerButton SelectedColor="{x:Bind local:C.ToAlphaColor(Vm.DanmakuStrokeColor), BindBack=ColorBindBack, Mode=TwoWay}">
                                 <controls:ColorPickerButton.ColorPickerStyle>
@@ -163,22 +164,22 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{fluent:SymbolIcon Symbol=Cookies}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCookieExpander" HeaderIcon="{markup:SymbolIcon Symbol=Cookies}">
                     <CommandBar DefaultLabelPosition="Collapsed">
                         <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuClearCookieAppBarButton"
                             Width="50"
-                            Icon="{fluent:SymbolIcon Symbol=Delete}"
+                            Icon="{markup:SymbolIcon Symbol=Delete}"
                             Tapped="DanmakuClearCookieAppBarButton_OnTapped" />
                         <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuGetCookieFromClipboardAppBarButton"
                             Width="50"
-                            Icon="{fluent:SymbolIcon Symbol=Clipboard}"
+                            Icon="{markup:SymbolIcon Symbol=Clipboard}"
                             Tapped="DanmakuGetCookieFromClipboardAppBarButton_OnTapped" />
                         <AppBarButton
                             x:Uid="/SettingsDialog/DanmakuGetCookieFromWebViewAppBarButton"
                             Width="50"
-                            Icon="{fluent:SymbolIcon Symbol=Globe}"
+                            Icon="{markup:SymbolIcon Symbol=Globe}"
                             Tapped="DanmakuGetCookieFromWebViewAppBarButton_OnTapped" />
                     </CommandBar>
                     <controls:SettingsExpander.Items>
@@ -212,12 +213,12 @@
 
                 <!--  弹幕滤过  -->
                 <TextBlock x:Uid="/SettingsDialog/DanmakuFiltrationHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{fluent:SymbolIcon Symbol=Merge}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuMergeExpander" HeaderIcon="{markup:SymbolIcon Symbol=Merge}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=AutoFitWidth}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=AutoFitWidth}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
@@ -226,7 +227,7 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=DataBarHorizontal}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=DataBarHorizontal}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
@@ -235,7 +236,7 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=Timer10}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=Timer10}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="60"
@@ -245,13 +246,13 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuMergeCrossModeCard"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=ArrowMoveInward}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=ArrowMoveInward}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuMergeCrossMode, Mode=TwoWay}" />
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="{fluent:SymbolIcon Symbol=Filter}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuRegexExpander" HeaderIcon="{markup:SymbolIcon Symbol=Filter}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableRegex, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
@@ -261,7 +262,7 @@
                             <StackPanel Orientation="Vertical">
                                 <AutoSuggestBox
                                     x:Uid="/SettingsDialog/AddRegexPatternAutoSuggestBox"
-                                    QueryIcon="{fluent:SymbolIcon Symbol=Add,
+                                    QueryIcon="{markup:SymbolIcon Symbol=Add,
                                                                   FontSize=16}"
                                     QuerySubmitted="AddRegexPattern"
                                     TextChanged="RegexPatternChanged" />
@@ -292,10 +293,10 @@
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
                 </controls:SettingsExpander>
-                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{fluent:SymbolIcon Symbol=Stack}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuEnableOverlapCard" HeaderIcon="{markup:SymbolIcon Symbol=Stack}">
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableOverlap, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{fluent:SymbolIcon Symbol=TextWordCount}">
+                <controls:SettingsExpander x:Uid="/SettingsDialog/DanmakuCountLimitExpander" HeaderIcon="{markup:SymbolIcon Symbol=TextWordCount}">
                     <controls:SettingsExpander.Resources>
                         <Style
                             x:Key="DanmakuCountLimitSliderStyle"
@@ -308,22 +309,22 @@
                         </Style>
                     </controls:SettingsExpander.Resources>
                     <controls:SettingsExpander.Items>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTopRight}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountRollLimitCard" HeaderIcon="{markup:SymbolIcon Symbol=TextboxAlignTopRight}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountRollLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTop}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountBottomLimitCard" HeaderIcon="{markup:SymbolIcon Symbol=TextboxAlignTop}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountBottomLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignBottom}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountTopLimitCard" HeaderIcon="{markup:SymbolIcon Symbol=TextboxAlignBottom}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountTopLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard" HeaderIcon="{fluent:SymbolIcon Symbol=TextboxAlignTopLeft}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountInverseLimitCard" HeaderIcon="{markup:SymbolIcon Symbol=TextboxAlignTopLeft}">
                             <Slider Style="{StaticResource DanmakuCountLimitSliderStyle}" Value="{x:Bind Vm.DanmakuCountInverseLimit, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard" HeaderIcon="{fluent:SymbolIcon Symbol=SlideTextSparkle}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountM7EnableCard" HeaderIcon="{markup:SymbolIcon Symbol=SlideTextSparkle}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountM7Enable, Mode=TwoWay}" />
                         </controls:SettingsCard>
-                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountSubtitleEnableCard" HeaderIcon="{fluent:SymbolIcon Symbol=Subtitles}">
+                        <controls:SettingsCard x:Uid="/SettingsDialog/DanmakuCountSubtitleEnableCard" HeaderIcon="{markup:SymbolIcon Symbol=Subtitles}">
                             <ToggleSwitch IsOn="{x:Bind Vm.DanmakuCountSubtitleEnable, Mode=TwoWay}" />
                         </controls:SettingsCard>
                     </controls:SettingsExpander.Items>
@@ -331,39 +332,39 @@
 
                 <!--  WebView2设置  -->
                 <TextBlock x:Uid="/SettingsDialog/WebView2Header" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="{fluent:SymbolIcon Symbol=Globe}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/EnableWebView2Card" HeaderIcon="{markup:SymbolIcon Symbol=Globe}">
                     <ToggleSwitch IsOn="{x:Bind Vm.EnableWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{fluent:SymbolIcon Symbol=CursorHoverOff}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/LockWebView2Card" HeaderIcon="{markup:SymbolIcon Symbol=CursorHoverOff}">
                     <ToggleSwitch IsOn="{x:Bind Vm.LockWebView2, Mode=TwoWay}" />
                 </controls:SettingsCard>
-                <controls:SettingsCard x:Uid="/SettingsDialog/ClearStyleWhenFullScreenCard" HeaderIcon="{fluent:SymbolIcon Symbol=ArrowMaximize}">
+                <controls:SettingsCard x:Uid="/SettingsDialog/ClearStyleWhenFullScreenCard" HeaderIcon="{markup:SymbolIcon Symbol=ArrowMaximize}">
                     <ToggleSwitch IsOn="{x:Bind Vm.ClearStyleWhenFullScreen, Mode=TwoWay}" />
                 </controls:SettingsCard>
 
                 <!--  关于  -->
                 <TextBlock x:Uid="/SettingsDialog/AboutHeader" Style="{StaticResource SettingHeaderStyle}" />
-                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}" HeaderIcon="{fluent:SymbolIcon Symbol=Info}">
+                <controls:SettingsExpander Header="{x:Bind rs:ConstantStrings.AppAboutHeader}" HeaderIcon="{markup:SymbolIcon Symbol=Info}">
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/StoreCard"
-                            ActionIcon="{fluent:SymbolIcon Symbol=Open}"
+                            ActionIcon="{markup:SymbolIcon Symbol=Open}"
                             Description="{x:Bind rs:ConstantStrings.StoreUri}"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=StoreMicrosoft}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=StoreMicrosoft}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.StoreUri}"
                             Tapped="NavigateUriTapped" />
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/MailCard"
-                            ActionIcon="{fluent:SymbolIcon Symbol=Open}"
+                            ActionIcon="{markup:SymbolIcon Symbol=Open}"
                             Description="{x:Bind rs:ConstantStrings.Mail}"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=Mail}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=Mail}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.MailToUri}"
                             Tapped="NavigateUriTapped" />
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/AuthorCard"
-                            ActionIcon="{fluent:SymbolIcon Symbol=Open}"
+                            ActionIcon="{markup:SymbolIcon Symbol=Open}"
                             Description="{x:Bind rs:ConstantStrings.Author}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.AuthorUri}"
@@ -374,7 +375,7 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/QqCard"
-                            ActionIcon="{fluent:SymbolIcon Symbol=Open}"
+                            ActionIcon="{markup:SymbolIcon Symbol=Open}"
                             Description="{x:Bind rs:ConstantStrings.QqUin}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.QqUri}"
@@ -385,9 +386,9 @@
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/RepositoryCard"
-                            ActionIcon="{fluent:SymbolIcon Symbol=Open}"
+                            ActionIcon="{markup:SymbolIcon Symbol=Open}"
                             Description="{x:Bind rs:ConstantStrings.AppName}"
-                            HeaderIcon="{fluent:SymbolIcon Symbol=Box}"
+                            HeaderIcon="{markup:SymbolIcon Symbol=Box}"
                             IsClickEnabled="True"
                             Tag="{x:Bind rs:ConstantStrings.RepositoryUri}"
                             Tapped="NavigateUriTapped" />
@@ -395,8 +396,8 @@
                 </controls:SettingsExpander>
                 <controls:SettingsCard
                     x:Uid="/SettingsDialog/LicenseCard"
-                    ActionIcon="{fluent:SymbolIcon Symbol=Open}"
-                    HeaderIcon="{fluent:SymbolIcon Symbol=CheckmarkStarburst}"
+                    ActionIcon="{markup:SymbolIcon Symbol=Open}"
+                    HeaderIcon="{markup:SymbolIcon Symbol=CheckmarkStarburst}"
                     IsClickEnabled="True"
                     Tag="{x:Bind rs:ConstantStrings.LicenseUri}"
                     Tapped="NavigateUriTapped" />
