@@ -8,7 +8,6 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using WinUI3Utilities;
 using Symbol = FluentIcons.Common.Symbol;
 
 namespace DanmakuPlayer.Views.Controls;
@@ -43,7 +42,7 @@ public static class C
         {
             -1 => SettingsDialogResources.Unlimited,
             > -1 => ((int)value).ToString(),
-            _ => ThrowHelper.ArgumentOutOfRange<double, string>(value)
+            _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 
     public static Visibility IsMultipleToVisibility(ICollection value) => value.Count < 2 ? Visibility.Collapsed : Visibility.Visible;
@@ -173,6 +172,6 @@ public static class C
         8 => FontWeights.ExtraBold,
         9 => FontWeights.Black,
         10 => FontWeights.ExtraBlack,
-        _ => ThrowHelper.ArgumentOutOfRange<Enum, FontWeight>(value)
+        _ => throw new ArgumentOutOfRangeException(nameof(value))
     };
 }

@@ -213,7 +213,7 @@ public sealed partial class BackgroundPanel : Grid
             if (file is not null)
                 await LoadDanmakuAsync(async token =>
                 {
-                    await using var stream = File.OpenRead(file.Path);
+                    await using var stream = File.OpenAsyncRead(file.Path);
                     return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToArray();
                 });
         }

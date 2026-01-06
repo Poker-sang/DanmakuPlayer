@@ -12,7 +12,6 @@ using System.Xml.Linq;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Models;
 using DanmakuPlayer.Resources;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services;
 
@@ -144,7 +143,7 @@ public static partial class BiliHelper
                     return [videoPage];
                 return null;
             default:
-                return ThrowHelper.ArgumentOutOfRange<CodeType, IEnumerable<VideoPage>?>(codeType);
+                throw new ArgumentOutOfRangeException(nameof(codeType));
         }
     }
 

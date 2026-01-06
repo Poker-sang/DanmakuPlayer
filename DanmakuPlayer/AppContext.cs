@@ -3,7 +3,6 @@ using System.IO;
 using Windows.ApplicationModel;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.Windows.Storage;
-using WinUI3Utilities;
 using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
@@ -31,10 +30,8 @@ public static partial class AppContext
     public static string ApplicationUriToPath(Uri uri)
     {
         if (uri.Scheme is not "ms-appx")
-        {
             // ms-appdata is handled by the caller.
-            ThrowHelper.InvalidOperation("Uri is not using the ms-appx scheme");
-        }
+            throw new InvalidOperationException("Uri is not using the ms-appx scheme");
 
         var path = Uri.UnescapeDataString(uri.PathAndQuery).TrimStart('/');
 

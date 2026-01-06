@@ -1,7 +1,6 @@
 using System;
 using System.Numerics;
 using System.Text.Json;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
 
@@ -54,10 +53,9 @@ public record AdvancedDanmaku(
                     return default;
                 return default(T) switch
                 {
-                    float => T.Parse(s, null),
-                    int => T.Parse(s, null),
+                    float or int => T.Parse(s, null),
                     bool => T.TryParse(s, null, out var b) ? b : (T)(object)(int.Parse(s) is not 0),
-                    _ => ThrowHelper.ArgumentOutOfRange<T, T>(default)
+                    _ => throw new ArgumentOutOfRangeException(nameof(T))
                 };
             }
 
@@ -69,9 +67,9 @@ public record AdvancedDanmaku(
                 {
                     JsonValueKind.Number => jsonElement.GetInt32() is not 0,
                     JsonValueKind.False or JsonValueKind.True => jsonElement.GetBoolean(),
-                    _ => ThrowHelper.ArgumentOutOfRange<JsonValueKind, T>(jsonElement.ValueKind)
+                    _ => throw new ArgumentOutOfRangeException(nameof(jsonElement.ValueKind))
                 },
-                _ => ThrowHelper.ArgumentOutOfRange<T, T>(default)
+                _ => throw new ArgumentOutOfRangeException(nameof(T))
             });
         }
     }

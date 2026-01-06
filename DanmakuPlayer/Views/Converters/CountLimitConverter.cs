@@ -13,9 +13,9 @@ public partial class CountLimitConverter : IValueConverter
         {
             -1 => SettingsDialogResources.Unlimited,
             > -1 => (int)v,
-            _ => ThrowHelper.ArgumentOutOfRange<double, string>(v)
+            _ => throw new ArgumentOutOfRangeException(nameof(v))
         };
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => ThrowHelper.NotSupported<object>();
+    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
 }

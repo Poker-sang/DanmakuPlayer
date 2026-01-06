@@ -8,7 +8,6 @@ using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Models;
 
@@ -113,8 +112,7 @@ public partial record Danmaku
                     return false;
                 break;
             default:
-                ThrowHelper.ArgumentOutOfRange(Mode);
-                break;
+                throw new ArgumentOutOfRangeException(nameof(Mode));
         }
 
         if (!layoutExists)
@@ -241,10 +239,10 @@ public partial record Danmaku
 
         var pos = Mode switch
         {
-            DanmakuMode.Roll => new((float)(provider.ViewWidth - ((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs)), _showPositionY),
+            DanmakuMode.Roll => new Vector2((float)(provider.ViewWidth - ((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs)), _showPositionY),
             DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
             DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs) - width), _showPositionY),
-            _ => ThrowHelper.ArgumentOutOfRange<DanmakuMode, Vector2>(Mode)
+            _ => throw new ArgumentOutOfRangeException(nameof(Mode))
         };
         renderTarget.DrawTextLayout(layout, pos, brush);
 

@@ -9,7 +9,6 @@ using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
-using WinUI3Utilities;
 
 namespace DanmakuPlayer.Services.DanmakuServices;
 
@@ -115,7 +114,7 @@ public static class DanmakuHelper
         var actualDurationMs = (int) (Math.Max(10, duration) * playbackRate * 1000);
 
         if (Pool is not List<Danmaku> list)
-            return ThrowHelper.NotSupported<Danmaku[]>(nameof(Pool));
+            throw new NotSupportedException(nameof(Pool));
 
         var firstIndex = list.FindIndex(t => t.TimeMs > timeMs - actualDurationMs);
         if (firstIndex is -1)
