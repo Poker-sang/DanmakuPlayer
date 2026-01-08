@@ -35,7 +35,6 @@ public enum DanmakuMode
     /// <summary>
     /// Flash 代码弹幕（已弃用）
     /// </summary>
-    [Obsolete("Flash")]
     Code = 8,
 
     /// <summary>

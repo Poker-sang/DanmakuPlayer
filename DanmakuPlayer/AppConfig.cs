@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using DanmakuPlayer.Enums;
 using DanmakuPlayer.Resources;
 using WinUI3Utilities.Attributes;
 
@@ -200,13 +201,45 @@ public partial record AppConfig()
     /// <remarks>default: <see langword="true"/></remarks>
     public bool DanmakuEnableMerge { get; set; } = true;
 
-    public int DanmakuMergeMaxCosine { get; set; } = 6;
+    public int DanmakuMergeMaxCosineDistance { get; set; } = 6;
 
-    public int DanmakuMergeMaxDistance { get; set; } = 5;
+    public int DanmakuMergeMaxEditDistance { get; set; } = 5;
 
     public int DanmakuMergeTimeSpan { get; set; } = 20;
 
     public bool DanmakuMergeCrossMode { get; set; } = false;
+
+    // 文本处理参数
+    public bool DanmakuMergeTrimEnding { get; set; } = true;            // 移除结尾符号
+    public bool DanmakuMergeTrimSpace { get; set; } = true;             // 整理空格
+    public bool DanmakuMergeTrimWidth { get; set; } = true;             // 全角转半角
+
+    // 过滤选项
+    public bool DanmakuMergeProcessSubtitle { get; set; } = true;          // 处理字幕弹幕
+    public bool DanmakuMergeProcessAdvanced { get; set; } = true;          // 处理特殊弹幕
+    public bool DanmakuMergeProcessBottom { get; set; } = true;          // 处理底部弹幕
+
+
+    // 白名单和黑名单
+    public string[] Whitelist { get; set; } = [];
+    public string[] Blacklist { get; set; } = [];
+
+    public bool UsePinYin { get; set; } = true;
+
+    // 显示选项
+    public int DanmakuMergeRepresentativePercent { get; set; } // 代表弹幕选择百分比（默认0）
+    public bool DanmakuMergeModeElevation { get; set; }       // 是否启用模式提升
+    public bool DanmakuMergeEnlarge { get; set; }         // 是否启用字号放大
+
+    // 文本标记
+    public DanmakuMergeMarkStyle DanmakuMergeMarkStyle { get; set; } // "off" | "prefix" | "suffix"
+    public bool DanmakuMergeUseSubscript { get; set; }            // 是否使用下标数字
+    public int DanmakuMergeMarkThreshold { get; set; } = 5;               // 标记阈值（默认5）
+
+    // 密度管理
+    public int DanmakuMergeShrinkThreshold { get; set; }     // 缩小阈值（0=禁用）
+    public int DanmakuMergeDropThreshold { get; set; }       // 丢弃阈值（0=禁用）
+    public int DanmakuMergeScrollThreshold { get; set; }      // 滚动转换阈值（0=禁用）
 
     #endregion
 

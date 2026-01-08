@@ -197,7 +197,7 @@ public sealed partial class WebView2ForVideo : UserControl
                 _ = Task.WhenAny(Task.WhenAll(tasks), Task.Delay(3000, _source.Token)).ContinueWith(_ => _source.Cancel(), _source.Token);
 
                 // ReSharper disable once MethodSupportsCancellation
-                while (!_source.Token.IsCancellationRequested)
+                while (!_source.IsCancellationRequested)
                     await Task.Delay(200);
             }
             _source = null;
@@ -248,9 +248,9 @@ public sealed partial class WebView2ForVideo : UserControl
                         foreach (var locator in await first.AllAsync())
                             Videos.Add(await VideoLocatorDisplay.CreateAsync(locator));
                     await Task.Delay(200);
-                } while (!s.Token.IsCancellationRequested && count is 0);
+                } while (!s.IsCancellationRequested && count is 0);
 
-                if (!s.Token.IsCancellationRequested && count is not 0)
+                if (!s.IsCancellationRequested && count is not 0)
                     await s.CancelAsync();
             }
             catch

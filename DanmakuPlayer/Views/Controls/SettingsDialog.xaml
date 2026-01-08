@@ -217,22 +217,22 @@
                     <ToggleSwitch IsOn="{x:Bind Vm.DanmakuEnableMerge, Mode=TwoWay}" />
                     <controls:SettingsExpander.Items>
                         <controls:SettingsCard
-                            x:Uid="/SettingsDialog/DanmakuMergeMaxDistanceCard"
+                            x:Uid="/SettingsDialog/DanmakuMergeMaxEditDistanceCard"
                             HeaderIcon="{markup:SymbolIcon Symbol=AutoFitWidth}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Style="{StaticResource SliderStyle}"
-                                Value="{x:Bind Vm.DanmakuMergeMaxDistance, Mode=TwoWay}" />
+                                Value="{x:Bind Vm.DanmakuMergeMaxEditDistance, Mode=TwoWay}" />
                         </controls:SettingsCard>
                         <controls:SettingsCard
-                            x:Uid="/SettingsDialog/DanmakuMergeMaxCosineCard"
+                            x:Uid="/SettingsDialog/DanmakuMergeMaxCosineDistanceCard"
                             HeaderIcon="{markup:SymbolIcon Symbol=DataBarHorizontal}"
                             IsEnabled="{x:Bind Vm.DanmakuEnableMerge, Mode=OneWay}">
                             <Slider
                                 Maximum="10"
                                 Style="{StaticResource SliderStyle}"
-                                Value="{x:Bind Vm.DanmakuMergeMaxCosine, Mode=TwoWay}" />
+                                Value="{x:Bind Vm.DanmakuMergeMaxCosineDistance, Mode=TwoWay}" />
                         </controls:SettingsCard>
                         <controls:SettingsCard
                             x:Uid="/SettingsDialog/DanmakuMergeTimeSpanCard"

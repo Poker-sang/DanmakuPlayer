@@ -76,7 +76,7 @@ public record AdvancedDanmaku(
 
     public float GetOpacity(int timeMs)
     {
-        return (EndOpacity - StartOpacity) * timeMs / DurationMs + StartOpacity;
+        return ((EndOpacity - StartOpacity) * timeMs / DurationMs) + StartOpacity;
     }
 
     public Vector2 GetPosition(int timeMs, float width, float height)
@@ -98,13 +98,13 @@ public record AdvancedDanmaku(
                 var scale = ms / (float) ActionTimeMs;
                 if (LinearAccelerate)
                 {
-                    x = (EndPosition.X - StartPosition.X) * MathF.Pow(scale, 2) + StartPosition.X;
-                    y = (EndPosition.Y - StartPosition.Y) * MathF.Pow(scale, 2) + StartPosition.Y;
+                    x = ((EndPosition.X - StartPosition.X) * MathF.Pow(scale, 2)) + StartPosition.X;
+                    y = ((EndPosition.Y - StartPosition.Y) * MathF.Pow(scale, 2)) + StartPosition.Y;
                 }
                 else
                 {
-                    x = (EndPosition.X - StartPosition.X) * (2 * scale - MathF.Pow(scale, 2)) + StartPosition.X;
-                    y = (EndPosition.Y - StartPosition.Y) * (2 * scale - MathF.Pow(scale, 2)) + StartPosition.Y;
+                    x = ((EndPosition.X - StartPosition.X) * ((2 * scale) - MathF.Pow(scale, 2))) + StartPosition.X;
+                    y = ((EndPosition.Y - StartPosition.Y) * ((2 * scale) - MathF.Pow(scale, 2))) + StartPosition.Y;
                 }
                 break;
         }
