@@ -20,25 +20,25 @@ public class DanmakuCombiner : IDanmakuFilter
     /// <summary>
     /// 全角字符和部分英文标点
     /// </summary>
-    private const string FullAngleChars = "　０１２３４５６７８９!＠＃＄％＾＆＊()－＝＿＋［］｛｝;＇:＂,．／＜＞?＼｜｀～ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
+    private const string FullWidthChars = "　０１２３４５６７８９!＠＃＄％＾＆＊()－＝＿＋［］｛｝;＇:＂,．／＜＞?＼｜｀～ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
 
     /// <summary>
     /// 半角字符和部分中文标点
     /// </summary>
-    private const string HalfAngleChars = @" 0123456789！@#$%^&*（）-=_+[]{}；'：""，./<>？\|`~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private const string HalfWidthChars = @" 0123456789！@#$%^&*（）-=_+[]{}；'：""，./<>？\|`~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     public const int MinDanmakuSize = 10;
 
-    private static List<int> Gen2GramArray(string p)
+    private static IReadOnlyList<int> Gen2GramArray(string p)
     {
+        var res = new int[p.Length];
         p += p[0];
-        var res = new List<int>();
         for (var i = 0; i < p.Length - 1; ++i)
-            res.Add(p[i..(i + 1)].GetHashCode());
+            res[i] = p[i..(i + 1)].GetHashCode();
         return res;
     }
 
-    private static string ToSubscript(uint x) => x is 0 ? "" : ToSubscript(x / 10) + (char)(0x2080 + x % 10);
+    private static string ToSubscript(uint x) => x is 0 ? "" : ToSubscript(x / 10) + (char)(0x2080 + (x % 10));
 
     /// <remarks>abnormal edit distance</remarks>
     private static int EditDistance(string p, string q)
@@ -53,7 +53,7 @@ public class DanmakuCombiner : IDanmakuFilter
         return edCounts.Values.Sum(Math.Abs);
     }
 
-    private static double CosineDistanceSquare(List<int> p, List<int> q)
+    private static double CosineDistanceSquare(IReadOnlyList<int> p, IReadOnlyList<int> q)
     {
         var hashList = new Dictionary<int, int>();
         var vector = new List<int[]>();
@@ -100,14 +100,14 @@ public class DanmakuCombiner : IDanmakuFilter
             // 内容相近
             var dis = EditDistance(p.Original, q.Original);
             if (p.Length + q.Length < MinDanmakuSize
-                    ? dis < (p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize - 1
+                    ? dis < ((p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize) - 1
                     : dis <= appConfig.DanmakuMergeMaxDistance)
                 return true;
 
             // 谐音
             var pyDis = EditDistance(p.Pinyin, q.Pinyin);
             if (p.Length + q.Length < MinDanmakuSize
-                    ? pyDis < (p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize - 1
+                    ? pyDis < ((p.Length + q.Length) * appConfig.DanmakuMergeMaxDistance / MinDanmakuSize) - 1
                     : pyDis <= appConfig.DanmakuMergeMaxDistance)
                 return true;
 
@@ -171,8 +171,8 @@ public class DanmakuCombiner : IDanmakuFilter
                     _ = channel.Writer.TryWrite(oldestDanmaku);
                 }
 
-                for (var i = 0; i < FullAngleChars.Length; ++i)
-                    text = text.Replace(FullAngleChars[i], HalfAngleChars[i]);
+                for (var i = 0; i < FullWidthChars.Length; ++i)
+                    text = text.Replace(FullWidthChars[i], HalfWidthChars[i]);
 
                 var pinyin = "";
                 foreach (var c in danmaku.Text)
@@ -243,5 +243,5 @@ public class DanmakuCombiner : IDanmakuFilter
         return represent;
     }
 
-    private record DanmakuString(string Original, int Length, string Pinyin, List<int> Gram);
+    private record DanmakuString(string Original, int Length, string Pinyin, IReadOnlyList<int> Gram);
 }

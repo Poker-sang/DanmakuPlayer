@@ -6,23 +6,24 @@ namespace DanmakuPlayer.Services;
 
 public static class ColorHelper
 {
-    extension(uint color)
+    /// <param name="argbColor">ARGB格式的4*16位整型</param>
+    extension(uint argbColor)
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Color GetColor(float alpha = 1)
         {
-            return color.GetColor((byte) (0xFF * alpha));
+            return argbColor.GetColor((byte) (0xFF * alpha));
         }
 
         public Color GetColor(byte alpha = 0xFF)
         {
-            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref color), 4);
+            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref argbColor), 4);
             return Color.FromArgb(alpha, span[2], span[1], span[0]);
         }
 
         public Color GetAlphaColor()
         {
-            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref color), 4);
+            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref argbColor), 4);
             return Color.FromArgb(span[3], span[2], span[1], span[0]);
         }
     }

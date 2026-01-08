@@ -54,6 +54,34 @@ public partial class BackgroundPanelViewModel : ObservableObject
 
     public bool EnableWebView2 => AppConfig.EnableWebView2;
 
+    public bool HasWebViewVideo
+    {
+        private get;
+        set => field = EnableWebView2 && value;
+    }
+
+    public TimeSpan DanmakuTotalTime
+    {
+        get;
+        set
+        {
+            field = value;
+            if (HasWebViewVideo)
+                TotalTime = TimeSpan.Max(value, SubtitleTotalTime);
+        }
+    }
+
+    public TimeSpan SubtitleTotalTime
+    {
+        get;
+        set
+        {
+            field = value;
+            if (HasWebViewVideo)
+                TotalTime = TimeSpan.Max(value, DanmakuTotalTime);
+        }
+    }
+
     public bool LockWebView2
     {
         get => AppConfig.LockWebView2;

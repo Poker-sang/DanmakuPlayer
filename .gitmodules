@@ -1,0 +1,3 @@
+[submodule "AssParser"]
+	path = AssParser
+	url = https://github.com/Poker-sang/AssParser.git

@@ -144,10 +144,10 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
 
     public CanvasTextLayout GetNewLayout(Danmaku danmaku) => new(Creator, danmaku.Text, GetTextFormat(danmaku.Size * AppConfig.DanmakuScale), int.MaxValue, int.MaxValue);
 
-    public CanvasSolidColorBrush GetBrush(uint color, float alpha)
+    public CanvasSolidColorBrush GetBrush(uint argbColor, float alpha)
     {
-        if (!Brushes.TryGetValue(color, out var value))
-            Brushes[color] = value = new(Creator, color.GetColor(alpha));
+        if (!Brushes.TryGetValue(argbColor, out var value))
+            Brushes[argbColor] = value = new(Creator, argbColor.GetColor(alpha));
         return value;
     }
 

@@ -51,6 +51,7 @@
 		<PackageReference Include="WinUIEx" Version="2.9.0" />
 		<Manifest Include="$(ApplicationManifest)" />
 
+		<ProjectReference Include="..\AssParser\AssParser\AssParser.csproj" />
 		<ProjectReference Include="..\DanmakuPlayer.Proto\DanmakuPlayer.Proto.csproj" />
 	</ItemGroup>
 

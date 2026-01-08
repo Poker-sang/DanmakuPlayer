@@ -22,7 +22,7 @@ public static partial class AppContext
         InitializeConfiguration();
         AppConfig = LoadConfiguration() is not { } appConfigurations
 #if FIRST_TIME
-        || true
+            || true
 #endif
             ? new() : appConfigurations;
     }

@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.System;
-using Windows.UI.Core;
 using Bilibili.Community.Service.Dm.V1;
 using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models;
@@ -16,6 +14,8 @@ using DanmakuPlayer.Services;
 using DanmakuPlayer.Services.DanmakuServices;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace DanmakuPlayer.Views.Controls;
 
@@ -40,7 +40,7 @@ public partial class BackgroundPanel
 
             InfoBarService.Info(MainPanelResources.DanmakuLoading, Emoticon.Okay);
 
-            await LoadDanmakuAsync(async token =>
+            _ = await LoadDanmakuAsync(async token =>
             {
                 var tempPool = new List<Danmaku>();
                 var danmakuCount = 0;
@@ -99,19 +99,16 @@ public partial class BackgroundPanel
     /// 加载弹幕操作
     /// </summary>
     /// <param name="getDanmakuAsync"></param>
-    private async Task LoadDanmakuAsync(Func<CancellationToken, Task<IReadOnlyList<Danmaku>>> getDanmakuAsync)
+    private async Task<bool> LoadDanmakuAsync(Func<CancellationToken, Task<IReadOnlyList<Danmaku>>> getDanmakuAsync)
     {
+        var isPlaying = Vm.TempConfig.IsPlaying;
         Vm.TempConfig.IsPlaying = false;
 
         await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new();
 
-        if (!HasVideo)
-        {
-            Vm.TotalTime = TimeSpan.Zero;
-            Vm.Time = TimeSpan.Zero;
-        }
+        Vm.HasWebViewVideo = WebView.HasVideo;
 
         DanmakuHelper.ClearPool();
 
@@ -119,8 +116,7 @@ public partial class BackgroundPanel
         {
             var tempPool = await getDanmakuAsync(_cancellationTokenSource.Token);
 
-            if (!HasVideo)
-                Vm.TotalTime = TimeSpan.FromMilliseconds((tempPool.Count is 0 ? 0 : tempPool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
+            Vm.DanmakuTotalTime = TimeSpan.FromMilliseconds((tempPool.Count is 0 ? 0 : tempPool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
             InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
@@ -135,18 +131,22 @@ public partial class BackgroundPanel
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
 
             InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Count, filtrateRate, renderRate, totalRate), Emoticon.Okay);
+            return true;
         }
         catch (TaskCanceledException)
         {
-            return;
         }
         catch (Exception e)
         {
             Debug.WriteLine(e);
             InfoBarService.Error(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, e.Message);
         }
+        finally
+        {
+            Vm.TempConfig.IsPlaying = isPlaying;
+        }
 
-        Vm.TempConfig.IsPlaying = true;
+        return false;
     }
 
     public async void ReloadDanmaku(RenderMode renderType)
