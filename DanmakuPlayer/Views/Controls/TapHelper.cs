@@ -7,7 +7,7 @@ namespace DanmakuPlayer.Views.Controls;
 /// <summary>
 /// 阻止按钮把双击事件传递给背景
 /// </summary>
-public class TapHelper
+public static class TapHelper
 {
     public static readonly DependencyProperty DoubleTappedDisabledProperty =
         DependencyProperty.RegisterAttached(

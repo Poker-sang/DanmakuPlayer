@@ -1,15 +1,14 @@
 {
   "profiles": {
     "DanmakuPlayer": {
-      "commandName": "MsixPackage"
-    },
-    "DanmakuPlayer (Unpackaged)": {
-      "commandName": "Project"
-    },
-    "Remote": {
       "commandName": "MsixPackage",
-      "remoteDebugEnabled": true,
-      "remoteDebugMachine": "LAPTOP-576M8DKG"
+      "alwaysReinstallApp": "false",
+      "remoteDebugEnabled": false,
+      "allowLocalNetworkLoopbackProperty": true,
+      "authenticationMode": "Windows",
+      "doNotLaunchApp": false,
+      "remoteDebugMachine": "",
+      "nativeDebugging": false
     }
   }
 }

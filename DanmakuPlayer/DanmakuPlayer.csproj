@@ -29,7 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Labs.WinUI.DependencyPropertyGenerator" Version="0.1.251208-build.2408" />
+		<PackageReference Include="CommunityToolkit.Labs.WinUI.DependencyPropertyGenerator" Version="0.1.260109-build.2471" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
@@ -42,7 +42,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7463" />
 		<PackageReference Include="System.Drawing.Common" Version="10.0.1" />
 		<PackageReference Include="System.Linq.Async" Version="7.0.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="10.0.652802" />
@@ -52,6 +52,7 @@
 		<Manifest Include="$(ApplicationManifest)" />
 
 		<ProjectReference Include="..\AssParser\AssParser\AssParser.csproj" />
+		<ProjectReference Include="..\AutoSettingsPage\AutoSettingsPage.WinUI\AutoSettingsPage.WinUI.csproj" />
 		<ProjectReference Include="..\DanmakuPlayer.Proto\DanmakuPlayer.Proto.csproj" />
 	</ItemGroup>
 

@@ -1,3 +1,6 @@
 [submodule "AssParser"]
 	path = AssParser
 	url = https://github.com/Poker-sang/AssParser.git
+[submodule "AutoSettingsPage"]
+	path = AutoSettingsPage
+	url = https://github.com/Poker-sang/AutoSettingsPage.git

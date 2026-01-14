@@ -29,62 +29,68 @@ public static class DanmakuHelper
 
     public static void Rendering(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e, TimeSpan timeSpan, TempConfig tempConfig, AppConfig appConfig)
     {
-        var timeMs = (int)timeSpan.TotalMilliseconds;
-        if ((RenderType & RenderMode.RenderInit) is not 0)
+        try
         {
-            if ((RenderType & RenderMode.ReloadProvider) is not 0)
+            // None时无操作
+            var timeMs = (int) timeSpan.TotalMilliseconds;
+            if ((RenderType & RenderMode.RenderInit) is not 0)
             {
-                if ((RenderType & RenderMode.ReloadFormats) is not 0)
+                if ((RenderType & RenderMode.ReloadProvider) is not 0)
                 {
-                    CreatorProvider.DisposeFormats();
-                    RenderType &= ~RenderMode.ReloadFormats;
-                }
-
-                Current.Dispose();
-                Current = new(sender);
-                RenderType &= ~RenderMode.ReloadProvider;
-            }
-
-            var context = new DanmakuContext((float)Current.ViewHeight, appConfig);
-            var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
-            if (appConfig.RenderBefore)
-            {
-                if (appConfig.DanmakuEnableStrokes)
-                    foreach (var (danmakuString, layout) in Current.Layouts)
-                        Current.Geometries[danmakuString] = CanvasGeometry.CreateText(layout);
-            }
-            else
-                Current.ClearLayouts();
-
-            _RenderCount = count;
-            RenderType &= ~RenderMode.RenderInit;
-        }
-
-        if ((RenderType & RenderMode.RenderOnce) is not 0 || (RenderType & RenderMode.RenderAlways) is not 0)
-            using (e.DrawingSession)
-            {
-                e.DrawingSession.Clear(Colors.Transparent);
-
-                if (appConfig.RenderBefore)
-                    foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
-                        t.OnRender(e.DrawingSession, Current, timeMs);
-                else
-                {
-                    Current.ClearLayoutRefCount();
-                    foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
+                    if ((RenderType & RenderMode.ReloadFormats) is not 0)
                     {
-                        Current.AddLayoutRef(t);
-                        t.OnRender(e.DrawingSession, Current, timeMs);
+                        CreatorProvider.DisposeFormats();
+                        RenderType &= ~RenderMode.ReloadFormats;
                     }
 
-                    Current.ClearUnusedLayoutRef();
+                    Current.Dispose();
+                    Current = new(sender);
+                    RenderType &= ~RenderMode.ReloadProvider;
                 }
 
-                if ((RenderType & RenderMode.RenderOnce) is not 0)
-                    RenderType &= ~RenderMode.RenderOnce;
+                var context = new DanmakuContext((float) Current.ViewHeight, appConfig);
+                var count = Pool.Count(danmaku => danmaku.RenderInit(context, Current));
+                if (appConfig.RenderBefore)
+                {
+                    if (appConfig.DanmakuEnableStrokes)
+                        foreach (var (danmakuString, layout) in Current.Layouts)
+                            Current.Geometries[danmakuString] = CanvasGeometry.CreateText(layout);
+                }
+                else
+                    Current.ClearLayouts();
+
+                _RenderCount = count;
+                RenderType &= ~RenderMode.RenderInit;
             }
 
-        IsRendering = false;
+            if ((RenderType & RenderMode.RenderOnce) is not 0 || (RenderType & RenderMode.RenderAlways) is not 0)
+                using (e.DrawingSession)
+                {
+                    e.DrawingSession.Clear(Colors.Transparent);
+
+                    if (appConfig.RenderBefore)
+                        foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
+                            t.OnRender(e.DrawingSession, Current, timeMs);
+                    else
+                    {
+                        Current.ClearLayoutRefCount();
+                        foreach (var t in DisplayingDanmaku(timeMs, appConfig, tempConfig))
+                        {
+                            Current.AddLayoutRef(t);
+                            t.OnRender(e.DrawingSession, Current, timeMs);
+                        }
+
+                        Current.ClearUnusedLayoutRef();
+                    }
+
+                    if ((RenderType & RenderMode.RenderOnce) is not 0)
+                        RenderType &= ~RenderMode.RenderOnce;
+                }
+        }
+        finally
+        {
+            IsRendering = false;
+        }
     }
 
     public static void ClearPool() => Pool = [];

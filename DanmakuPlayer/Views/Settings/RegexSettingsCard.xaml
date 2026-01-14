@@ -1,0 +1,45 @@
+<controls:SettingsCard
+    x:Class="DanmakuPlayer.Views.Settings.RegexSettingsCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DanmakuPlayer.Views.Settings"
+    xmlns:markup="using:FluentIcons.WinUI.Markup"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    HorizontalContentAlignment="Stretch"
+    ContentAlignment="Vertical"
+    Tag="{x:Bind Entry.Token}"
+    mc:Ignorable="d">
+    <StackPanel Orientation="Vertical">
+        <AutoSuggestBox
+            PlaceholderText="{x:Bind Entry.Placeholder}"
+            QueryIcon="{markup:SymbolIcon Symbol=Add,
+                                          FontSize=16}"
+            QuerySubmitted="AddRegexPattern"
+            TextChanged="RegexPatternChanged" />
+        <InfoBar x:Name="RegexErrorInfoBar" IsClosable="True" />
+        <ListView
+            AllowDrop="True"
+            CanDragItems="True"
+            CanReorderItems="True"
+            ItemsSource="{x:Bind Entry.Value, Mode=OneWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Grid Tag="{x:Bind}" Tapped="RemoveTapped">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <SymbolIcon Grid.Column="1" Symbol="Cancel" />
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="{x:Bind}"
+                            TextAlignment="Left" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackPanel>
+</controls:SettingsCard>

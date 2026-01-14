@@ -12,6 +12,8 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="AssParser/AssParser/AssParser.csproj" />
+  <Project Path="AutoSettingsPage/AutoSettingsPage.WinUI/AutoSettingsPage.WinUI.csproj" />
+  <Project Path="AutoSettingsPage/AutoSettingsPage/AutoSettingsPage.csproj" />
   <Project Path="DanmakuPlayer.Proto/DanmakuPlayer.Proto.csproj" />
   <Project Path="DanmakuPlayer/DanmakuPlayer.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />

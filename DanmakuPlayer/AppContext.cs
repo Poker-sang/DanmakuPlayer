@@ -1,8 +1,9 @@
 using System;
 using System.IO;
-using Windows.ApplicationModel;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.Windows.Storage;
+using Windows.ApplicationModel;
+using Windows.Foundation.Collections;
 using WinUI3Utilities.Attributes;
 
 namespace DanmakuPlayer;
@@ -15,6 +16,8 @@ public static partial class AppContext
     public static AppConfig AppConfig { get; set; } = null!;
 
     public static CanvasAnimatedControl DanmakuCanvas { get; set; } = null!;
+
+    public static IPropertySet LocalConfig => _containerConfiguration.Values;
 
     public static void Initialize()
     {

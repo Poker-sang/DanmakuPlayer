@@ -1,5 +1,3 @@
-using System;
-
 namespace DanmakuPlayer.Enums;
 
 /// <summary>

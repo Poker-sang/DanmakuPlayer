@@ -233,9 +233,11 @@ public partial record Danmaku
         if (!(0 <= ms) || !(ms < provider.AppConfig.DanmakuActualDurationMs))
             return;
 
+        var danmakuOpacity = (float) provider.AppConfig.DanmakuOpacity;
+
         var layout = provider.Layouts[ToString()];
         var width = layout.LayoutBounds.Width;
-        var brush = provider.GetBrush(Color, provider.AppConfig.DanmakuOpacity);
+        var brush = provider.GetBrush(Color, danmakuOpacity);
 
         var pos = Mode switch
         {
@@ -250,8 +252,8 @@ public partial record Danmaku
         {
             var geometry = provider.Geometries[ToString()];
             ICanvasBrush outlineBrush = !provider.AppConfig.DanmakuDisableColorful && Colorful
-                ? provider.GetColorfulBrush(pos, width, provider.AppConfig.DanmakuOpacity / 2)
-                : provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, provider.AppConfig.DanmakuOpacity / 2);
+                ? provider.GetColorfulBrush(pos, width, danmakuOpacity / 2)
+                : provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, danmakuOpacity / 2);
             renderTarget.DrawGeometry(geometry, pos, outlineBrush, provider.AppConfig.DanmakuStrokeWidth);
         }
     }

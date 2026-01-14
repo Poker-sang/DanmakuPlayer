@@ -49,6 +49,9 @@ public sealed partial class BackgroundPanel : Grid
                     case nameof(Vm.FullScreen):
                         FullScreenChanged();
                         break;
+                    case nameof(Vm.EnableWebView2):
+                        Vm.FullScreen = !Vm.EnableWebView2;
+                        break;
                 }
             };
             Vm.TempConfig.PropertyChanged += async (o, e) =>

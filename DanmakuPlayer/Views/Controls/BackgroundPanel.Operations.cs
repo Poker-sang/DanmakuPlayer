@@ -260,7 +260,7 @@ public partial class BackgroundPanel
         await SyncAsync();
     }
 
-    public void TrySetPlaybackRate()
+    private void TrySetPlaybackRate()
     {
         _ = WebView.LockOperationsAsync(async operations => await operations.SetPlaybackRateAsync(Vm.ActualPlaybackRate));
     }

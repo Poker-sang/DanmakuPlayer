@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -65,7 +66,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
     /// <summary>
     /// 执行实际的弹幕合并操作
     /// </summary>
-    private async IAsyncEnumerable<DanmakuCluster> DoCombineAsync(IAsyncEnumerable<ProcessedDanmaku> danmakuList, AppConfig appConfig, CancellationToken token = default)
+    private async IAsyncEnumerable<DanmakuCluster> DoCombineAsync(IAsyncEnumerable<ProcessedDanmaku> danmakuList, AppConfig appConfig, [EnumeratorCancellation] CancellationToken token = default)
     {
         var nearbyQueue = new DanmakuQueue<List<ProcessedDanmaku>>();
         var thresholdMs = appConfig.DanmakuMergeTimeSpan * 1000;
@@ -129,13 +130,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
         .Where(danmaku => appConfig.DanmakuMergeProcessAdvanced || danmaku.Mode is not DanmakuMode.Advanced)
         .Where(danmaku => appConfig.DanmakuMergeProcessBottom || danmaku.Mode is not DanmakuMode.Bottom)
         .Where(danmaku => danmaku.Mode is not (DanmakuMode.Code or DanmakuMode.Bas))
-        .Select(t => new ProcessedDanmaku
-        {
-            Original = t,
-            NormalizedText = NormalizeText(t.DisplayText, appConfig),
-            IsWhitelisted = false,
-            SimilarityReason = "ORIG"
-        });
+        .Select(t => new ProcessedDanmaku(t, NormalizeText(t.DisplayText, appConfig), "ORIG"));
 
     /// <summary>
     /// 规范化文本
@@ -181,7 +176,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
     private static DanmakuCluster ApplyCluster(List<ProcessedDanmaku> items)
     {
         if (items.Count is 1)
-            return new DanmakuCluster(items, items[0].NormalizedText, []);
+            return new(items, items[0].NormalizedText);
 
         // 统计各个文本出现次数
         var textCounts = new Dictionary<string, int>();
@@ -208,7 +203,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
 
         var chosenText = SelectMedianLength(mostTexts);
 
-        return new DanmakuCluster(items, chosenText, mostCount > 1 ? [$"采用了出现 {mostCount} 次的文本"] : []);
+        return new(items, chosenText);
     }
 
     /// <summary>
@@ -227,7 +222,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
     /// <summary>
     /// 将簇转换为合并弹幕结果（包含模式提升、字号放缩等后处理）
     /// </summary>
-    private static async IAsyncEnumerable<Danmaku> ConvertClustersToDanmakuAsync(IAsyncEnumerable<DanmakuCluster> clusters, AppConfig appConfig, CancellationToken token = default)
+    private static async IAsyncEnumerable<Danmaku> ConvertClustersToDanmakuAsync(IAsyncEnumerable<DanmakuCluster> clusters, AppConfig appConfig, [EnumeratorCancellation] CancellationToken token = default)
     {
         const int displayValueTimeThreshold = 5000; // 5秒
         const double displayValuePower = 0.35;
@@ -615,27 +610,23 @@ public partial class DanmakuCombiner : IDanmakuFilter
     /// <summary>
     /// 内部使用的处理后弹幕对象
     /// </summary>
-    private class ProcessedDanmaku
+    private class ProcessedDanmaku(Danmaku original, string normalizedText, string similarityReason)
     {
-        public Danmaku Original { get; set; }
+        public Danmaku Original { get; set; } = original;
 
-        public string NormalizedText { get; set; }
+        public string NormalizedText { get; set; } = normalizedText;
 
-        public bool IsWhitelisted { get; set; }
-
-        public string SimilarityReason { get; set; }
+        public string SimilarityReason { get; set; } = similarityReason;
     }
 
     /// <summary>
     /// 弹幕簇
     /// </summary>
-    private class DanmakuCluster(List<ProcessedDanmaku> items, string chosenText, IReadOnlyList<string> descriptions)
+    private class DanmakuCluster(List<ProcessedDanmaku> items, string chosenText)
     {
         public List<ProcessedDanmaku> Items { get; } = items;
 
         public string ChosenText { get; } = chosenText;
-
-        public IReadOnlyList<string> Descriptions { get; } = descriptions;
     }
 
     /// <summary>
@@ -707,7 +698,7 @@ public partial class DanmakuCombiner : IDanmakuFilter
                 Str.Push(c);
 
             // gen pinyin
-            if (appConfig.UsePinYin)
+            if (appConfig.DanmakuMergeEnablePinYin)
             {
                 const ushort pinyinBase = 0xE000; // U+E000 ~ U+F8FF: Private Use Area
 
