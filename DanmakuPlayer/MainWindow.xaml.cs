@@ -49,10 +49,4 @@ public sealed partial class MainWindow : Window
             cyTopHeight = 1
         });
     }
-
-    ~MainWindow()
-    {
-        DanmakuHelper.Current.Dispose();
-        CreatorProvider.DisposeFormats();
-    }
 }

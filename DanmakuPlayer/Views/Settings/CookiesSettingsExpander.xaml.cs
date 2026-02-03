@@ -32,7 +32,7 @@ public sealed partial class CookiesSettingsExpander : IEntryControl<CookiesSetti
         var cookieText = await Clipboard.GetContent().GetTextAsync();
         try
         {
-            if (JsonSerializer.Deserialize(cookieText, typeof(Cookie[]), CookieSerializerContext.Default) is Cookie[] { Length: > 2 } cookie)
+            if (JsonSerializer.Deserialize(cookieText, CookieSerializerContext.Default.CookieArray) is { Length: > 2 } cookie)
             {
                 Entry.Value = cookie.ToDictionary(c => c.Name, c => c.Value);
                 return;

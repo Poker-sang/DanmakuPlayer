@@ -16,12 +16,15 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Windows.System;
 using Windows.UI.Core;
+using AssParser;
 
 namespace DanmakuPlayer.Views.Controls;
 
 public partial class BackgroundPanel
 {
-    private CancellationTokenSource _cancellationTokenSource = new();
+    private CancellationTokenSource _danmakuLoadingSource = new();
+    private CancellationTokenSource _danmakuSource = new();
+    private CancellationTokenSource _subtitleSource = new();
     private DateTime _lastTime;
     private bool _isRightPressing;
     private TimeOnly _lastPressTime;
@@ -104,33 +107,36 @@ public partial class BackgroundPanel
         var isPlaying = Vm.TempConfig.IsPlaying;
         Vm.TempConfig.IsPlaying = false;
 
-        await _cancellationTokenSource.CancelAsync();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
+        await _danmakuSource.CancelAsync();
+        await _danmakuLoadingSource.CancelAsync();
+        _danmakuLoadingSource.Dispose();
+        _danmakuSource.Dispose();
+        _danmakuLoadingSource = new();
+        _danmakuSource = new();
 
         Vm.HasWebViewVideo = WebView.HasVideo;
 
-        DanmakuHelper.ClearPool();
+        RenderHelper.ClearPool();
 
         try
         {
-            var tempPool = await getDanmakuAsync(_cancellationTokenSource.Token);
+            var tempPool = await getDanmakuAsync(_danmakuLoadingSource.Token);
 
             Vm.DanmakuTotalTime = TimeSpan.FromMilliseconds((tempPool.Count is 0 ? 0 : tempPool[^1].TimeMs) + Vm.AppConfig.DanmakuActualDurationMs);
 
             InfoBarService.Info(string.Format(MainPanelResources.ObtainedAndFiltrating, tempPool.Count), Emoticon.Okay);
 
-            DanmakuHelper.Pool = await tempPool.ToAsyncEnumerable().FiltrateAsync(Vm.AppConfig, _cancellationTokenSource.Token).ToListAsync();
+            RenderHelper.Pool = await tempPool.ToAsyncEnumerable().FiltrateAsync(Vm.AppConfig, _danmakuLoadingSource.Token).ToListAsync();
 
-            var filtrateRate = tempPool.Count is 0 ? 0 : DanmakuHelper.Pool.Count * 100 / tempPool.Count;
+            var filtrateRate = tempPool.Count is 0 ? 0 : RenderHelper.Pool.Count * 100 / tempPool.Count;
 
-            InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, DanmakuHelper.Pool.Count, filtrateRate), Emoticon.Okay);
+            InfoBarService.Info(string.Format(MainPanelResources.FiltratedAndRendering, RenderHelper.Pool.Count, filtrateRate), Emoticon.Okay);
 
-            var renderedCount = await DanmakuHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _cancellationTokenSource.Token);
-            var renderRate = DanmakuHelper.Pool.Count is 0 ? 0 : renderedCount * 100 / DanmakuHelper.Pool.Count;
+            var renderedCount = await RenderHelper.RenderAsync(DanmakuCanvas, RenderMode.RenderInit, _danmakuSource.Token);
+            var renderRate = RenderHelper.Pool.Count is 0 ? 0 : renderedCount * 100 / RenderHelper.Pool.Count;
             var totalRate = tempPool.Count is 0 ? 0 : renderedCount * 100 / tempPool.Count;
 
-            InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, DanmakuHelper.Pool.Count, filtrateRate, renderRate, totalRate), Emoticon.Okay);
+            InfoBarService.Success(string.Format(MainPanelResources.DanmakuReady, RenderHelper.Pool.Count, filtrateRate, renderRate, totalRate), Emoticon.Okay);
             return true;
         }
         catch (TaskCanceledException)
@@ -149,20 +155,52 @@ public partial class BackgroundPanel
         return false;
     }
 
-    public async void ReloadDanmaku(RenderMode renderType)
+    /// <summary>
+    /// 加载弹幕操作
+    /// </summary>
+    private async Task<bool> LoadSubtitleAsync(Stream assFile)
     {
-        if (DanmakuHelper.Pool.Count is 0)
-            return;
+        await _subtitleSource.CancelAsync();
+        _subtitleSource.Dispose();
+        _subtitleSource = new();
 
-        Vm.TempConfig.IsPlaying = false;
-
-        await _cancellationTokenSource.CancelAsync();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
+        RenderHelper.ClearSubtitle();
 
         try
         {
-            _ = await DanmakuHelper.RenderAsync(DanmakuCanvas, renderType, _cancellationTokenSource.Token);
+            var assSubtitleModel = await AssSubtitleParser.ParseAsync(assFile, StrictnessLevel.Strict, _subtitleSource.Token);
+
+            assSubtitleModel.Events.Sort((x, y) => x.Start.CompareTo(y.Start));
+            Vm.SubtitleTotalTime = assSubtitleModel.Events.Max(t => t.End);
+            RenderHelper.Model = assSubtitleModel;
+            _ = await RenderHelper.RenderAsync(DanmakuCanvas, RenderMode.SubtitleRenderInit, _subtitleSource.Token);
+
+            InfoBarService.Success(MainPanelResources.SubtitleReady, Emoticon.Okay);
+            return true;
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+            InfoBarService.Error(Emoticon.Depressed + " " + MainPanelResources.ExceptionThrown, e.Message);
+        }
+
+        return false;
+    }
+
+    public async void ReloadDanmaku(RenderMode renderType)
+    {
+        Vm.TempConfig.IsPlaying = false;
+
+        await _danmakuSource.CancelAsync();
+        _danmakuSource.Dispose();
+        _danmakuSource = new();
+
+        try
+        {
+            _ = await RenderHelper.RenderAsync(DanmakuCanvas, renderType, _danmakuSource.Token);
         }
         catch (TaskCanceledException)
         {
@@ -171,10 +209,6 @@ public partial class BackgroundPanel
 
         Vm.TempConfig.IsPlaying = true;
     }
-
-    public void ResetProvider() => ReloadDanmaku(RenderMode.ReloadProvider);
-
-    public void DanmakuFontChanged() => ReloadDanmaku(RenderMode.ReloadFormats);
 
     #region 播放及暂停
 
@@ -243,7 +277,7 @@ public partial class BackgroundPanel
 
     private async Task ResumeAsync()
     {
-        DanmakuHelper.RenderType = RenderMode.RenderAlways;
+        RenderHelper.RenderType = RenderMode.RenderAlways;
         Vm.IsPlaying = true;
         await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
         // 傻逼WebView的视频播放后一段时间内IsPlaying仍然为false
@@ -253,7 +287,7 @@ public partial class BackgroundPanel
 
     private async Task PauseAsync()
     {
-        DanmakuHelper.RenderType = RenderMode.RenderOnce;
+        RenderHelper.RenderType = RenderMode.RenderOnce;
         Vm.IsPlaying = false;
         await WebView.LockOperationsAsync(async operations => await operations.PauseAsync());
         await Task.Delay(500);

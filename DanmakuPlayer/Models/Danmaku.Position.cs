@@ -10,7 +10,7 @@ namespace DanmakuPlayer.Models;
 
 public partial record Danmaku
 {
-    private double GetDistance(CreatorProvider provider, IDanmakuWidth previous)
+    private double GetDistance(DanmakuCreatorProvider provider, IDanmakuWidth previous)
     {
         var timeMs = _layoutWidth <= previous.LayoutWidth
             ? TimeMs
@@ -32,16 +32,16 @@ public partial record Danmaku
     /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool TopDownRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
+    private bool TopDownRollDanmaku(DanmakuCreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
         // 目前可用区间中，距离上条弹幕的最大距离
         var mostDistance = allowOverlap ? double.NegativeInfinity : 0;
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
-        var firstNode = null as RollNode;
+        RollNode? firstNode = null;
         // 插入的最后一个区间（靠下）
-        var lastNode = null as RollNode;
+        RollNode? lastNode = null;
         // 应该放置的位置（取左上角位置）
         var pos = 0f;
         // 是否重叠
@@ -117,14 +117,14 @@ public partial record Danmaku
     /// <param name="allowOverlap"></param>
     /// <param name="overlapPredicate"></param>
     /// <returns></returns>
-    private bool BottomUpRollDanmaku(CreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
+    private bool BottomUpRollDanmaku(DanmakuCreatorProvider provider, DanmakuRoomRollList list, bool allowOverlap, Func<bool, bool> overlapPredicate)
     {
         // 目前可用区间中，距离上条弹幕的最大距离
         var mostDistance = allowOverlap ? double.NegativeInfinity : 0;
         // 插入的第一个区间（靠下）
-        var firstNode = null as RollNode;
+        RollNode? firstNode = null;
         // 插入的最后一个区间（靠上）
-        var lastNode = null as RollNode;
+        RollNode? lastNode = null;
         // 应该放置的位置（取左下角位置）
         var pos = 0f;
         // 是否重叠
@@ -210,9 +210,9 @@ public partial record Danmaku
         // 本区间开始位置（上一个区间的结束位置）
         var lastPos = 0f;
         // 插入的第一个区间（靠上）
-        var firstNode = (StaticNode?)null;
+        StaticNode? firstNode = null;
         // 插入的最后一个区间（靠下）
-        var lastNode = (StaticNode?)null;
+        StaticNode? lastNode = null;
         // 应该放置的位置（取左上角位置）
         var pos = 0f;
         // 是否重叠
@@ -287,9 +287,9 @@ public partial record Danmaku
         // 目前可用区间中，上条弹幕最短的显示时间
         var leastTime = allowOverlap ? double.PositiveInfinity : TimeMs;
         // 插入的第一个区间（靠下）
-        var firstNode = (StaticNode?)null;
+        StaticNode? firstNode = null;
         // 插入的最后一个区间（靠上）
-        var lastNode = (StaticNode?)null;
+        StaticNode? lastNode = null;
         // 应该放置的位置（取左下角位置）
         var pos = 0f;
         // 是否重叠

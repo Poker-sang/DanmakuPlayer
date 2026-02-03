@@ -28,9 +28,6 @@ public partial class SettingsViewModel : ObservableObject
                 .Bool(t => t.TopMost,
                     // 需要setter中设置OverlappedPresenter.IsAlwaysOnTop，所以不能直接用RaisePropertyChanged
                     entry => entry.ValueChanged += t => getBackgroundPanel().Vm.TopMost = t))
-            .NewGroup(SettingsDialogResources.RenderingHeaderText)
-            .Config(group => group
-                .Bool(t => t.RenderBefore))
             .NewGroup(SettingsDialogResources.PlayHeaderText)
             .Config(group => group
                 .Int(t => t.PlayFastForward, 1, 20, 1)

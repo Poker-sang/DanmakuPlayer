@@ -24,7 +24,9 @@ public partial record Danmaku(
 {
     public string DisplayText => this is { Mode: DanmakuMode.Advanced, AdvancedInfo: { } advancedInfo } ? advancedInfo.Text : Text;
 
-    public override string ToString() => $"{Text},{Color},{Size}";
+    private readonly string _token = $"{Text},{Color},{Size}";
+
+    public override string ToString() => _token;
 
     public static Danmaku Parse(DanmakuElem elem)
     {

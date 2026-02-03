@@ -13,7 +13,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 
 namespace DanmakuPlayer.Services;
 
-public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposable
+public partial class DanmakuCreatorProvider(ICanvasAnimatedControl creator) : IDisposable
 {
     public ICanvasResourceCreator Creator { get; } = creator;
 
@@ -22,9 +22,9 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822 // 将成员标记为 static
 
-    public double ViewWidth { get; } = creator.Size.Width;
+    public float ViewWidth { get; } = (float) creator.Size.Width;
 
-    public double ViewHeight { get; } = creator.Size.Height;
+    public float ViewHeight { get; } = (float) creator.Size.Height;
 
     /// <summary>
     /// 颜色和对应笔刷
@@ -62,7 +62,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
         ColorfulBrush?.Dispose();
         ColorfulBrush = null;
 
-        ClearLayouts();
+        DisposeLayouts();
     }
 
     public static void DisposeFormats()
@@ -72,7 +72,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
         Formats.Clear();
     }
 
-    public void ClearLayouts()
+    public void DisposeLayouts()
     {
         foreach (var layout in Layouts)
             layout.Value.Dispose();
@@ -151,7 +151,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
         return value;
     }
 
-    public CanvasLinearGradientBrush GetColorfulBrush(Vector2 position, double width, float alpha)
+    public CanvasLinearGradientBrush GetColorfulBrush(Vector2 position, float width, float alpha)
     {
         var brush = ColorfulBrush ??=
             // B站网页使用的颜色
@@ -160,7 +160,7 @@ public partial class CreatorProvider(ICanvasAnimatedControl creator) : IDisposab
                 Opacity = alpha
             };
         brush.StartPoint = position;
-        brush.EndPoint = position + new Vector2((float)width, 0f);
+        brush.EndPoint = position + new Vector2(width, 0f);
         return brush;
     }
 

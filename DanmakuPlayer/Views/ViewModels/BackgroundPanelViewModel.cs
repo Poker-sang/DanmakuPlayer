@@ -66,7 +66,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
         set
         {
             field = value;
-            if (HasWebViewVideo)
+            if (!HasWebViewVideo)
                 TotalTime = TimeSpan.Max(value, SubtitleTotalTime);
         }
     }
@@ -77,7 +77,7 @@ public partial class BackgroundPanelViewModel : ObservableObject
         set
         {
             field = value;
-            if (HasWebViewVideo)
+            if (!HasWebViewVideo)
                 TotalTime = TimeSpan.Max(value, DanmakuTotalTime);
         }
     }
@@ -172,6 +172,9 @@ public partial class BackgroundPanelViewModel : ObservableObject
     public AppConfig AppConfig => AppContext.AppConfig;
 #pragma warning restore CA1822
 
+    /// <summary>
+    /// 临时配置，不影响UI等
+    /// </summary>
     public TempConfig TempConfig { get; } = new();
 
     private CancellationTokenSource? _cts;

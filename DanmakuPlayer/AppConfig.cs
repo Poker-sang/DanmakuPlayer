@@ -34,17 +34,6 @@ public partial record AppConfig()
 
     #endregion
 
-    #region 渲染设置
-
-    /// <summary>
-    /// 提前渲染并存储，会占用更高内存
-    /// </summary>
-    /// <remarks>default: <see langword="false"/></remarks>
-    [SettingsEntry(Symbol.History, nameof(RenderBeforeCardHeader), nameof(RenderBeforeCardDescription))]
-    public bool RenderBefore { get; set; }
-
-    #endregion
-
     #region 播放设置
 
     /// <summary>

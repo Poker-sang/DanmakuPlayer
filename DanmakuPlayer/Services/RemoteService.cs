@@ -48,7 +48,7 @@ public class RemoteService : IAsyncDisposable
         try
         {
             var rooms = await new Uri(_serverUrl, "rooms").DownloadStreamAsync(token);
-            return (IList<RoomInfo>) (await JsonSerializer.DeserializeAsync(rooms, typeof(IList<RoomInfo>), RemoteSerializerContext.Default, token))!;
+            return (await JsonSerializer.DeserializeAsync(rooms, RemoteSerializerContext.Default.IListRoomInfo, token))!;
         }
         catch (Exception)
         {
@@ -124,7 +124,7 @@ public class RemoteService : IAsyncDisposable
         if (!IsConnected)
             return;
 
-        var buffer = JsonSerializer.SerializeToUtf8Bytes(status, typeof(RemoteStatus), RemoteSerializerContext.Default);
+        var buffer = JsonSerializer.SerializeToUtf8Bytes(status, RemoteSerializerContext.Default.RemoteStatus);
         await _webSocket.SendAsync(
             buffer,
             WebSocketMessageType.Text,
@@ -145,8 +145,7 @@ public class RemoteService : IAsyncDisposable
                 if (result.MessageType is WebSocketMessageType.Close)
                     return;
 
-                var status = (Message) JsonSerializer.Deserialize(new ReadOnlySpan<byte>(buffer, 0, result.Count),
-                    typeof(Message), RemoteSerializerContext.Default)!;
+                var status = JsonSerializer.Deserialize(new ReadOnlySpan<byte>(buffer, 0, result.Count), RemoteSerializerContext.Default.Message)!;
 
                 MessageReceived?.Invoke(this, status);
             }

@@ -52,4 +52,29 @@ public static class ColorHelper
             return ret;
         }
     }
+
+    extension(System.Drawing.Color color)
+    {
+        public uint GetUInt(byte alpha = 0xFF)
+        {
+            var ret = 0u;
+            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref ret), 4);
+            span[0] = color.B;
+            span[1] = color.G;
+            span[2] = color.R;
+            span[3] = alpha;
+            return ret;
+        }
+
+        public uint GetAlphaUInt()
+        {
+            var ret = 0u;
+            var span = MemoryMarshal.CreateSpan(ref Unsafe.As<uint, byte>(ref ret), 4);
+            span[0] = color.B;
+            span[1] = color.G;
+            span[2] = color.R;
+            span[3] = color.A;
+            return ret;
+        }
+    }
 }

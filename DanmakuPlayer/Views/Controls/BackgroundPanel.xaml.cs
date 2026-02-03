@@ -11,7 +11,6 @@ using DanmakuPlayer.Enums;
 using DanmakuPlayer.Models.Remote;
 using DanmakuPlayer.Resources;
 using DanmakuPlayer.Services;
-using DanmakuPlayer.Services.DanmakuServices;
 using DanmakuPlayer.Views.ViewModels;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -64,19 +63,19 @@ public sealed partial class BackgroundPanel : Grid
                     case nameof(Vm.TempConfig.IsPlaying):
                         if (o.To<TempConfig>().IsPlaying)
                         {
-                            DanmakuHelper.RenderType = RenderMode.RenderAlways;
+                            RenderHelper.RenderType = RenderMode.RenderAlways;
                             await WebView.LockOperationsAsync(async operations => await operations.PlayAsync());
                         }
                         else
                         {
-                            DanmakuHelper.RenderType = RenderMode.RenderOnce;
+                            RenderHelper.RenderType = RenderMode.RenderOnce;
                             await WebView.LockOperationsAsync(async operations => await operations.PauseAsync());
                         }
 
                         break;
                 }
             };
-            Vm.ResetProvider += ResetProvider;
+            Vm.ResetProvider += () => ReloadDanmaku(RenderMode.ReloadProvider);
 
             InitializeComponent();
             FullScreenChanged();
@@ -125,18 +124,23 @@ public sealed partial class BackgroundPanel : Grid
 
     private void MaximizeRestoreDoubleTapped(object sender, RoutedEventArgs e) => Vm.IsMaximized = !Vm.IsMaximized;
 
-    private void RootSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (DanmakuHelper.Pool.Count is 0)
-            return;
-
-        ReloadDanmaku(RenderMode.ReloadProvider);
-    }
+    private void RootSizeChanged(object sender, SizeChangedEventArgs e) => ReloadDanmaku(RenderMode.ReloadProvider | RenderMode.SubtitleRenderInit);
 
     private void RootUnloaded(object sender, RoutedEventArgs e)
     {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
+        try
+        {
+            _danmakuLoadingSource.Cancel();
+            _danmakuSource.Cancel();
+            _subtitleSource.Cancel();
+            _danmakuLoadingSource.Dispose();
+            _danmakuSource.Dispose();
+            _subtitleSource.Dispose();
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     #endregion
@@ -214,11 +218,14 @@ public sealed partial class BackgroundPanel : Grid
 
             var file = await new FileOpenPicker(App.Window.AppWindow.Id).PickSingleFileAsync();
             if (file is not null)
-                await LoadDanmakuAsync(async token =>
+            {
+                await using var stream = File.OpenAsyncRead(file.Path);
+                if (!await LoadSubtitleAsync(stream))
                 {
-                    await using var stream = File.OpenAsyncRead(file.Path);
-                    return BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToArray();
-                });
+                    stream.Position = 0;
+                    _ = await LoadDanmakuAsync(async token => BiliHelper.ToDanmaku(await XDocument.LoadAsync(stream, LoadOptions.None, token)).ToArray());
+                }
+            }
         }
         finally
         {
@@ -281,7 +288,7 @@ public sealed partial class BackgroundPanel : Grid
     }
 
     [SuppressMessage("Performance", "CA1822:将成员标记为 static")]
-    private void DanmakuCanvasCreateResources(CanvasAnimatedControl sender, CanvasCreateResourcesEventArgs e) => DanmakuHelper.Current = new(sender);
+    private void DanmakuCanvasCreateResources(CanvasAnimatedControl sender, CanvasCreateResourcesEventArgs e) => RenderHelper.CreateResource(sender);
 
     private void DanmakuCanvasDraw(ICanvasAnimatedControl sender, CanvasAnimatedDrawEventArgs e)
     {
@@ -290,12 +297,12 @@ public sealed partial class BackgroundPanel : Grid
         if (Vm.TurnOffDanmaku)
             e.DrawingSession.Clear(Colors.Transparent);
         else
-            DanmakuHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.TempConfig, Vm.AppConfig);
+            RenderHelper.Rendering(sender, e, Vm.Time - Vm.DanmakuDelayTime, Vm.TempConfig, Vm.AppConfig);
     }
 
     #endregion
 
-    #region WebView视频控制
+    #region 远程同步
 
     public async void OnMessageReceived(object? sender, Message message)
     {
@@ -303,21 +310,21 @@ public sealed partial class BackgroundPanel : Grid
         {
             case MessageTypes.Login:
             {
-                var info = (LoginInfo) JsonSerializer.Deserialize(message.Data, typeof(LoginInfo), RemoteSerializerContext.Default)!;
+                var info = JsonSerializer.Deserialize(message.Data, RemoteSerializerContext.Default.LoginInfo)!;
                 DialogRemote.ConnectedCount = info.Current.TotalConnectedClients;
                 InfoBarService.Info(string.Format(MainPanelResources.RemoteUserLogin, info.UserName), Emoticon.Okay);
                 break;
             }
             case MessageTypes.Exit:
             {
-                var info = (LoginInfo) JsonSerializer.Deserialize(message.Data, typeof(LoginInfo), RemoteSerializerContext.Default)!;
+                var info = JsonSerializer.Deserialize(message.Data, RemoteSerializerContext.Default.LoginInfo)!;
                 DialogRemote.ConnectedCount = info.Current.TotalConnectedClients;
                 InfoBarService.Info(string.Format(MainPanelResources.RemoteUserExit, info.UserName), Emoticon.Depressed);
                 break;
             }
             case MessageTypes.StatusUpdate:
             {
-                Status = (RemoteStatus) JsonSerializer.Deserialize(message.Data, typeof(RemoteStatus), RemoteSerializerContext.Default)!;
+                Status = JsonSerializer.Deserialize(message.Data, RemoteSerializerContext.Default.RemoteStatus)!;
                 break;
             }
             case MessageTypes.SendCurrentStatus:
@@ -357,6 +364,10 @@ public sealed partial class BackgroundPanel : Grid
             Vm.FullScreen = Vm.IsPlaying = Vm.Mute = false;
         }
     }
+
+    #endregion
+
+    #region WebView视频控制
 
     private void PlaybackRateOnSelectionChanged(RadioMenuFlyout sender)
     {

@@ -27,12 +27,17 @@ public enum RenderMode
     RenderInit = 1 << 2,
 
     /// <summary>
-    /// 重新加载<see cref="CreatorProvider"/>
+    /// 字幕渲染初始化
     /// </summary>
-    ReloadProvider = (1 << 3) | RenderInit,
+    SubtitleRenderInit = 1 << 3,
 
     /// <summary>
-    /// 重新加载<see cref="CreatorProvider.Formats"/>
+    /// 重新加载<see cref="DanmakuCreatorProvider"/>
     /// </summary>
-    ReloadFormats = (1 << 4) | ReloadProvider,
+    ReloadProvider = (1 << 4) | RenderInit,
+
+    /// <summary>
+    /// 重新加载<see cref="DanmakuCreatorProvider.Formats"/>
+    /// </summary>
+    ReloadFormats = (1 << 5) | ReloadProvider
 }

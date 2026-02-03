@@ -43,7 +43,7 @@ public partial record Danmaku
     /// 初始化渲染
     /// </summary>
     /// <returns>是否需要渲染</returns>
-    public bool RenderInit(DanmakuContext context, CreatorProvider provider)
+    public bool RenderInit(DanmakuContext context, DanmakuCreatorProvider provider)
     {
         NeedRender = false;
 
@@ -85,7 +85,7 @@ public partial record Danmaku
         })
             return false;
 
-        var layoutExists = provider.Layouts.TryGetValue(ToString(), out var layout);
+        var layoutExists = provider.Layouts.TryGetValue(_token, out var layout);
         if (!layoutExists)
             layout = provider.GetNewLayout(this);
         _layoutWidth = layout!.LayoutBounds.Width;
@@ -116,7 +116,7 @@ public partial record Danmaku
         }
 
         if (!layoutExists)
-            provider.Layouts.Add(ToString(), layout);
+            provider.Layouts.Add(_token, layout);
 
         switch (Mode)
         {
@@ -163,98 +163,107 @@ public partial record Danmaku
         }
     }
 
-    public void OnRender(CanvasDrawingSession renderTarget, CreatorProvider provider, int timeMs)
+    private void OnRenderAdvanced(CanvasDrawingSession renderTarget, DanmakuCreatorProvider provider, int timeMs)
     {
-        if (!NeedRender)
+        if (timeMs >= AdvancedInfo!.DurationMs)
             return;
 
-        var ms = timeMs - TimeMs;
-
-        if (Mode is DanmakuMode.Advanced)
+        CanvasDrawingSession drawingSession;
+        CanvasCommandList? commandList = null;
+        if (AdvancedInfo.YFlip is 0)
+            drawingSession = renderTarget;
+        else
         {
-            if (!(0 <= ms) || !(ms < AdvancedInfo!.DurationMs))
-                return;
-
-            CanvasDrawingSession drawingSession;
-            CanvasCommandList? commandList = null;
-            if (AdvancedInfo.YFlip is 0)
-                drawingSession = renderTarget;
-            else
-            {
-                commandList = new(renderTarget);
-                drawingSession = commandList.CreateDrawingSession();
-            }
-
-            var aPos = AdvancedInfo.GetPosition(ms, (float) provider.ViewWidth, (float) provider.ViewHeight);
-            var aOpacity = AdvancedInfo.GetOpacity(ms);
-            using var aBrush = new CanvasSolidColorBrush(drawingSession, Color.GetColor(aOpacity));
-            using var aFormat = new CanvasTextFormat();
-            aFormat.FontFamily = AdvancedInfo.Font;
-            aFormat.FontSize = Size;
-            using var aLayout = new CanvasTextLayout(drawingSession, AdvancedInfo.Text, aFormat, int.MaxValue,
-                int.MaxValue);
-
-            var lastTransform = drawingSession.Transform;
-
-            if (AdvancedInfo.ZFlip is not 0)
-                drawingSession.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, aPos);
-
-            drawingSession.DrawTextLayout(aLayout, aPos, aBrush);
-
-            if (AdvancedInfo.Outline)
-            {
-                using var aGeometry = CanvasGeometry.CreateText(aLayout);
-                using var aOutlineBrush = new CanvasSolidColorBrush(drawingSession,
-                    provider.AppConfig.DanmakuStrokeColor.GetColor(aOpacity / 2));
-                drawingSession.DrawGeometry(aGeometry, aPos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
-            }
-
-            drawingSession.Transform = lastTransform;
-
-            // Y轴翻转需使用3D变换
-            if (commandList is not null)
-            {
-                // reference: https://github.com/cotaku/DanmakuFrostMaster/blob/main/DanmakuFrostMaster/DanmakuRender.cs
-                using var effect = new Transform3DEffect();
-                var rotation = Matrix4x4.CreateRotationY(AdvancedInfo.YFlip, new(aPos, 0));
-                rotation.M14 = (float) -(1 / aLayout.LayoutBounds.Width * Math.Sin(AdvancedInfo.YFlip)); // Perspective transform
-                rotation *= Matrix4x4.CreateTranslation((float) (aLayout.LayoutBounds.Width / 2), (float)
-                    (aLayout.LayoutBounds.Height / 2), 0); // Move back to original position
-                effect.TransformMatrix = rotation;
-                effect.Source = commandList;
-                renderTarget.DrawImage(effect);
-                drawingSession.Dispose();
-                commandList.Dispose();
-            }
-
-            return;
+            commandList = new(renderTarget);
+            drawingSession = commandList.CreateDrawingSession();
         }
 
-        if (!(0 <= ms) || !(ms < provider.AppConfig.DanmakuActualDurationMs))
+        var pos = AdvancedInfo.GetPosition(timeMs, provider.ViewWidth, provider.ViewHeight);
+        var opacity = AdvancedInfo.GetOpacity(timeMs);
+        using var brush = new CanvasSolidColorBrush(drawingSession, Color.GetColor(opacity));
+        using var format = new CanvasTextFormat();
+        format.FontFamily = AdvancedInfo.Font;
+        format.FontSize = Size;
+        using var layout = new CanvasTextLayout(drawingSession, AdvancedInfo.Text, format, int.MaxValue, int.MaxValue);
+        var width = (float) layout.LayoutBounds.Width;
+
+        var lastTransform = drawingSession.Transform;
+
+        if (AdvancedInfo.ZFlip is not 0)
+            drawingSession.Transform = Matrix3x2.CreateRotation(AdvancedInfo.ZFlip, pos);
+
+        drawingSession.DrawTextLayout(layout, pos, brush);
+
+        if (AdvancedInfo.Outline)
+        {
+            using var aGeometry = CanvasGeometry.CreateText(layout);
+            using var aOutlineBrush = new CanvasSolidColorBrush(drawingSession,
+                provider.AppConfig.DanmakuStrokeColor.GetColor(opacity / 2));
+            drawingSession.DrawGeometry(aGeometry, pos, aOutlineBrush, provider.AppConfig.DanmakuStrokeWidth);
+        }
+
+        drawingSession.Transform = lastTransform;
+
+        // Y轴翻转需使用3D变换
+        if (commandList is not null)
+        {
+            // reference: https://github.com/cotaku/DanmakuFrostMaster/blob/main/DanmakuFrostMaster/DanmakuRender.cs
+            using var effect = new Transform3DEffect();
+            var rotation = Matrix4x4.CreateRotationY(AdvancedInfo.YFlip, new(pos, 0));
+            rotation.M14 = -(1 / width * MathF.Sin(AdvancedInfo.YFlip)); // Perspective transform
+            rotation *= Matrix4x4.CreateTranslation(width / 2, (float)
+                (layout.LayoutBounds.Height / 2), 0); // Move back to original position
+            effect.TransformMatrix = rotation;
+            effect.Source = commandList;
+            renderTarget.DrawImage(effect);
+            drawingSession.Dispose();
+            commandList.Dispose();
+        }
+    }
+
+    private void OnRenderNormal(CanvasDrawingSession renderTarget, DanmakuCreatorProvider provider, int timeMs)
+    {
+        if (timeMs >= provider.AppConfig.DanmakuActualDurationMs)
             return;
 
         var danmakuOpacity = (float) provider.AppConfig.DanmakuOpacity;
 
-        var layout = provider.Layouts[ToString()];
-        var width = layout.LayoutBounds.Width;
+        var layout = provider.Layouts[_token];
+        var width = (float) layout.LayoutBounds.Width;
         var brush = provider.GetBrush(Color, danmakuOpacity);
 
         var pos = Mode switch
         {
-            DanmakuMode.Roll => new Vector2((float)(provider.ViewWidth - ((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs)), _showPositionY),
+            DanmakuMode.Roll => new Vector2(provider.ViewWidth - ((provider.ViewWidth + width) * timeMs / provider.AppConfig.DanmakuActualDurationMs), _showPositionY),
             DanmakuMode.Bottom or DanmakuMode.Top => new(_showPositionX, _showPositionY),
-            DanmakuMode.Inverse => new((float)(((provider.ViewWidth + width) * ms / provider.AppConfig.DanmakuActualDurationMs) - width), _showPositionY),
+            DanmakuMode.Inverse => new(((provider.ViewWidth + width) * timeMs / provider.AppConfig.DanmakuActualDurationMs) - width, _showPositionY),
             _ => throw new ArgumentOutOfRangeException(nameof(Mode))
         };
         renderTarget.DrawTextLayout(layout, pos, brush);
 
         if (provider.AppConfig.DanmakuEnableStrokes)
         {
-            var geometry = provider.Geometries[ToString()];
+            var geometry = provider.Geometries[_token];
             ICanvasBrush outlineBrush = !provider.AppConfig.DanmakuDisableColorful && Colorful
                 ? provider.GetColorfulBrush(pos, width, danmakuOpacity / 2)
                 : provider.GetBrush(provider.AppConfig.DanmakuStrokeColor, danmakuOpacity / 2);
             renderTarget.DrawGeometry(geometry, pos, outlineBrush, provider.AppConfig.DanmakuStrokeWidth);
         }
+    }
+
+    public void OnRender(CanvasDrawingSession renderTarget, DanmakuCreatorProvider provider, int timeMs)
+    {
+        if (!NeedRender)
+            return;
+
+        var ms = timeMs - TimeMs;
+
+        if (0 > timeMs)
+            return;
+
+        if (Mode is DanmakuMode.Advanced)
+            OnRenderAdvanced(renderTarget, provider, ms);
+        else
+            OnRenderNormal(renderTarget, provider, ms);
     }
 }

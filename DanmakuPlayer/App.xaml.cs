@@ -52,6 +52,7 @@ public partial class App : Application
                 Title = nameof(DanmakuPlayer),
                 IconPath = new(AppContext.ApplicationUriToPath(new("ms-appx:///Assets/DanmakuPlayer.ico")))
             });
+            Window.Closed += (_, _) => RenderHelper.DisposeProviders();
             Window.RegisterUnhandledExceptionHandler();
             Window.Activate();
         }

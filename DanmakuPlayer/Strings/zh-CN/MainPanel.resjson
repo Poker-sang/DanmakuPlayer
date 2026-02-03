@@ -1,6 +1,7 @@
 {
   "DanmakuLoading": "弹幕装填中...",
   "DanmakuReady": "{0}条弹幕已就绪，装载率{1}%*{2}%={3}%",
+  "SubtitleReady": "字幕已就绪",
   "ExceptionThrown": "发生异常了",
   "FiltratedAndRendering": "已过滤为{0}条弹幕，剩余{1}%，正在计算渲染",
   "ObtainedAndFiltrating": "已获取{0}条弹幕，正在过滤",
