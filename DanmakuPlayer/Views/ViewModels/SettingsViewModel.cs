@@ -110,10 +110,15 @@ public partial class SettingsViewModel : ObservableObject
         _ = await Launcher.LaunchUriAsync(new(sender.Token));
     }
 
-    private static readonly IReadOnlyList<EnumStringPair<object>> _Themes =
+    private static readonly IReadOnlyList<StringPair> _Themes =
     [
         new(ElementTheme.Default, SettingsDialogResources.RadioButtonSystemThemeContent),
         new(ElementTheme.Light, SettingsDialogResources.RadioButtonLightThemeContent),
         new(ElementTheme.Dark, SettingsDialogResources.RadioButtonDarkThemeContent)
     ];
+
+    private record StringPair(object Value, string Description) : IReadOnlyStringPair<object>
+    {
+        public override string ToString() => Description;
+    }
 }
